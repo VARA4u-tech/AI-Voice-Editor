@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from "react";
+import { Download } from "lucide-react";
 import FloatingParticles from "@/components/FloatingParticles";
 import GoldDivider from "@/components/GoldDivider";
 import MicButton from "@/components/MicButton";
@@ -11,7 +12,6 @@ import CommandHelp from "@/components/CommandHelp";
 import useSpeechRecognition from "@/hooks/useSpeechRecognition";
 import { parseDocument, type ParsedDocument } from "@/lib/documentParser";
 import { processVoiceCommand } from "@/lib/voiceCommands";
-import logo from "@/assets/logo.png";
 
 const Index = () => {
   const [fileName, setFileName] = useState("");
@@ -36,7 +36,6 @@ const Index = () => {
         return;
       }
 
-      // Handle undo specially
       if (/^undo$/i.test(command.trim())) {
         if (history.length > 0) {
           const prev = history[history.length - 1];
@@ -75,11 +74,9 @@ const Index = () => {
     stopListening,
   } = useSpeechRecognition();
 
-  // When user stops listening, process the command
   const handleMicToggle = useCallback(() => {
     if (isListening) {
       stopListening();
-      // Process the transcript as a command after a brief delay
       setTimeout(() => {
         const cmd = transcript || "";
         if (cmd.trim()) {
@@ -122,6 +119,18 @@ const Index = () => {
     }
   };
 
+  const handleExport = () => {
+    const content = paragraphs.join("\n\n");
+    const blob = new Blob([content], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    const base = fileName ? fileName.replace(/\.[^.]+$/, "") : "document";
+    a.download = `${base}-edited.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const displayTranscript =
     transcript + (interimTranscript ? (transcript ? " " : "") + interimTranscript : "");
 
@@ -141,12 +150,12 @@ const Index = () => {
         {/* Moon Phase */}
         <MoonPhaseAnimation />
 
-        {/* Logo */}
-        <img
-          src={logo}
-          alt="All I See"
-          className="w-56 h-56 sm:w-72 sm:h-72 object-contain drop-shadow-[0_0_40px_hsl(var(--gold)/0.2)]"
-        />
+        {/* Decorative gold symbol instead of logo image */}
+        <div className="my-6 flex flex-col items-center gap-1">
+          <span className="text-primary/50 text-sm tracking-[0.4em]">✦ ✧ ✦</span>
+          <span className="text-5xl drop-shadow-[0_0_20px_hsl(var(--gold)/0.3)]">☽</span>
+          <span className="text-primary/50 text-sm tracking-[0.4em]">✦ ✧ ✦</span>
+        </div>
 
         {/* Title */}
         <div className="text-center space-y-2 mb-6">
@@ -160,12 +169,29 @@ const Index = () => {
 
         <GoldDivider />
 
-        {/* Upload */}
-        <UploadButton
-          onUpload={handleUpload}
-          hasFile={!!fileName}
-          fileName={fileName}
-        />
+        {/* Upload + Export row */}
+        <div className="flex items-center gap-4">
+          <UploadButton
+            onUpload={handleUpload}
+            hasFile={!!fileName}
+            fileName={fileName}
+          />
+
+          {paragraphs.length > 0 && (
+            <button
+              onClick={handleExport}
+              className="group flex items-center gap-2 px-6 py-3
+                border border-primary/60 bg-transparent
+                text-primary font-heading text-sm tracking-[0.2em] uppercase
+                transition-all duration-300
+                hover:border-primary hover:bg-primary/5
+                gold-glow-hover cursor-pointer animate-fade-in"
+            >
+              <Download className="w-4 h-4 transition-transform duration-300 group-hover:translate-y-0.5" />
+              Export
+            </button>
+          )}
+        </div>
 
         {!isSupported && (
           <p className="text-destructive/80 font-body text-sm italic mt-2">
@@ -179,7 +205,6 @@ const Index = () => {
           <GoldWaveform isActive={isListening} />
           <StatusIndicator status={isListening ? "listening" : "idle"} />
 
-          {/* Live transcript while listening */}
           {displayTranscript && isListening && (
             <p className="font-body text-sm text-primary/60 italic text-center max-w-sm animate-fade-in">
               "{displayTranscript}"
