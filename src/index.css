@@ -116,7 +116,10 @@
   }
 
   .emerald-gradient-bg {
-    background: radial-gradient(ellipse at center, hsl(var(--emerald-mid)) 0%, hsl(var(--emerald-deep)) 70%);
+    background: 
+      radial-gradient(ellipse at 30% 20%, hsl(170 45% 18% / 0.6) 0%, transparent 50%),
+      radial-gradient(ellipse at 70% 80%, hsl(170 50% 14% / 0.5) 0%, transparent 50%),
+      radial-gradient(ellipse at center, hsl(var(--emerald-mid)) 0%, hsl(var(--emerald-deep)) 80%);
   }
 
   .gold-divider {

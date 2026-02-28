@@ -5,7 +5,6 @@ import MicButton from "@/components/MicButton";
 import UploadButton from "@/components/UploadButton";
 import StatusIndicator from "@/components/StatusIndicator";
 import PreviewArea from "@/components/PreviewArea";
-import MoonPhaseAnimation from "@/components/MoonPhaseAnimation";
 import GoldWaveform from "@/components/GoldWaveform";
 import useSpeechRecognition from "@/hooks/useSpeechRecognition";
 import logo from "@/assets/logo.png";
@@ -24,8 +23,6 @@ const Index = () => {
     stopListening,
   } = useSpeechRecognition();
 
-  const status = isListening ? "listening" : transcript ? "idle" : "idle";
-
   const handleMicToggle = () => {
     if (isListening) {
       stopListening();
@@ -43,7 +40,6 @@ const Index = () => {
     if (file) {
       setFileName(file.name);
       setFileLoaded(false);
-      // Simulate load transition
       setTimeout(() => setFileLoaded(true), 300);
     }
   };
@@ -51,7 +47,7 @@ const Index = () => {
   const displayTranscript = transcript + (interimTranscript ? (transcript ? " " : "") + interimTranscript : "");
 
   return (
-    <div className="relative min-h-screen emerald-gradient-bg flex items-center justify-center p-4 overflow-hidden">
+    <div className="relative min-h-screen emerald-gradient-bg flex flex-col items-center justify-center p-4 overflow-hidden">
       <FloatingParticles />
 
       <input
@@ -62,23 +58,22 @@ const Index = () => {
         className="hidden"
       />
 
-      <main className="relative z-10 flex flex-col items-center gap-5 w-full max-w-xl animate-fade-in">
-        {/* Moon Phase */}
-        <MoonPhaseAnimation />
-
-        {/* Logo */}
-        <img
-          src={logo}
-          alt="All I See - Voice PDF Editor"
-          className="w-28 h-28 object-contain opacity-90 transition-transform duration-700 hover:scale-105"
-        />
+      <main className="relative z-10 flex flex-col items-center w-full max-w-xl animate-fade-in">
+        {/* Hero Logo — Large & Centered like the reference image */}
+        <div className="flex flex-col items-center mb-8">
+          <img
+            src={logo}
+            alt="All I See"
+            className="w-56 h-56 sm:w-72 sm:h-72 object-contain drop-shadow-[0_0_40px_hsl(var(--gold)/0.2)]"
+          />
+        </div>
 
         {/* Title */}
-        <div className="text-center space-y-3">
-          <h1 className="font-heading text-3xl sm:text-4xl tracking-[0.15em] text-primary gold-text-glow uppercase">
+        <div className="text-center space-y-2 mb-6">
+          <h1 className="font-heading text-2xl sm:text-3xl tracking-[0.2em] text-primary gold-text-glow uppercase">
             Voice PDF Editor
           </h1>
-          <p className="font-body text-xl text-foreground/70 italic">
+          <p className="font-body text-lg text-foreground/60 italic">
             Edit your documents with voice
           </p>
         </div>
@@ -95,21 +90,21 @@ const Index = () => {
         </div>
 
         {!isSupported && (
-          <p className="text-destructive/80 font-body text-sm italic">
+          <p className="text-destructive/80 font-body text-sm italic mt-2">
             Speech recognition is not supported in this browser
           </p>
         )}
 
         {/* Mic + Waveform */}
-        <div className="flex flex-col items-center gap-4 my-2">
+        <div className="flex flex-col items-center gap-3 my-6">
           <MicButton isListening={isListening} onClick={handleMicToggle} />
           <GoldWaveform isActive={isListening} />
-          <StatusIndicator status={isListening ? "listening" : status} />
+          <StatusIndicator status={isListening ? "listening" : "idle"} />
         </div>
 
         <GoldDivider />
 
-        {/* Preview with fade transition */}
+        {/* Preview */}
         <div
           className={`w-full transition-all duration-700 ${
             displayTranscript || fileName
@@ -120,9 +115,8 @@ const Index = () => {
           <PreviewArea hasFile={!!fileName} transcript={displayTranscript} />
         </div>
 
-        {/* Interim indicator */}
         {interimTranscript && (
-          <p className="text-primary/40 font-body text-sm italic animate-pulse">
+          <p className="text-primary/40 font-body text-sm italic animate-pulse mt-2">
             Still listening...
           </p>
         )}
