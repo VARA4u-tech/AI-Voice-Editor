@@ -1,0 +1,460 @@
+@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 170 60% 8%;
+    --foreground: 43 50% 85%;
+
+    --card: 170 55% 10%;
+    --card-foreground: 43 50% 85%;
+
+    --popover: 170 55% 10%;
+    --popover-foreground: 43 50% 85%;
+
+    --primary: 43 56% 52%;
+    --primary-foreground: 170 60% 8%;
+
+    --secondary: 170 40% 15%;
+    --secondary-foreground: 43 50% 85%;
+
+    --muted: 170 35% 14%;
+    --muted-foreground: 170 20% 50%;
+
+    --accent: 43 56% 52%;
+    --accent-foreground: 170 60% 8%;
+
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 43 40% 30%;
+    --input: 43 40% 25%;
+    --ring: 43 56% 52%;
+
+    --radius: 0.25rem;
+
+    --gold: 43 56% 52%;
+    --gold-light: 43 60% 70%;
+    --gold-glow: 43 80% 55%;
+    --emerald-deep: 170 60% 8%;
+    --emerald-mid: 170 50% 15%;
+    --emerald-light: 170 40% 22%;
+
+    --sidebar-background: 170 55% 10%;
+    --sidebar-foreground: 43 50% 85%;
+    --sidebar-primary: 43 56% 52%;
+    --sidebar-primary-foreground: 170 60% 8%;
+    --sidebar-accent: 170 40% 15%;
+    --sidebar-accent-foreground: 43 50% 85%;
+    --sidebar-border: 43 40% 25%;
+    --sidebar-ring: 43 56% 52%;
+
+    --font-heading: "Cinzel", serif;
+    --font-body: "Cormorant Garamond", serif;
+  }
+
+  .dark {
+    --background: 170 60% 8%;
+    --foreground: 43 50% 85%;
+    --card: 170 55% 10%;
+    --card-foreground: 43 50% 85%;
+    --popover: 170 55% 10%;
+    --popover-foreground: 43 50% 85%;
+    --primary: 43 56% 52%;
+    --primary-foreground: 170 60% 8%;
+    --secondary: 170 40% 15%;
+    --secondary-foreground: 43 50% 85%;
+    --muted: 170 35% 14%;
+    --muted-foreground: 170 20% 50%;
+    --accent: 43 56% 52%;
+    --accent-foreground: 170 60% 8%;
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 43 40% 30%;
+    --input: 43 40% 25%;
+    --ring: 43 56% 52%;
+    --sidebar-background: 170 55% 10%;
+    --sidebar-foreground: 43 50% 85%;
+    --sidebar-primary: 43 56% 52%;
+    --sidebar-primary-foreground: 170 60% 8%;
+    --sidebar-accent: 170 40% 15%;
+    --sidebar-accent-foreground: 43 50% 85%;
+    --sidebar-border: 43 40% 25%;
+    --sidebar-ring: 43 56% 52%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-body);
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--gold) / 0.5) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      hsl(var(--gold) / 0.4),
+      transparent
+    );
+    border-radius: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--gold) / 0.6);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+  }
+}
+
+@layer components {
+  .gold-glow {
+    box-shadow:
+      0 0 20px hsl(var(--gold) / 0.15),
+      0 0 60px hsl(var(--gold) / 0.05);
+  }
+
+  .gold-glow-hover:hover {
+    box-shadow:
+      0 0 25px hsl(var(--gold) / 0.3),
+      0 0 80px hsl(var(--gold) / 0.1);
+  }
+
+  .gold-text-glow {
+    text-shadow: 0 0 20px hsl(var(--gold) / 0.3);
+  }
+
+  .emerald-gradient-bg {
+    background: 
+      /* Layers of 'watercolor' stains to create organic blooming effect */
+      radial-gradient(
+        circle at 30% 20%,
+        rgba(0, 80, 80, 0.5) 0%,
+        transparent 60%
+      ),
+      radial-gradient(
+        circle at 70% 80%,
+        rgba(0, 100, 100, 0.4) 0%,
+        transparent 60%
+      ),
+      /* Central soft golden glow to warm the document workspace */
+        radial-gradient(
+          circle at 50% 50%,
+          rgba(191, 149, 63, 0.12) 0%,
+          transparent 70%
+        ),
+      /* Base dark teal foundation */
+        linear-gradient(135deg, #012a2a 0%, #004d4d 100%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .emerald-gradient-bg::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+    /* Deep vignette for that 'spotlight' focus in the center */
+    background: radial-gradient(
+      ellipse at center,
+      transparent 20%,
+      rgba(0, 10, 10, 0.9) 100%
+    );
+    mix-blend-mode: multiply;
+  }
+
+  .emerald-gradient-bg::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.25;
+    /* More organic watercolor/paper texture for tactile feel */
+    background-image: url("https://www.transparenttextures.com/patterns/handmade-paper.png");
+    background-size: 600px 600px;
+    mix-blend-mode: soft-light;
+  }
+
+  .mystical-stars-bg {
+    background-image:
+      radial-gradient(
+        1px 1px at 15% 25%,
+        hsl(var(--gold) / 0.4),
+        hsl(var(--gold) / 0)
+      ),
+      radial-gradient(
+        1.5px 1.5px at 45% 15%,
+        hsl(var(--gold) / 0.3),
+        hsl(var(--gold) / 0)
+      ),
+      radial-gradient(
+        2px 2px at 75% 35%,
+        hsl(var(--gold) / 0.5),
+        hsl(var(--gold) / 0)
+      ),
+      radial-gradient(
+        1px 1px at 25% 65%,
+        hsl(var(--gold) / 0.3),
+        hsl(var(--gold) / 0)
+      ),
+      radial-gradient(
+        1.5px 1.5px at 85% 75%,
+        hsl(var(--gold) / 0.4),
+        hsl(var(--gold) / 0)
+      ),
+      radial-gradient(
+        2px 2px at 55% 85%,
+        hsl(var(--gold) / 0.2),
+        hsl(var(--gold) / 0)
+      );
+    background-size: 250px 250px;
+    animation: driftStars 120s linear infinite;
+  }
+
+  .sacred-geometry {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.15;
+    background-image:
+      radial-gradient(
+        circle at center,
+        transparent 30%,
+        hsl(var(--background) / 1) 70%
+      ),
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 40px,
+        hsl(var(--gold) / 0.1) 40px,
+        hsl(var(--gold) / 0.1) 41px
+      ),
+      repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 40px,
+        hsl(var(--gold) / 0.1) 40px,
+        hsl(var(--gold) / 0.1) 41px
+      );
+    background-size:
+      100% 100%,
+      40px 40px,
+      40px 40px;
+    background-position: center center;
+    mask-image: radial-gradient(circle at center, black 20%, transparent 60%);
+    -webkit-mask-image: radial-gradient(
+      circle at center,
+      black 20%,
+      transparent 60%
+    );
+  }
+
+  /* Complex rotating orbital rings */
+  .orbital-rings::before,
+  .orbital-rings::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .orbital-rings::before {
+    width: 120vw;
+    height: 120vw;
+    border: 1px dashed hsl(var(--gold) / 0.15);
+    animation: spinReverse 120s linear infinite;
+  }
+
+  .orbital-rings::after {
+    width: 80vw;
+    height: 80vw;
+    border: 1px solid hsl(var(--gold) / 0.08);
+    animation: spin 90s linear infinite;
+  }
+
+  .gold-divider {
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      hsl(var(--gold) / 0.5),
+      transparent
+    );
+  }
+
+  .mic-pulse {
+    animation: micPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .float-particle {
+    animation: floatUp 6s ease-in-out infinite;
+  }
+}
+
+@keyframes scan {
+  0% {
+    transform: translateY(-30px);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0px);
+    opacity: 0;
+  }
+}
+
+@keyframes micPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 hsl(var(--gold) / 0.3);
+  }
+  50% {
+    box-shadow: 0 0 0 20px hsl(var(--gold) / 0);
+  }
+}
+
+@keyframes floatUp {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateY(-20px) scale(1.2);
+    opacity: 0.7;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes driftStars {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 250px -250px;
+  }
+}
+
+@keyframes spin {
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@keyframes spinReverse {
+  100% {
+    transform: translate(-50%, -50%) rotate(-360deg);
+  }
+}
+
+.mystical-gold-text {
+  background: linear-gradient(
+    to bottom right,
+    #bf953f 0%,
+    #fcf6ba 25%,
+    #b38728 50%,
+    #fbf5b7 75%,
+    #aa771c 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: inline-block;
+  text-shadow: 0 4px 20px rgba(191, 149, 63, 0.4);
+  font-family: var(--font-heading);
+  letter-spacing: 0.1em;
+  font-weight: 300;
+  transform: scaleY(1.3) scaleX(0.85);
+}
+
+.gold-svg-stroke {
+  stroke: url(#gold-foil-svg);
+}
+
+.gold-svg-fill {
+  fill: url(#gold-foil-svg);
+}
+
+.parchment-bg {
+  background-image:
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(191, 149, 63, 0.05) 0%,
+      transparent 80%
+    ),
+    url("https://www.transparenttextures.com/patterns/p6.png");
+  background-color: rgba(0, 40, 40, 0.4);
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.3);
+}
+
+.ink-flow {
+  animation: inkFlow 3s ease-out forwards;
+  position: relative;
+  overflow: hidden;
+}
+
+.ink-flow::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    hsl(var(--gold) / 0.1),
+    transparent
+  );
+  animation: shimmer 4s linear infinite;
+}
+
+@keyframes inkFlow {
+  0% {
+    background-color: hsl(var(--gold) / 0.15);
+    box-shadow: 0 0 20px hsl(var(--gold) / 0.2);
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: 0 0 0px transparent;
+  }
+}
