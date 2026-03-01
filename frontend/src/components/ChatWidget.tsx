@@ -11,7 +11,7 @@ interface Message {
 
 interface ChatWidgetProps {
   paragraphs: string[];
-  onCommand: (command: string) => Promise<any>;
+  onCommand: (command: string) => Promise<unknown>;
 }
 
 const ChatWidget = ({ paragraphs, onCommand }: ChatWidgetProps) => {
@@ -58,11 +58,18 @@ const ChatWidget = ({ paragraphs, onCommand }: ChatWidgetProps) => {
 
       let responseText = "Command processed. No specific output recorded.";
 
-      if (result) {
-        if (result.scribeResponse?.content) {
-          responseText = result.scribeResponse.content;
-        } else if (result.message) {
-          responseText = result.message;
+      if (result && typeof result === "object") {
+        const res = result as Record<string, unknown>;
+        if (
+          res.scribeResponse &&
+          typeof res.scribeResponse === "object" &&
+          (res.scribeResponse as Record<string, unknown>).content
+        ) {
+          responseText = String(
+            (res.scribeResponse as Record<string, unknown>).content,
+          );
+        } else if (typeof res.message === "string") {
+          responseText = res.message;
         }
       }
 

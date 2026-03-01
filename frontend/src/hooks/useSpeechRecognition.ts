@@ -10,20 +10,43 @@ interface UseSpeechRecognitionResult {
   resetTranscript: () => void;
 }
 
-interface SpeechRecognitionEvent {
-  results: SpeechRecognitionResultList;
-  resultIndex: number;
+// SpeechRecognitionErrorEvent is NOT reliably present in globalThis across all
+// TypeScript versions, so we define a minimal local interface instead.
+interface SpeechRecognitionErrorEvent extends Event {
+  readonly error: string;
+  readonly message: string;
 }
 
-interface SpeechRecognitionErrorEvent {
-  error: string;
+// Minimal interface describing the SpeechRecognition *instance* we use,
+// so we don't depend on the global `SpeechRecognition` type which isn't
+// reliably available in every TypeScript DOM lib version.
+interface SpeechRecognitionInstance extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  onresult: ((event: any) => void) | null;
+  onerror: ((event: SpeechRecognitionErrorEvent) => void) | null;
+  onend: (() => void) | null;
+  start(): void;
+  stop(): void;
+  abort(): void;
+}
+
+// Constructor type for SpeechRecognition.
+interface SpeechRecognitionConstructor {
+  new (): SpeechRecognitionInstance;
+}
+
+interface WindowWithSpeechRecognition extends Window {
+  SpeechRecognition?: SpeechRecognitionConstructor;
+  webkitSpeechRecognition?: SpeechRecognitionConstructor;
 }
 
 const useSpeechRecognition = (): UseSpeechRecognitionResult => {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [interimTranscript, setInterimTranscript] = useState("");
-  const recognitionRef = useRef<any>(null);
+  const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
 
   const isSupported =
     typeof window !== "undefined" &&
@@ -32,15 +55,14 @@ const useSpeechRecognition = (): UseSpeechRecognitionResult => {
   useEffect(() => {
     if (!isSupported) return;
 
-    const SpeechRecognition =
-      (window as any).SpeechRecognition ||
-      (window as any).webkitSpeechRecognition;
+    const w = window as WindowWithSpeechRecognition;
+    const SpeechRecognition = w.SpeechRecognition || w.webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
     recognition.continuous = true;
     recognition.interimResults = true;
     recognition.lang = "en-US";
 
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
+    recognition.onresult = (event: any) => {
       let final = "";
       let interim = "";
       for (let i = event.resultIndex; i < event.results.length; i++) {

@@ -373,7 +373,7 @@ const commands: CommandPattern[] = [
 
       // Simulated AI Tone Shifting logic
       if (tone === "professional") {
-        rewritten = `It should be noted that ${original.charAt(0).toLowerCase()}${original.slice(1).replace(/\!|\?/g, ".")}`;
+        rewritten = `It should be noted that ${original.charAt(0).toLowerCase()}${original.slice(1).replace(/[!?]/g, ".")}`;
         if (!rewritten.endsWith(".")) rewritten += " regarding this matter.";
       } else if (tone === "poetic") {
         rewritten = `Like gold upon velvet, ${original.charAt(0).toLowerCase()}${original.slice(1)}`;
