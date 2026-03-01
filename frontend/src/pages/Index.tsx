@@ -56,6 +56,8 @@ const Index = () => {
     fileName,
   );
   const [history, setHistory] = useState<string[][]>([]);
+  const [future, setFuture] = useState<string[][]>([]);
+  const [showHistoryPanel, setShowHistoryPanel] = useState(false);
   const [pageCount, setPageCount] = useState(saved?.pageCount ?? 0);
   const [isParsing, setIsParsing] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -166,6 +168,7 @@ const Index = () => {
       if (/^undo$/i.test(trimmedCmd)) {
         if (history.length > 0) {
           const prev = history[history.length - 1];
+          setFuture((f) => [...f, paragraphs]); // save current for redo
           setParagraphs(prev);
           setHistory((h) => h.slice(0, -1));
           setCommandFeedback("Undone last change.");
@@ -173,6 +176,25 @@ const Index = () => {
           playSuccess();
         } else {
           setCommandFeedback("Nothing to undo.");
+          setCommandSuccess(false);
+          playError();
+        }
+        clearFeedback();
+        return;
+      }
+
+      // 1b. Handle Redo (voice command)
+      if (/^redo$/i.test(trimmedCmd)) {
+        if (future.length > 0) {
+          const next = future[future.length - 1];
+          setFuture((f) => f.slice(0, -1));
+          setHistory((h) => [...h, paragraphs]);
+          setParagraphs(next);
+          setCommandFeedback("Redone last undone change.");
+          setCommandSuccess(true);
+          playSuccess();
+        } else {
+          setCommandFeedback("Nothing to redo.");
           setCommandSuccess(false);
           playError();
         }
@@ -317,6 +339,65 @@ const Index = () => {
         (e.target as HTMLElement)?.isContentEditable;
       if (isTyping) return;
 
+      // Escape — exit Focus Mode
+      if (e.key === "Escape") {
+        setIsFocusMode(false);
+        return;
+      }
+      // Ctrl+Shift+F — toggle Focus Mode
+      if (
+        (e.ctrlKey || e.metaKey) &&
+        e.shiftKey &&
+        e.key.toLowerCase() === "f"
+      ) {
+        e.preventDefault();
+        setIsFocusMode((prev) => !prev);
+        return;
+      }
+      // Ctrl+Z — Undo
+      if (
+        (e.ctrlKey || e.metaKey) &&
+        !e.shiftKey &&
+        e.key.toLowerCase() === "z"
+      ) {
+        e.preventDefault();
+        if (history.length > 0) {
+          const prev = history[history.length - 1];
+          setFuture((f) => [...f, paragraphs]);
+          setParagraphs(prev);
+          setHistory((h) => h.slice(0, -1));
+          setCommandFeedback(
+            `↩ Undo — ${history.length - 1} step${history.length - 1 !== 1 ? "s" : ""} left`,
+          );
+          setCommandSuccess(true);
+          playSuccess();
+          clearFeedback();
+        }
+        return;
+      }
+      // Ctrl+Y — Redo
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "y") {
+        e.preventDefault();
+        if (future.length > 0) {
+          const next = future[future.length - 1];
+          setFuture((f) => f.slice(0, -1));
+          setHistory((h) => [...h, paragraphs]);
+          setParagraphs(next);
+          setCommandFeedback(
+            `↪ Redo — ${future.length - 1} step${future.length - 1 !== 1 ? "s" : ""} left`,
+          );
+          setCommandSuccess(true);
+          playSuccess();
+          clearFeedback();
+        }
+        return;
+      }
+      // Ctrl+H — toggle History Panel
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "h") {
+        e.preventDefault();
+        setShowHistoryPanel((p) => !p);
+        return;
+      }
       // Space bar — hold-to-talk feel (toggle)
       if (e.code === "Space" && !e.ctrlKey && !e.metaKey && !e.altKey) {
         e.preventDefault();
@@ -331,7 +412,7 @@ const Index = () => {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [handleMicToggle]);
+  }, [handleMicToggle, isFocusMode]);
 
   const handleUpload = () => {
     playClick();
@@ -513,10 +594,51 @@ const Index = () => {
       <FloatingParticles />
       <ChatWidget paragraphs={paragraphs} onCommand={handleCommand} />
 
-      {/* Focus Mode Backdrop overlay */}
+      {/* ──────────────── Focus Mode Layers ──────────────── */}
+      {/* 1. Deep vignette that covers the full screen */}
       <div
-        className={`fixed inset-0 z-0 bg-background/60 backdrop-blur-sm pointer-events-none transition-opacity duration-1000 ${isFocusMode ? "opacity-100" : "opacity-0"}`}
+        className={`fixed inset-0 z-[5] pointer-events-none transition-opacity duration-700 ${
+          isFocusMode ? "opacity-100" : "opacity-0"
+        }`}
+        style={{
+          background:
+            "radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.92) 100%)",
+        }}
       />
+      {/* 2. Blur overlay for background chrome */}
+      <div
+        className={`fixed inset-0 z-[4] bg-background/80 backdrop-blur-sm pointer-events-none transition-opacity duration-700 ${
+          isFocusMode ? "opacity-100" : "opacity-0"
+        }`}
+      />
+      {/* 3. Pulsing ambient glow behind the document */}
+      {isFocusMode && (
+        <div
+          className="fixed z-[6] pointer-events-none"
+          style={{
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "72vw",
+            height: "60vh",
+            background:
+              "radial-gradient(ellipse at center, hsl(var(--accent)/0.06) 0%, transparent 70%)",
+            animation: "pulse 4s ease-in-out infinite",
+          }}
+        />
+      )}
+      {/* 4. Floating Exit Focus Mode pill */}
+      {isFocusMode && (
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[60] animate-fade-in">
+          <button
+            onClick={() => setIsFocusMode(false)}
+            className="flex items-center gap-2.5 px-6 py-2.5 bg-background/80 border border-accent/30 backdrop-blur-md text-accent font-tech text-[10px] uppercase tracking-[0.25em] hover:bg-accent/10 transition-all duration-300 shadow-[0_0_30px_rgba(0,0,0,0.5)]"
+          >
+            <X className="w-3.5 h-3.5" />
+            Exit_Focus · Esc
+          </button>
+        </div>
+      )}
 
       {/* Onboarding Tutorial */}
       <OnboardingTutorial
@@ -524,14 +646,16 @@ const Index = () => {
         onClose={() => setShowOnboarding(false)}
       />
 
-      {/* Help Button — bottom-left, re-opens tutorial */}
-      <button
-        onClick={() => setShowOnboarding(true)}
-        title="Open Tutorial"
-        className="fixed bottom-6 left-6 z-40 w-9 h-9 flex items-center justify-center rounded-full border border-primary/20 bg-background/60 backdrop-blur-md text-primary/50 hover:text-accent hover:border-accent/40 transition-all duration-300 font-tech text-sm"
-      >
-        ?
-      </button>
+      {/* Help Button — hidden in focus mode */}
+      {!isFocusMode && (
+        <button
+          onClick={() => setShowOnboarding(true)}
+          title="Open Tutorial"
+          className="fixed bottom-6 left-6 z-40 w-9 h-9 flex items-center justify-center rounded-full border border-primary/20 bg-background/60 backdrop-blur-md text-primary/50 hover:text-accent hover:border-accent/40 transition-all duration-300 font-tech text-sm"
+        >
+          ?
+        </button>
+      )}
 
       {/* Sidebar Toggle Button */}
       <button
@@ -566,116 +690,144 @@ const Index = () => {
       />
 
       <main
-        className={`w-full max-w-4xl flex flex-col items-center mx-auto relative z-10 transition-all duration-1000 pt-8 sm:pt-12 ${
+        className={`w-full max-w-4xl flex flex-col items-center mx-auto relative transition-all duration-700 pt-8 sm:pt-12 ${
           isListening
             ? "scale-[1.02] filter drop-shadow-[0_0_30px_hsl(var(--gold)/0.15)]"
             : "scale-100"
-        } ${isFocusMode ? "opacity-100" : ""} animate-fade-in`}
+        } ${isFocusMode ? "z-[10]" : "z-10"} animate-fade-in`}
       >
-        {/* Everything inside main stays visible in focus mode, but we can dim specific parts */}
+        {/* Hero — collapses in focus mode */}
         <div
-          className={`transition-all duration-1000 flex flex-col items-center w-full ${isFocusMode ? "opacity-20 blur-[1px] grayscale-[0.5]" : "opacity-100 blur-0"}`}
+          className={`transition-all duration-700 flex flex-col items-center w-full overflow-hidden ${
+            isFocusMode
+              ? "max-h-0 opacity-0 pointer-events-none"
+              : "max-h-[400px] opacity-100"
+          }`}
         >
           <CyberHero fileName={fileName} paragraphsCount={paragraphs.length} />
         </div>
 
-        {/* Upload + Export + Clear row */}
-        <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 px-4 w-full">
-          <UploadButton
-            onUpload={handleUpload}
-            hasFile={!!fileName}
-            fileName={fileName}
-          />
+        {/* Upload + Export + Clear row — collapses in Focus Mode */}
+        <div
+          className={`transition-all duration-700 overflow-hidden w-full ${
+            isFocusMode
+              ? "max-h-0 opacity-0 pointer-events-none"
+              : "max-h-40 opacity-100"
+          }`}
+        >
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 px-4 w-full">
+            <UploadButton
+              onUpload={handleUpload}
+              hasFile={!!fileName}
+              fileName={fileName}
+            />
 
-          {/* Session Timer Badge */}
-          {paragraphs.length > 0 && (
-            <div className="flex items-center gap-1.5 px-3 py-2 border border-primary/20 bg-primary/5 rounded-sm animate-fade-in">
-              <Timer className="w-3.5 h-3.5 text-accent/60 animate-pulse" />
-              <span className="font-mono text-[11px] text-primary/70 tracking-widest tabular-nums">
-                {sessionTime}
-              </span>
-              <span className="font-tech text-[8px] text-primary/30 uppercase">
-                Session
-              </span>
-            </div>
-          )}
+            {/* Session Timer Badge */}
+            {paragraphs.length > 0 && (
+              <div className="flex items-center gap-1.5 px-3 py-2 border border-primary/20 bg-primary/5 rounded-sm animate-fade-in">
+                <Timer className="w-3.5 h-3.5 text-accent/60 animate-pulse" />
+                <span className="font-mono text-[11px] text-primary/70 tracking-widest tabular-nums">
+                  {sessionTime}
+                </span>
+                <span className="font-tech text-[8px] text-primary/30 uppercase">
+                  Session
+                </span>
+              </div>
+            )}
 
-          {paragraphs.length > 0 && (
-            <>
-              {/* Auto-Title Button */}
-              <button
-                onClick={handleGenerateTitle}
-                onMouseEnter={() => playHover()}
-                disabled={isGeneratingTitle}
-                title="AI Auto-Title Generator"
-                className="group relative flex items-center justify-center gap-2 px-5 py-2.5 sm:py-3
+            {paragraphs.length > 0 && (
+              <>
+                {/* Auto-Title Button */}
+                <button
+                  onClick={handleGenerateTitle}
+                  onMouseEnter={() => playHover()}
+                  disabled={isGeneratingTitle}
+                  title="AI Auto-Title Generator"
+                  className="group relative flex items-center justify-center gap-2 px-5 py-2.5 sm:py-3
                     border border-primary/20 bg-primary/5
                     text-primary font-tech text-[10px] sm:text-[11px] tracking-[0.2em] uppercase
                     transition-all duration-300 w-full sm:w-auto
                     hover:border-accent hover:bg-accent/5 hover:text-accent
                     cursor-pointer animate-fade-in overflow-hidden disabled:opacity-50"
-              >
-                <div className="tech-bracket-tl w-1 h-1" />
-                <div className="tech-bracket-br w-1 h-1" />
-                {isGeneratingTitle ? (
-                  <div className="w-3.5 h-3.5 border-2 border-accent border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <Wand2 className="w-3.5 h-3.5 transition-transform duration-300 group-hover:-rotate-12" />
-                )}
-                {isGeneratingTitle ? "Conjuring..." : "Auto_Title"}
-              </button>
+                >
+                  <div className="tech-bracket-tl w-1 h-1" />
+                  <div className="tech-bracket-br w-1 h-1" />
+                  {isGeneratingTitle ? (
+                    <div className="w-3.5 h-3.5 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <Wand2 className="w-3.5 h-3.5 transition-transform duration-300 group-hover:-rotate-12" />
+                  )}
+                  {isGeneratingTitle ? "Conjuring..." : "Auto_Title"}
+                </button>
 
-              {/* Save Version Button — only when logged in */}
-              {user && (
-                <button
-                  onClick={() => setShowVersionModal(true)}
-                  onMouseEnter={() => playHover()}
-                  title="Save Version to Archive"
-                  className="group relative flex items-center justify-center gap-2 px-5 py-2.5 sm:py-3
+                {/* Save Version Button — only when logged in */}
+                {user && (
+                  <button
+                    onClick={() => setShowVersionModal(true)}
+                    onMouseEnter={() => playHover()}
+                    title="Save Version to Archive"
+                    className="group relative flex items-center justify-center gap-2 px-5 py-2.5 sm:py-3
                       border border-primary/20 bg-primary/5
                       text-primary font-tech text-[10px] sm:text-[11px] tracking-[0.2em] uppercase
                       transition-all duration-300 w-full sm:w-auto
                       hover:border-accent hover:bg-accent/5 hover:text-accent
                       cursor-pointer animate-fade-in overflow-hidden"
-                >
-                  <div className="tech-bracket-tl w-1 h-1" />
-                  <div className="tech-bracket-br w-1 h-1" />
-                  <Save className="w-3.5 h-3.5 transition-transform duration-300 group-hover:scale-110" />
-                  Save_Version
-                </button>
-              )}
+                  >
+                    <div className="tech-bracket-tl w-1 h-1" />
+                    <div className="tech-bracket-br w-1 h-1" />
+                    <Save className="w-3.5 h-3.5 transition-transform duration-300 group-hover:scale-110" />
+                    Save_Version
+                  </button>
+                )}
 
-              <button
-                onClick={handleExport}
-                onMouseEnter={() => playHover()}
-                className="group relative flex items-center justify-center gap-2 px-6 py-2.5 sm:py-3
+                <button
+                  onClick={handleExport}
+                  onMouseEnter={() => playHover()}
+                  className="group relative flex items-center justify-center gap-2 px-6 py-2.5 sm:py-3
                     border border-primary/20 bg-primary/5
                     text-primary font-tech text-[10px] sm:text-[11px] tracking-[0.2em] uppercase
                     transition-all duration-300 w-full sm:w-auto
                     hover:border-accent hover:bg-accent/5 hover:text-accent
                     cursor-pointer animate-fade-in overflow-hidden"
-              >
-                <div className="tech-bracket-tl w-1 h-1" />
-                <div className="tech-bracket-br w-1 h-1" />
-                <Download className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-y-0.5" />
-                Export_Out
-              </button>
+                >
+                  <div className="tech-bracket-tl w-1 h-1" />
+                  <div className="tech-bracket-br w-1 h-1" />
+                  <Download className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-y-0.5" />
+                  Export_Out
+                </button>
 
-              <button
-                onClick={handleClearDocument}
-                onMouseEnter={() => playHover()}
-                title="Clear document"
-                className="group flex items-center justify-center p-2.5 sm:p-3
+                <button
+                  onClick={handleClearDocument}
+                  onMouseEnter={() => playHover()}
+                  title="Clear document"
+                  className="group flex items-center justify-center p-2.5 sm:p-3
                     border border-destructive/40 bg-transparent rounded-full
                     text-destructive/80 transition-all duration-300
                     hover:border-destructive hover:bg-destructive/10 hover:text-destructive
                     cursor-pointer animate-fade-in"
-              >
-                <X className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-90" />
-              </button>
-            </>
-          )}
+                >
+                  <X className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-90" />
+                </button>
+                <button
+                  onClick={() => {
+                    setIsFocusMode((p) => !p);
+                    playTransition();
+                  }}
+                  onMouseEnter={() => playHover()}
+                  title="Toggle Focus Mode (Ctrl+Shift+F)"
+                  className="group flex items-center justify-center p-2.5 sm:p-3
+                    border border-primary/20 bg-transparent rounded-full
+                    text-primary/50 transition-all duration-300
+                    hover:border-accent/40 hover:text-accent
+                    cursor-pointer animate-fade-in"
+                >
+                  <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:scale-110" />
+                </button>
+              </>
+            )}
+          </div>
         </div>
+        {/* end collapsing toolbar wrapper */}
 
         {!isSupported && (
           <p className="text-destructive/80 font-body text-sm italic mt-2">
@@ -719,6 +871,128 @@ const Index = () => {
 
         <GoldDivider />
 
+        {/* ── Undo / Redo Strip ── */}
+        {paragraphs.length > 0 && (
+          <div className="flex items-center gap-2 w-full justify-end pr-2 mt-4 mb-1">
+            <button
+              onClick={() => {
+                if (history.length > 0) {
+                  const prev = history[history.length - 1];
+                  setFuture((f) => [...f, paragraphs]);
+                  setParagraphs(prev);
+                  setHistory((h) => h.slice(0, -1));
+                  setCommandFeedback(
+                    `↩ Undo — ${history.length - 1} step(s) left`,
+                  );
+                  setCommandSuccess(true);
+                  playSuccess();
+                  clearFeedback();
+                }
+              }}
+              disabled={history.length === 0}
+              title="Undo (Ctrl+Z)"
+              className="flex items-center gap-1.5 px-3 py-1.5 font-tech text-[9px] uppercase tracking-widest border border-primary/15 bg-primary/5 text-primary/50 hover:text-primary hover:border-primary/30 disabled:opacity-25 transition-all rounded-sm"
+            >
+              ↩ Undo
+              {history.length > 0 && (
+                <span className="text-accent/60 font-mono">
+                  ({history.length})
+                </span>
+              )}
+            </button>
+            <button
+              onClick={() => {
+                if (future.length > 0) {
+                  const next = future[future.length - 1];
+                  setFuture((f) => f.slice(0, -1));
+                  setHistory((h) => [...h, paragraphs]);
+                  setParagraphs(next);
+                  setCommandFeedback(
+                    `↪ Redo — ${future.length - 1} step(s) left`,
+                  );
+                  setCommandSuccess(true);
+                  playSuccess();
+                  clearFeedback();
+                }
+              }}
+              disabled={future.length === 0}
+              title="Redo (Ctrl+Y)"
+              className="flex items-center gap-1.5 px-3 py-1.5 font-tech text-[9px] uppercase tracking-widest border border-primary/15 bg-primary/5 text-primary/50 hover:text-primary hover:border-primary/30 disabled:opacity-25 transition-all rounded-sm"
+            >
+              ↪ Redo
+              {future.length > 0 && (
+                <span className="text-accent/60 font-mono">
+                  ({future.length})
+                </span>
+              )}
+            </button>
+            <button
+              onClick={() => setShowHistoryPanel((p) => !p)}
+              title="Toggle History Panel (Ctrl+H)"
+              className={`flex items-center gap-1.5 px-3 py-1.5 font-tech text-[9px] uppercase tracking-widest border transition-all rounded-sm ${showHistoryPanel ? "border-accent/40 bg-accent/10 text-accent" : "border-primary/15 bg-primary/5 text-primary/40 hover:text-primary hover:border-primary/30"}`}
+            >
+              ⏱ History ({history.length})
+            </button>
+          </div>
+        )}
+
+        {/* ── History Timeline Panel ── */}
+        {showHistoryPanel && history.length > 0 && (
+          <div className="w-full mb-4 border border-primary/10 bg-primary/5 rounded-sm overflow-hidden animate-fade-in">
+            <div className="flex items-center justify-between px-4 py-2 border-b border-primary/10 bg-primary/5">
+              <span className="font-tech text-[9px] text-primary/40 uppercase tracking-widest">
+                Edit_Timeline — {history.length} snapshot
+                {history.length !== 1 ? "s" : ""}
+              </span>
+              <button
+                onClick={() => setShowHistoryPanel(false)}
+                className="text-primary/30 hover:text-primary transition-colors"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </div>
+            <div className="max-h-48 overflow-y-auto divide-y divide-primary/5">
+              {[...history].reverse().map((snap, i) => {
+                const idx = history.length - 1 - i;
+                const wordCount = snap.join(" ").trim().split(/\s+/).length;
+                return (
+                  <div
+                    key={i}
+                    className="flex items-center justify-between px-4 py-2.5 hover:bg-primary/10 transition-colors group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="font-mono text-[9px] text-primary/20 w-5 tabular-nums">
+                        {idx + 1}
+                      </span>
+                      <div>
+                        <div className="font-mono text-[10px] text-primary/60">
+                          {snap.length} segments · {wordCount.toLocaleString()}{" "}
+                          words
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setFuture((f) => [...f, paragraphs]);
+                        setParagraphs(snap);
+                        setHistory((h) => h.slice(0, idx));
+                        setCommandFeedback(`Restored snapshot ${idx + 1}.`);
+                        setCommandSuccess(true);
+                        playSuccess();
+                        clearFeedback();
+                        setShowHistoryPanel(false);
+                      }}
+                      className="opacity-0 group-hover:opacity-100 px-3 py-1 font-tech text-[8px] uppercase tracking-widest border border-accent/20 text-accent bg-accent/5 hover:bg-accent/15 transition-all rounded-sm"
+                    >
+                      Restore
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         <div
           className={`transition-all duration-1000 w-full flex flex-col items-center ${isFocusMode ? "mt-12" : "mt-0"}`}
         >
@@ -729,6 +1003,21 @@ const Index = () => {
             commandFeedback={commandFeedback}
             commandSuccess={commandSuccess}
             lastEditedIndices={lastEditedIndices}
+            onParagraphEdit={(idx, newText) => {
+              if (!newText || newText === paragraphs[idx]) return;
+              setHistory((h) => [...h, paragraphs]);
+              setParagraphs((prev) => {
+                const updated = [...prev];
+                updated[idx] = newText;
+                return updated;
+              });
+              setLastEditedIndices([idx]);
+              setTimeout(() => setLastEditedIndices([]), 3000);
+              setCommandFeedback(`Segment ${idx + 1} updated manually.`);
+              setCommandSuccess(true);
+              playSuccess();
+              clearFeedback();
+            }}
           />
 
           {/* Smart Suggestions — appears after each successful command */}

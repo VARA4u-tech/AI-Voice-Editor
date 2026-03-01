@@ -10,8 +10,10 @@ import {
   Clock,
   Search,
   X,
+  Pencil,
+  Check,
 } from "lucide-react";
-import { useEffect, useRef, useMemo, useState } from "react";
+import { useEffect, useRef, useMemo, useState, useCallback } from "react";
 
 interface PreviewAreaProps {
   paragraphs: string[];
@@ -20,6 +22,7 @@ interface PreviewAreaProps {
   commandFeedback?: string | null;
   commandSuccess?: boolean;
   lastEditedIndices?: number[];
+  onParagraphEdit?: (index: number, newText: string) => void;
 }
 
 const PreviewArea = ({
@@ -29,11 +32,47 @@ const PreviewArea = ({
   commandFeedback,
   commandSuccess,
   lastEditedIndices = [],
+  onParagraphEdit,
 }: PreviewAreaProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const paraRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [matchIndex, setMatchIndex] = useState(0);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editValue, setEditValue] = useState("");
+
+  const startEdit = useCallback((i: number, text: string) => {
+    setEditingIndex(i);
+    setEditValue(text);
+    setTimeout(() => {
+      textareaRef.current?.focus();
+      textareaRef.current?.select();
+    }, 30);
+  }, []);
+
+  const commitEdit = useCallback(() => {
+    if (editingIndex === null) return;
+    onParagraphEdit?.(editingIndex, editValue.trim());
+    setEditingIndex(null);
+    setEditValue("");
+  }, [editingIndex, editValue, onParagraphEdit]);
+
+  const cancelEdit = useCallback(() => {
+    setEditingIndex(null);
+    setEditValue("");
+  }, []);
+
+  const handleEditKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Escape") {
+      e.preventDefault();
+      cancelEdit();
+    }
+    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      commitEdit();
+    }
+  };
 
   const matchingIndices = useMemo(() => {
     if (!searchQuery.trim()) return [];
@@ -292,26 +331,93 @@ const PreviewArea = ({
               const isMatch = matchingIndices.includes(i);
               const isActive =
                 matchingIndices[matchIndex % matchingIndices.length] === i;
+              const isEditing = editingIndex === i;
               return (
                 <div
                   key={i}
                   ref={(el) => (paraRefs.current[i] = el)}
-                  className={`group flex gap-4 py-3 px-2 border-l-2 border-transparent hover:border-primary/20 transition-all duration-300 ${
-                    isActive
-                      ? "bg-accent/10 border-l-accent rounded-r-lg"
-                      : isMatch
-                        ? "bg-accent/5 border-l-accent/30 rounded-r-lg"
-                        : lastEditedIndices.includes(i)
-                          ? "bg-accent/5 border-l-accent/50 rounded-r-lg"
-                          : ""
+                  className={`group relative flex gap-4 py-3 px-2 border-l-2 border-transparent transition-all duration-300 ${
+                    isEditing
+                      ? "border-l-accent/80 bg-accent/5 rounded-r-lg"
+                      : isActive
+                        ? "bg-accent/10 border-l-accent rounded-r-lg"
+                        : isMatch
+                          ? "bg-accent/5 border-l-accent/30 rounded-r-lg"
+                          : lastEditedIndices.includes(i)
+                            ? "bg-accent/5 border-l-accent/50 rounded-r-lg"
+                            : "hover:border-primary/20"
                   }`}
                 >
+                  {/* Paragraph number */}
                   <span className="text-primary/30 font-mono text-[10px] mt-1 shrink-0 w-8 tabular-nums">
-                    [{String(i + 1).padStart(2, "0")}]
+                    [{String(i + 1).padStart(2, "00")}]
                   </span>
-                  <p className="font-body text-base text-foreground/90 leading-relaxed transition-colors duration-200 group-hover:text-foreground">
-                    {para}
-                  </p>
+
+                  {/* Content — view or edit */}
+                  <div className="flex-1 min-w-0">
+                    {isEditing ? (
+                      <>
+                        <textarea
+                          ref={textareaRef}
+                          value={editValue}
+                          onChange={(e) => {
+                            setEditValue(e.target.value);
+                            // Auto-resize
+                            e.target.style.height = "auto";
+                            e.target.style.height =
+                              e.target.scrollHeight + "px";
+                          }}
+                          onKeyDown={handleEditKeyDown}
+                          rows={3}
+                          className="w-full bg-transparent border border-accent/20 focus:border-accent/50 rounded-sm px-3 py-2 font-body text-base text-foreground/90 leading-relaxed resize-none focus:outline-none transition-colors"
+                          style={{ minHeight: "4rem" }}
+                        />
+                        <div className="flex items-center gap-2 mt-2">
+                          <button
+                            onClick={commitEdit}
+                            className="flex items-center gap-1.5 px-3 py-1 text-[9px] font-tech uppercase tracking-widest text-accent border border-accent/30 bg-accent/10 hover:bg-accent/20 transition-all rounded-sm"
+                          >
+                            <Check className="w-3 h-3" /> Save · Ctrl+↵
+                          </button>
+                          <button
+                            onClick={cancelEdit}
+                            className="flex items-center gap-1.5 px-3 py-1 text-[9px] font-tech uppercase tracking-widest text-primary/40 border border-primary/10 hover:text-primary hover:border-primary/30 transition-all rounded-sm"
+                          >
+                            <X className="w-3 h-3" /> Cancel · Esc
+                          </button>
+                          <span className="ml-auto font-mono text-[9px] text-primary/20">
+                            {
+                              editValue.trim().split(/\s+/).filter(Boolean)
+                                .length
+                            }{" "}
+                            words
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      <div
+                        className="relative cursor-text"
+                        onClick={() => onParagraphEdit && startEdit(i, para)}
+                        title={onParagraphEdit ? "Click to edit" : undefined}
+                      >
+                        <p className="font-body text-base text-foreground/90 leading-relaxed transition-colors duration-200 group-hover:text-foreground pr-7">
+                          {para}
+                        </p>
+                        {onParagraphEdit && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              startEdit(i, para);
+                            }}
+                            className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity p-1 text-primary/30 hover:text-accent"
+                            title="Edit paragraph"
+                          >
+                            <Pencil className="w-3 h-3" />
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               );
             })}
