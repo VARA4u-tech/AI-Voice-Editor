@@ -9,7 +9,6 @@ import PreviewArea from "@/components/PreviewArea";
 import MysticalHero from "@/components/MysticalHero";
 import CyberHero from "@/components/CyberHero";
 import ScribeSidebar from "@/components/ScribeSidebar";
-import AmbientPlayer from "@/components/AmbientPlayer";
 import MysticalBackground from "@/components/MysticalBackground";
 import useSpeechRecognition from "@/hooks/useSpeechRecognition";
 import { useSoundEffects } from "@/hooks/useSoundEffects";
@@ -361,8 +360,6 @@ const Index = () => {
         scribeLog={scribeLog}
         paragraphs={paragraphs}
       />
-
-      <AmbientPlayer />
 
       <input
         type="file"

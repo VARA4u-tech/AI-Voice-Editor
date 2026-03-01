@@ -66,60 +66,60 @@ const CyberHero = ({ fileName, paragraphsCount }: CyberHeroProps) => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-3xl px-6">
         <div
           onMouseEnter={() => playHover()}
-          className="p-4 border border-primary/10 bg-primary/5 backdrop-blur-md relative group hover:border-accent/40 transition-all duration-500 overflow-hidden"
+          className="p-4 border border-primary/20 bg-slate-950/40 backdrop-blur-xl relative group hover:border-accent/40 transition-all duration-500 overflow-hidden"
         >
           <div className="tech-bracket-tl w-2 h-2" />
           <div className="absolute top-0 right-0 p-2 opacity-20 group-hover:opacity-100 group-hover:text-accent transition-all">
             <Zap className="w-4 h-4" />
           </div>
-          <h3 className="font-tech text-[10px] text-primary/80 tracking-widest uppercase mb-2">
+          <h3 className="font-tech text-[10px] text-primary tracking-widest uppercase mb-2">
             Neural_Synthesis
           </h3>
-          <p className="font-body text-sm text-foreground/60 leading-relaxed">
+          <p className="font-body text-sm text-foreground/90 leading-relaxed font-medium">
             Advanced voice recognition algorithms translate natural speech into
             precise document manipulations.
           </p>
-          <div className="mt-3 font-mono text-[9px] text-accent/40 uppercase tracking-tighter">
+          <div className="mt-3 font-mono text-[9px] text-accent/60 uppercase tracking-tighter">
             Latency: 0.12ms
           </div>
         </div>
 
         <div
           onMouseEnter={() => playHover()}
-          className="p-4 border border-primary/10 bg-primary/5 backdrop-blur-md relative group hover:border-accent/40 transition-all duration-500 overflow-hidden"
+          className="p-4 border border-primary/20 bg-slate-950/40 backdrop-blur-xl relative group hover:border-accent/40 transition-all duration-500 overflow-hidden"
         >
           <div className="tech-bracket-tl w-2 h-2" />
           <div className="absolute top-0 right-0 p-2 opacity-20 group-hover:opacity-100 group-hover:text-accent transition-all">
             <Shield className="w-4 h-4" />
           </div>
-          <h3 className="font-tech text-[10px] text-primary/80 tracking-widest uppercase mb-2">
+          <h3 className="font-tech text-[10px] text-primary tracking-widest uppercase mb-2">
             Secure_Encryption
           </h3>
-          <p className="font-body text-sm text-foreground/60 leading-relaxed">
+          <p className="font-body text-sm text-foreground/90 leading-relaxed font-medium">
             Local-first processing ensures your document data never leaves the
             secure boundaries of your terminal.
           </p>
-          <div className="mt-3 font-mono text-[9px] text-accent/40 uppercase tracking-tighter">
+          <div className="mt-3 font-mono text-[9px] text-accent/60 uppercase tracking-tighter">
             Status: Protected
           </div>
         </div>
 
         <div
           onMouseEnter={() => playHover()}
-          className="p-4 border border-primary/10 bg-primary/5 backdrop-blur-md relative group hover:border-accent/40 transition-all duration-500 overflow-hidden"
+          className="p-4 border border-primary/20 bg-slate-950/40 backdrop-blur-xl relative group hover:border-accent/40 transition-all duration-500 overflow-hidden"
         >
           <div className="tech-bracket-tl w-2 h-2" />
           <div className="absolute top-0 right-0 p-2 opacity-20 group-hover:opacity-100 group-hover:text-accent transition-all">
             <Cpu className="w-4 h-4" />
           </div>
-          <h3 className="font-tech text-[10px] text-primary/80 tracking-widest uppercase mb-2">
+          <h3 className="font-tech text-[10px] text-primary tracking-widest uppercase mb-2">
             Logic_Alchemy
           </h3>
-          <p className="font-body text-sm text-foreground/60 leading-relaxed">
+          <p className="font-body text-sm text-foreground/90 leading-relaxed font-medium">
             Context-aware AI understands intent, allowing for complex multi-step
             edits with simple voice phrases.
           </p>
-          <div className="mt-3 font-mono text-[9px] text-accent/40 uppercase tracking-tighter">
+          <div className="mt-3 font-mono text-[9px] text-accent/60 uppercase tracking-tighter">
             Core: AGI_MIMIC
           </div>
         </div>

@@ -8,17 +8,17 @@ const MysticalBackground = () => {
       <div className="absolute bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] bg-primary/5 rounded-full blur-[140px] mix-blend-screen animate-[pulse_12s_ease-in-out_infinite_alternate-reverse]" />
 
       {/* Modern Tech Elements */}
-      <div className="absolute inset-0 digital-grid opacity-20" />
+      <div className="absolute inset-0 digital-grid opacity-5" />
       <div className="scanline" />
 
       {/* Modern Tech Nodes Background */}
-      <div className="absolute inset-0 opacity-40 digital-nodes-bg mix-blend-screen" />
+      <div className="absolute inset-0 opacity-10 digital-nodes-bg mix-blend-screen" />
 
       {/* Sweeping ethereal glow */}
-      <div className="absolute inset-x-0 top-1/4 h-1/2 bg-primary/5 blur-[100px] rounded-[100%] animate-[pulse_15s_ease-in-out_infinite_alternate] mix-blend-screen opacity-50" />
+      <div className="absolute inset-x-0 top-1/4 h-1/2 bg-primary/2 blur-[120px] rounded-[100%] animate-[pulse_15s_ease-in-out_infinite_alternate] mix-blend-screen opacity-20" />
 
       {/* Central Neural Audio Core / Voice Matrix */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150vw] sm:w-[100vw] max-w-[900px] aspect-square opacity-[0.15] animate-[spin_300s_linear_infinite]">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150vw] sm:w-[100vw] max-w-[900px] aspect-square opacity-[0.08] animate-[spin_300s_linear_infinite]">
         <svg
           viewBox="0 0 500 500"
           className="w-full h-full text-primary stroke-current fill-none"
@@ -106,7 +106,7 @@ const MysticalBackground = () => {
       </div>
 
       {/* Secondary Counter-rotating HUD Ring */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120vw] sm:w-[80vw] max-w-[700px] aspect-square opacity-[0.1] animate-[spin_180s_reverse_linear_infinite]">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120vw] sm:w-[80vw] max-w-[700px] aspect-square opacity-[0.05] animate-[spin_180s_reverse_linear_infinite]">
         <svg
           viewBox="0 0 500 500"
           className="w-full h-full text-accent stroke-current fill-none"

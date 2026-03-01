@@ -4,19 +4,19 @@ import { Volume2, VolumeX, ChevronUp, ChevronDown } from "lucide-react";
 const SOUNDSCAPES = [
   {
     label: "🌧 Rain",
-    src: "https://actions.google.com/sounds/v1/water/rain_on_roof.ogg",
+    src: "https://assets.mixkit.co/active_storage/sfx/2437/2437-preview.mp3",
   },
   {
     label: "🌊 Ocean",
-    src: "https://actions.google.com/sounds/v1/water/ocean_waves.ogg",
+    src: "https://assets.mixkit.co/active_storage/sfx/1114/1114-preview.mp3",
   },
   {
     label: "🔥 Hearth",
-    src: "https://actions.google.com/sounds/v1/ambiences/fireplace.ogg",
+    src: "https://assets.mixkit.co/active_storage/sfx/2425/2425-preview.mp3",
   },
   {
     label: "🌿 Forest",
-    src: "https://actions.google.com/sounds/v1/ambiences/forest_with_cuckoo_bird.ogg",
+    src: "https://assets.mixkit.co/active_storage/sfx/2499/2499-preview.mp3",
   },
 ] as const;
 
