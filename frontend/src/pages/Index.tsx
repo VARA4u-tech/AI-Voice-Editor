@@ -8,6 +8,7 @@ import StatusIndicator from "@/components/StatusIndicator";
 import PreviewArea from "@/components/PreviewArea";
 import MysticalHero from "@/components/MysticalHero";
 import CyberHero from "@/components/CyberHero";
+import ChatWidget from "@/components/ChatWidget";
 import ScribeSidebar from "@/components/ScribeSidebar";
 import MysticalBackground from "@/components/MysticalBackground";
 import useSpeechRecognition from "@/hooks/useSpeechRecognition";
@@ -331,6 +332,7 @@ const Index = () => {
     >
       <MysticalBackground />
       <FloatingParticles />
+      <ChatWidget />
 
       {/* Focus Mode Backdrop overlay */}
       <div
