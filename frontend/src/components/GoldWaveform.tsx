@@ -49,16 +49,35 @@ const GoldWaveform = ({ isActive }: GoldWaveformProps) => {
           barHeight = 2;
         }
 
-        const gradient = ctx.createLinearGradient(x, centerY - barHeight, x, centerY + barHeight);
-        const alpha = isActive ? 0.9 : 0.2;
-        gradient.addColorStop(0, `hsla(43, 56%, 62%, ${alpha * 0.3})`);
-        gradient.addColorStop(0.5, `hsla(43, 56%, 52%, ${alpha})`);
-        gradient.addColorStop(1, `hsla(43, 56%, 62%, ${alpha * 0.3})`);
+        const gradient = ctx.createLinearGradient(
+          x,
+          centerY - barHeight,
+          x,
+          centerY + barHeight,
+        );
+        const alpha = isActive ? 1 : 0.2;
+
+        if (isActive) {
+          gradient.addColorStop(0, `hsla(180, 100%, 50%, ${alpha * 0.4})`);
+          gradient.addColorStop(0.5, `hsla(43, 56%, 52%, ${alpha})`);
+          gradient.addColorStop(1, `hsla(210, 100%, 60%, ${alpha * 0.4})`);
+        } else {
+          gradient.addColorStop(0, `hsla(43, 56%, 52%, ${alpha * 0.5})`);
+          gradient.addColorStop(1, `hsla(43, 56%, 52%, ${alpha * 0.5})`);
+        }
 
         ctx.fillStyle = gradient;
         ctx.beginPath();
-        ctx.roundRect(x, centerY - barHeight, barWidth, barHeight * 2, 1.5);
+        // Sharper bars for tech look
+        ctx.rect(x, centerY - barHeight, barWidth, barHeight * 2);
         ctx.fill();
+
+        if (isActive && i % 4 === 0) {
+          ctx.shadowBlur = 10;
+          ctx.shadowColor = "rgba(0, 255, 255, 0.5)";
+        } else {
+          ctx.shadowBlur = 0;
+        }
       }
 
       animationRef.current = requestAnimationFrame(animate);

@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;1,400&family=JetBrains+Mono:wght@300;400;700&family=Orbitron:wght@400;500;700&family=Spectral:ital,wght@0,200;1,300&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -6,84 +6,52 @@
 
 @layer base {
   :root {
-    --background: 170 60% 8%;
+    --background: 220 40% 4%;
     --foreground: 43 50% 85%;
 
-    --card: 170 55% 10%;
+    --card: 220 30% 6%;
     --card-foreground: 43 50% 85%;
 
-    --popover: 170 55% 10%;
+    --popover: 220 30% 6%;
     --popover-foreground: 43 50% 85%;
 
     --primary: 43 56% 52%;
-    --primary-foreground: 170 60% 8%;
+    --primary-foreground: 220 40% 4%;
 
-    --secondary: 170 40% 15%;
+    --secondary: 180 60% 12%;
     --secondary-foreground: 43 50% 85%;
 
-    --muted: 170 35% 14%;
-    --muted-foreground: 170 20% 50%;
+    --muted: 220 20% 12%;
+    --muted-foreground: 220 10% 60%;
 
-    --accent: 43 56% 52%;
-    --accent-foreground: 170 60% 8%;
+    --accent: 180 100% 50%; /* Electric Cyan */
+    --accent-foreground: 220 40% 4%;
 
-    --destructive: 0 62% 50%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 43 40% 30%;
-    --input: 43 40% 25%;
-    --ring: 43 56% 52%;
+    --border: 220 30% 15%;
+    --input: 220 30% 12%;
+    --ring: 180 100% 50%;
 
     --radius: 0.25rem;
 
     --gold: 43 56% 52%;
     --gold-light: 43 60% 70%;
     --gold-glow: 43 80% 55%;
-    --emerald-deep: 170 60% 8%;
-    --emerald-mid: 170 50% 15%;
-    --emerald-light: 170 40% 22%;
 
-    --sidebar-background: 170 55% 10%;
-    --sidebar-foreground: 43 50% 85%;
-    --sidebar-primary: 43 56% 52%;
-    --sidebar-primary-foreground: 170 60% 8%;
-    --sidebar-accent: 170 40% 15%;
-    --sidebar-accent-foreground: 43 50% 85%;
-    --sidebar-border: 43 40% 25%;
-    --sidebar-ring: 43 56% 52%;
+    --tech-cyan: 180 100% 50%;
+    --tech-blue: 210 100% 60%;
 
     --font-heading: "Cinzel", serif;
     --font-body: "Cormorant Garamond", serif;
+    --font-mono: "JetBrains Mono", monospace;
+    --font-tech: "Orbitron", sans-serif;
   }
 
   .dark {
-    --background: 170 60% 8%;
+    --background: 220 40% 4%;
     --foreground: 43 50% 85%;
-    --card: 170 55% 10%;
-    --card-foreground: 43 50% 85%;
-    --popover: 170 55% 10%;
-    --popover-foreground: 43 50% 85%;
-    --primary: 43 56% 52%;
-    --primary-foreground: 170 60% 8%;
-    --secondary: 170 40% 15%;
-    --secondary-foreground: 43 50% 85%;
-    --muted: 170 35% 14%;
-    --muted-foreground: 170 20% 50%;
-    --accent: 43 56% 52%;
-    --accent-foreground: 170 60% 8%;
-    --destructive: 0 62% 50%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 43 40% 30%;
-    --input: 43 40% 25%;
-    --ring: 43 56% 52%;
-    --sidebar-background: 170 55% 10%;
-    --sidebar-foreground: 43 50% 85%;
-    --sidebar-primary: 43 56% 52%;
-    --sidebar-primary-foreground: 170 60% 8%;
-    --sidebar-accent: 170 40% 15%;
-    --sidebar-accent-foreground: 43 50% 85%;
-    --sidebar-border: 43 40% 25%;
-    --sidebar-ring: 43 56% 52%;
   }
 }
 
@@ -96,30 +64,29 @@
     @apply bg-background text-foreground;
     font-family: var(--font-body);
     scrollbar-width: thin;
-    scrollbar-color: hsl(var(--gold) / 0.5) transparent;
+    scrollbar-color: hsl(var(--gold) / 0.3) transparent;
   }
 
   ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 4px;
+    height: 4px;
   }
 
   ::-webkit-scrollbar-track {
-    background: transparent;
+    background: rgba(0, 0, 0, 0.1);
   }
 
   ::-webkit-scrollbar-thumb {
     background: linear-gradient(
       to bottom,
-      transparent,
-      hsl(var(--gold) / 0.4),
-      transparent
+      hsl(var(--tech-cyan) / 0.4),
+      hsl(var(--gold) / 0.4)
     );
     border-radius: 10px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: hsl(var(--gold) / 0.6);
+    background: hsl(var(--tech-cyan) / 0.7);
   }
 
   h1,
@@ -129,6 +96,14 @@
   h5,
   h6 {
     font-family: var(--font-heading);
+    letter-spacing: 0.1em;
+  }
+
+  .mono {
+    font-family: var(--font-mono);
+  }
+  .tech {
+    font-family: var(--font-tech);
   }
 }
 
@@ -149,93 +124,121 @@
     text-shadow: 0 0 20px hsl(var(--gold) / 0.3);
   }
 
+  .tech-bracket-tl {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 10px;
+    height: 10px;
+    border-top: 1px solid hsl(var(--tech-cyan));
+    border-left: 1px solid hsl(var(--tech-cyan));
+  }
+  .tech-bracket-tr {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
+    border-top: 1px solid hsl(var(--tech-cyan));
+    border-right: 1px solid hsl(var(--tech-cyan));
+  }
+  .tech-bracket-bl {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 10px;
+    height: 10px;
+    border-bottom: 1px solid hsl(var(--tech-cyan));
+    border-left: 1px solid hsl(var(--tech-cyan));
+  }
+  .tech-bracket-br {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
+    border-bottom: 1px solid hsl(var(--tech-cyan));
+    border-right: 1px solid hsl(var(--tech-cyan));
+  }
+
+  .digital-grid {
+    background-image:
+      linear-gradient(
+        to right,
+        hsl(var(--tech-cyan) / 0.05) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        to bottom,
+        hsl(var(--tech-cyan) / 0.05) 1px,
+        transparent 1px
+      );
+    background-size: 30px 30px;
+    mask-image: radial-gradient(circle at center, black, transparent 80%);
+  }
+
+  .scanline {
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(
+      to right,
+      transparent,
+      hsl(var(--tech-cyan) / 0.3),
+      transparent
+    );
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 5;
+    animation: scanVertical 6s linear infinite;
+  }
+
+  .tech-glow-blue {
+    box-shadow:
+      0 0 15px hsl(var(--tech-cyan) / 0.2),
+      0 0 30px hsl(var(--tech-blue) / 0.1);
+  }
+
   .emerald-gradient-bg {
-    background: 
-      /* Layers of 'watercolor' stains to create organic blooming effect */
+    background:
       radial-gradient(
-        circle at 30% 20%,
-        rgba(0, 80, 80, 0.5) 0%,
-        transparent 60%
+        circle at 20% 20%,
+        hsl(var(--tech-blue) / 0.1) 0%,
+        transparent 50%
       ),
       radial-gradient(
-        circle at 70% 80%,
-        rgba(0, 100, 100, 0.4) 0%,
-        transparent 60%
+        circle at 80% 80%,
+        hsl(var(--tech-cyan) / 0.1) 0%,
+        transparent 50%
       ),
-      /* Central soft golden glow to warm the document workspace */
-        radial-gradient(
-          circle at 50% 50%,
-          rgba(191, 149, 63, 0.12) 0%,
-          transparent 70%
-        ),
-      /* Base dark teal foundation */
-        linear-gradient(135deg, #012a2a 0%, #004d4d 100%);
+      linear-gradient(135deg, hsl(220 40% 2%) 0%, hsl(220 40% 6%) 100%);
     position: relative;
     overflow: hidden;
   }
 
-  .emerald-gradient-bg::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 2;
-    /* Deep vignette for that 'spotlight' focus in the center */
-    background: radial-gradient(
-      ellipse at center,
-      transparent 20%,
-      rgba(0, 10, 10, 0.9) 100%
-    );
-    mix-blend-mode: multiply;
-  }
-
-  .emerald-gradient-bg::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 1;
-    opacity: 0.25;
-    /* More organic watercolor/paper texture for tactile feel */
-    background-image: url("https://www.transparenttextures.com/patterns/handmade-paper.png");
-    background-size: 600px 600px;
-    mix-blend-mode: soft-light;
-  }
-
-  .mystical-stars-bg {
+  .digital-nodes-bg {
     background-image:
       radial-gradient(
-        1px 1px at 15% 25%,
-        hsl(var(--gold) / 0.4),
-        hsl(var(--gold) / 0)
+        1px 1px at 10% 10%,
+        hsl(var(--tech-cyan) / 0.3),
+        transparent
       ),
+      radial-gradient(1px 1px at 20% 80%, hsl(var(--gold) / 0.2), transparent),
       radial-gradient(
-        1.5px 1.5px at 45% 15%,
-        hsl(var(--gold) / 0.3),
-        hsl(var(--gold) / 0)
+        1px 1px at 40% 30%,
+        hsl(var(--tech-cyan) / 0.3),
+        transparent
       ),
+      radial-gradient(1px 1px at 60% 70%, hsl(var(--gold) / 0.2), transparent),
       radial-gradient(
-        2px 2px at 75% 35%,
-        hsl(var(--gold) / 0.5),
-        hsl(var(--gold) / 0)
+        1px 1px at 80% 40%,
+        hsl(var(--tech-cyan) / 0.3),
+        transparent
       ),
-      radial-gradient(
-        1px 1px at 25% 65%,
-        hsl(var(--gold) / 0.3),
-        hsl(var(--gold) / 0)
-      ),
-      radial-gradient(
-        1.5px 1.5px at 85% 75%,
-        hsl(var(--gold) / 0.4),
-        hsl(var(--gold) / 0)
-      ),
-      radial-gradient(
-        2px 2px at 55% 85%,
-        hsl(var(--gold) / 0.2),
-        hsl(var(--gold) / 0)
-      );
-    background-size: 250px 250px;
-    animation: driftStars 120s linear infinite;
+      radial-gradient(1px 1px at 90% 90%, hsl(var(--gold) / 0.2), transparent);
+    background-size: 200px 200px;
+    animation: driftNodes 120s linear infinite;
   }
 
   .sacred-geometry {
@@ -243,38 +246,30 @@
     inset: 0;
     pointer-events: none;
     z-index: 1;
-    opacity: 0.15;
+    opacity: 0.1;
     background-image:
       radial-gradient(
         circle at center,
         transparent 30%,
-        hsl(var(--background) / 1) 70%
+        hsl(var(--background)) 70%
       ),
       repeating-linear-gradient(
         0deg,
         transparent,
-        transparent 40px,
-        hsl(var(--gold) / 0.1) 40px,
-        hsl(var(--gold) / 0.1) 41px
+        transparent 39px,
+        hsl(var(--tech-cyan) / 0.1) 40px
       ),
       repeating-linear-gradient(
         90deg,
         transparent,
-        transparent 40px,
-        hsl(var(--gold) / 0.1) 40px,
-        hsl(var(--gold) / 0.1) 41px
+        transparent 39px,
+        hsl(var(--tech-cyan) / 0.1) 40px
       );
     background-size:
       100% 100%,
       40px 40px,
       40px 40px;
-    background-position: center center;
-    mask-image: radial-gradient(circle at center, black 20%, transparent 60%);
-    -webkit-mask-image: radial-gradient(
-      circle at center,
-      black 20%,
-      transparent 60%
-    );
+    mask-image: radial-gradient(circle at center, black 10%, transparent 70%);
   }
 
   /* Complex rotating orbital rings */
@@ -323,16 +318,16 @@
   }
 }
 
-@keyframes scan {
+@keyframes scanVertical {
   0% {
-    transform: translateY(-30px);
+    transform: translateY(-100%);
     opacity: 0;
   }
   50% {
     opacity: 1;
   }
   100% {
-    transform: translateY(0px);
+    transform: translateY(100vh);
     opacity: 0;
   }
 }
@@ -368,12 +363,12 @@
   }
 }
 
-@keyframes driftStars {
+@keyframes driftNodes {
   from {
     background-position: 0 0;
   }
   to {
-    background-position: 250px -250px;
+    background-position: 50vw 50vh;
   }
 }
 

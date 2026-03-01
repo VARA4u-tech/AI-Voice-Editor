@@ -20,19 +20,23 @@ const CommandHelp = () => {
       </button>
 
       {isOpen && (
-        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-[85vw] sm:w-[450px] z-[100] animate-fade-in shadow-2xl">
-          {/* Parchment-style card */}
+        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-[85vw] sm:w-[500px] z-[100] animate-fade-in shadow-2xl">
+          {/* Tech-style card */}
           <div
-            className="border border-primary/25 shadow-[0_0_30px_rgba(191,149,63,0.1)]"
+            className="border border-primary/30 relative overflow-hidden backdrop-blur-xl"
             style={{
-              background:
-                "linear-gradient(160deg, rgba(0,50,47,0.97) 0%, rgba(0,38,36,0.98) 100%)",
+              background: "rgba(4, 10, 20, 0.95)",
             }}
           >
+            <div className="tech-bracket-tl" />
+            <div className="tech-bracket-tr" />
+            <div className="tech-bracket-bl" />
+            <div className="tech-bracket-br" />
+
             {/* Header */}
-            <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-primary/10">
-              <p className="font-heading text-[10px] tracking-[0.3em] uppercase text-primary/60">
-                ✦ Available Incantations
+            <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-primary/10 bg-primary/5">
+              <p className="font-tech text-[9px] tracking-[0.4em] uppercase text-accent">
+                [ Command Protocols: Voice_Core ]
               </p>
               <button
                 onClick={() => setIsOpen(false)}
@@ -43,16 +47,19 @@ const CommandHelp = () => {
             </div>
 
             {/* Command list */}
-            <div className="max-h-[45vh] sm:max-h-[60vh] overflow-y-auto">
+            <div className="max-h-[45vh] sm:max-h-[60vh] overflow-y-auto custom-scrollbar">
               <ul className="p-4 space-y-4">
                 {commands.map((cmd, i) => (
-                  <li key={i} className="space-y-1">
-                    <p className="font-body text-[12px] sm:text-[13px] text-foreground/80 leading-snug font-medium">
+                  <li
+                    key={i}
+                    className="group/item border-l-2 border-primary/10 hover:border-accent/40 pl-3 transition-colors"
+                  >
+                    <p className="font-mono text-[11px] sm:text-[12px] text-foreground/70 leading-snug font-medium mb-1 uppercase tracking-tight">
                       {cmd.description}
                     </p>
-                    <p className="font-body text-[11px] sm:text-[12px] italic text-primary/70 tracking-wide gold-text-glow">
-                      <span className="text-primary/50 not-italic font-heading text-[9px] tracking-widest uppercase mr-1.5">
-                        say:
+                    <p className="font-mono text-[11px] sm:text-[12px] text-primary group-hover/item:text-accent transition-colors">
+                      <span className="opacity-40 font-tech text-[8px] tracking-[0.2em] mr-2">
+                        EXEC_CMD:
                       </span>
                       "{cmd.example}"
                     </p>
@@ -60,13 +67,13 @@ const CommandHelp = () => {
                 ))}
 
                 {/* Undo always shown at bottom */}
-                <li className="pt-3 border-t border-primary/20 space-y-1 mt-2">
-                  <p className="font-body text-[12px] sm:text-[13px] text-foreground/80 leading-snug font-medium">
-                    Undo the last change
+                <li className="pt-3 border-t border-primary/20 space-y-1 mt-2 border-l-2 border-destructive/20 pl-3">
+                  <p className="font-mono text-[11px] sm:text-[12px] text-foreground/70 leading-snug font-medium uppercase tracking-tight">
+                    Reverse last operation
                   </p>
-                  <p className="font-body text-[11px] sm:text-[12px] italic text-primary/70 gold-text-glow">
-                    <span className="text-primary/50 not-italic font-heading text-[9px] tracking-widest uppercase mr-1.5">
-                      say:
+                  <p className="font-mono text-[11px] sm:text-[12px] text-destructive/80">
+                    <span className="opacity-40 font-tech text-[8px] tracking-[0.2em] mr-2">
+                      EXEC_REV:
                     </span>
                     "undo"
                   </p>
@@ -75,18 +82,12 @@ const CommandHelp = () => {
             </div>
 
             {/* Footer tip */}
-            <div className="px-4 pb-3 border-t border-primary/10 pt-2">
-              <p className="font-body text-[10px] italic text-primary/30 text-center">
-                Press Space or Ctrl+M to toggle the mic
+            <div className="px-4 pb-3 border-t border-primary/10 pt-2 bg-primary/5">
+              <p className="font-mono text-[9px] tracking-wider text-primary/40 text-center uppercase">
+                Hotkey: [space] or [ctrl+m] to engage mic
               </p>
             </div>
           </div>
-
-          {/* Arrow */}
-          <div
-            className="w-3 h-3 mx-auto -mt-1.5 rotate-45 border-r border-b border-primary/25"
-            style={{ background: "rgba(0,38,36,0.98)" }}
-          />
         </div>
       )}
     </div>

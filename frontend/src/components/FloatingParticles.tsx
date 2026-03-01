@@ -7,7 +7,7 @@ interface Particle {
   delay: string;
   size: number;
   duration: string;
-  type: "star" | "dot" | "sparkle";
+  type: "node" | "glyph" | "square";
   opacity: number;
 }
 
@@ -15,17 +15,17 @@ const FloatingParticles = () => {
   const [particles, setParticles] = useState<Particle[]>([]);
 
   useEffect(() => {
-    const generated: Particle[] = Array.from({ length: 28 }, (_, i) => ({
+    const generated: Particle[] = Array.from({ length: 24 }, (_, i) => ({
       id: i,
       left: `${Math.random() * 100}%`,
       top: `${Math.random() * 100}%`,
-      delay: `${Math.random() * 8}s`,
-      size: 0.6 + Math.random() * 2.2,
-      duration: `${5 + Math.random() * 8}s`,
-      type: (["star", "dot", "sparkle"] as const)[
+      delay: `${Math.random() * 10}s`,
+      size: 0.8 + Math.random() * 1.5,
+      duration: `${10 + Math.random() * 15}s`,
+      type: (["node", "glyph", "square"] as const)[
         Math.floor(Math.random() * 3)
       ],
-      opacity: 0.15 + Math.random() * 0.45,
+      opacity: 0.1 + Math.random() * 0.3,
     }));
     setParticles(generated);
   }, []);
@@ -44,62 +44,49 @@ const FloatingParticles = () => {
             opacity: p.opacity,
           }}
         >
-          {p.type === "star" ? (
-            /* Four-point gold star matching the reference image */
+          {p.type === "node" ? (
+            /* Circled tech node */
             <svg
-              width={p.size * 8}
-              height={p.size * 8}
+              width={p.size * 10}
+              height={p.size * 10}
+              viewBox="0 0 20 20"
+              fill="none"
+              className="text-primary"
+            >
+              <circle
+                cx="10"
+                cy="10"
+                r="8"
+                stroke="currentColor"
+                strokeWidth="0.5"
+                strokeDasharray="2 2"
+              />
+              <circle cx="10" cy="10" r="2" fill="currentColor" />
+            </svg>
+          ) : p.type === "glyph" ? (
+            /* Futuristic small bracket/glyph */
+            <svg
+              width={p.size * 12}
+              height={p.size * 12}
               viewBox="0 0 12 12"
               fill="none"
+              className="text-accent"
             >
               <path
-                d="M6 0 L6.6 5.4 L12 6 L6.6 6.6 L6 12 L5.4 6.6 L0 6 L5.4 5.4 Z"
-                fill="url(#star-gold)"
-                filter="url(#star-glow)"
+                d="M2 2 H1 V11 H2 M10 2 H11 V11 H10"
+                stroke="currentColor"
+                strokeWidth="0.8"
               />
-              <defs>
-                <linearGradient
-                  id="star-gold"
-                  x1="0%"
-                  y1="0%"
-                  x2="100%"
-                  y2="100%"
-                >
-                  <stop offset="0%" stopColor="#f5e6a0" />
-                  <stop offset="50%" stopColor="#bf953f" />
-                  <stop offset="100%" stopColor="#aa771c" />
-                </linearGradient>
-                <filter id="star-glow">
-                  <feGaussianBlur stdDeviation="0.8" result="b" />
-                  <feMerge>
-                    <feMergeNode in="b" />
-                    <feMergeNode in="SourceGraphic" />
-                  </feMerge>
-                </filter>
-              </defs>
-            </svg>
-          ) : p.type === "sparkle" ? (
-            /* Tiny + sparkle */
-            <svg
-              width={p.size * 5}
-              height={p.size * 5}
-              viewBox="0 0 8 8"
-              fill="none"
-            >
-              <path
-                d="M4 0 L4.3 3.7 L8 4 L4.3 4.3 L4 8 L3.7 4.3 L0 4 L3.7 3.7 Z"
-                fill="#f0d878"
-              />
+              <rect x="4" y="5" width="4" height="1" fill="currentColor" />
             </svg>
           ) : (
-            /* Soft dot */
+            /* Rotating hollow square */
             <div
               style={{
-                width: p.size * 3,
-                height: p.size * 3,
-                borderRadius: "50%",
-                background:
-                  "radial-gradient(circle, #f5e6a0 0%, #bf953f 60%, transparent 100%)",
+                width: p.size * 6,
+                height: p.size * 6,
+                border: "1px solid hsl(var(--gold) / 0.5)",
+                transform: "rotate(45deg)",
               }}
             />
           )}

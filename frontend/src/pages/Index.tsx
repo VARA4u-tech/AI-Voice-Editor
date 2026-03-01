@@ -7,10 +7,12 @@ import UploadButton from "@/components/UploadButton";
 import StatusIndicator from "@/components/StatusIndicator";
 import PreviewArea from "@/components/PreviewArea";
 import MysticalHero from "@/components/MysticalHero";
+import CyberHero from "@/components/CyberHero";
 import ScribeSidebar from "@/components/ScribeSidebar";
 import AmbientPlayer from "@/components/AmbientPlayer";
 import MysticalBackground from "@/components/MysticalBackground";
 import useSpeechRecognition from "@/hooks/useSpeechRecognition";
+import { useSoundEffects } from "@/hooks/useSoundEffects";
 import { Sparkles } from "lucide-react";
 import MoonPhaseAnimation from "@/components/MoonPhaseAnimation";
 import GoldWaveform from "@/components/GoldWaveform";
@@ -61,6 +63,15 @@ const Index = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isFocusMode, setIsFocusMode] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const {
+    playClick,
+    playSuccess,
+    playError,
+    playHover,
+    playStart,
+    playStop,
+    playTransition,
+  } = useSoundEffects();
 
   // ── Persist session to localStorage on every change ──
   useEffect(() => {
@@ -113,6 +124,7 @@ const Index = () => {
       setCommandSuccess(result.success);
 
       if (result.success) {
+        playSuccess();
         if (result.scribeResponse) {
           // Check for Focus Mode Toggle
           if (result.structuredData?.action === "focus_toggle") {
@@ -136,6 +148,8 @@ const Index = () => {
             setTimeout(() => setLastEditedIndices([]), 3000);
           }
         }
+      } else {
+        playError();
       }
 
       clearFeedback();
@@ -155,6 +169,7 @@ const Index = () => {
   const handleMicToggle = useCallback(() => {
     if (isListening) {
       stopListening();
+      playStop();
       setIsProcessing(true);
       setTimeout(() => {
         const cmd = transcript || "";
@@ -164,9 +179,18 @@ const Index = () => {
         setIsProcessing(false);
       }, 600);
     } else {
+      playStart();
       startListening();
     }
-  }, [isListening, stopListening, startListening, transcript, handleCommand]);
+  }, [
+    isListening,
+    stopListening,
+    startListening,
+    transcript,
+    handleCommand,
+    playStart,
+    playStop,
+  ]);
 
   // ── Keyboard shortcut: Space (when not typing) or Ctrl+M ──
   useEffect(() => {
@@ -195,6 +219,7 @@ const Index = () => {
   }, [handleMicToggle]);
 
   const handleUpload = () => {
+    playClick();
     fileInputRef.current?.click();
   };
 
@@ -219,6 +244,7 @@ const Index = () => {
         `Loaded "${file.name}" — ${parsed.paragraphs.length} paragraphs found.${typeNote}`,
       );
       setCommandSuccess(true);
+      playSuccess();
       clearFeedback();
     } catch (err) {
       console.error("Parse error:", err);
@@ -232,6 +258,7 @@ const Index = () => {
         setCommandFeedback("Failed to parse document. Try a different file.");
       }
       setCommandSuccess(false);
+      playError();
       clearFeedback();
     } finally {
       setIsParsing(false);
@@ -245,6 +272,7 @@ const Index = () => {
     setHistory([]);
     setCommandFeedback("Scroll cleared. Ready for a new document.");
     setCommandSuccess(true);
+    playTransition();
     clearFeedback();
 
     // Clear input value so same file can be uploaded again
@@ -286,8 +314,12 @@ const Index = () => {
 </html>`;
     const blob = new Blob([html], { type: "text/html" });
     const url = URL.createObjectURL(blob);
+    playSuccess();
     window.open(url, "_blank");
     setTimeout(() => URL.revokeObjectURL(url), 10000);
+    function playHover(): void {
+      throw new Error("Function not implemented.");
+    }
   };
 
   const displayTranscript =
@@ -309,6 +341,7 @@ const Index = () => {
       {/* Sidebar Toggle Button */}
       <button
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        onMouseEnter={() => playHover()}
         className="fixed top-6 right-6 z-40 p-3 rounded-full border border-primary/20 bg-background/40 backdrop-blur-md text-primary hover:bg-primary/10 transition-all duration-300 shadow-xl group"
       >
         <Sparkles className="w-5 h-5 group-hover:scale-110 transition-transform" />
@@ -350,71 +383,49 @@ const Index = () => {
         <div
           className={`transition-all duration-1000 flex flex-col items-center w-full ${isFocusMode ? "opacity-20 blur-[1px] grayscale-[0.5]" : "opacity-100 blur-0"}`}
         >
-          {/* Premium Logo Header */}
-          <div className="my-6 sm:my-8 flex flex-col items-center">
-            <img
-              src="/LOGO.png"
-              alt="AI Voice Editor Logo"
-              className="w-48 sm:w-64 h-auto drop-shadow-[0_0_20px_hsl(var(--gold)/0.4)] animate-fade-in"
-            />
-          </div>
+          <CyberHero fileName={fileName} paragraphsCount={paragraphs.length} />
+        </div>
 
-          {/* Title */}
-          <div className="text-center space-y-1 sm:space-y-2 mb-4 sm:mb-6 px-4">
-            <h1 className="font-heading text-xl sm:text-2xl md:text-3xl tracking-[0.2em] text-primary gold-text-glow uppercase">
-              AI Voice Editor
-            </h1>
-            <p className="font-body text-base sm:text-lg text-foreground/60 italic">
-              Voice-Controlled PDF Editor
-            </p>
-            {/* Session restored notice */}
-            {paragraphs.length > 0 && !!saved && (
-              <p className="font-body text-[11px] text-primary/40 italic animate-fade-in">
-                ✦ Scribe remembers your last scroll · {paragraphs.length}{" "}
-                paragraphs restored
-              </p>
-            )}
-          </div>
+        {/* Upload + Export + Clear row */}
+        <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 px-4 w-full">
+          <UploadButton
+            onUpload={handleUpload}
+            hasFile={!!fileName}
+            fileName={fileName}
+          />
 
-          <GoldDivider />
-
-          {/* Upload + Export + Clear row */}
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 px-4 w-full">
-            <UploadButton
-              onUpload={handleUpload}
-              hasFile={!!fileName}
-              fileName={fileName}
-            />
-
-            {paragraphs.length > 0 && (
-              <>
-                <button
-                  onClick={handleExport}
-                  className="group flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3
-                    border border-primary/60 bg-transparent
-                    text-primary font-heading text-xs sm:text-sm tracking-[0.2em] uppercase
+          {paragraphs.length > 0 && (
+            <>
+              <button
+                onClick={handleExport}
+                onMouseEnter={() => playHover()}
+                className="group relative flex items-center justify-center gap-2 px-6 py-2.5 sm:py-3
+                    border border-primary/20 bg-primary/5
+                    text-primary font-tech text-[10px] sm:text-[11px] tracking-[0.2em] uppercase
                     transition-all duration-300 w-full sm:w-auto
-                    hover:border-primary hover:bg-primary/5
-                    gold-glow-hover cursor-pointer animate-fade-in"
-                >
-                  <Download className="w-4 h-4 transition-transform duration-300 group-hover:translate-y-0.5" />
-                  Export
-                </button>
+                    hover:border-accent hover:bg-accent/5 hover:text-accent
+                    cursor-pointer animate-fade-in overflow-hidden"
+              >
+                <div className="tech-bracket-tl w-1 h-1" />
+                <div className="tech-bracket-br w-1 h-1" />
+                <Download className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-y-0.5" />
+                Export_Out
+              </button>
 
-                <button
-                  onClick={handleClearDocument}
-                  title="Clear document"
-                  className="group flex items-center justify-center p-2.5 sm:p-3
+              <button
+                onClick={handleClearDocument}
+                onMouseEnter={() => playHover()}
+                title="Clear document"
+                className="group flex items-center justify-center p-2.5 sm:p-3
                     border border-destructive/40 bg-transparent rounded-full
                     text-destructive/80 transition-all duration-300
                     hover:border-destructive hover:bg-destructive/10 hover:text-destructive
                     cursor-pointer animate-fade-in"
-                >
-                  <X className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-90" />
-                </button>
-              </>
-            )}
-          </div>
+              >
+                <X className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-90" />
+              </button>
+            </>
+          )}
         </div>
 
         {!isSupported && (
@@ -434,10 +445,13 @@ const Index = () => {
           />
 
           {displayTranscript && isListening && (
-            <div className="relative font-body text-sm text-primary/80 italic text-center max-w-sm animate-fade-in group">
-              <span className="absolute -inset-1 bg-primary/5 blur-xl rounded-full scale-150 opacity-50 group-hover:opacity-100 transition-opacity" />
-              <p className="relative z-10 gold-text-glow tracking-wide">
-                "{displayTranscript}"
+            <div className="relative font-mono text-[11px] text-accent tracking-wider text-center max-w-md animate-fade-in group px-6 py-2 border-x border-accent/20">
+              <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
+              <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
+              <p className="relative z-10 uppercase opacity-80">
+                <span className="opacity-40 mr-2">Capture:</span>"
+                {displayTranscript}"
+                <span className="inline-block w-1.5 h-3 bg-accent/60 ml-1 animate-pulse" />
               </p>
             </div>
           )}

@@ -33,86 +33,108 @@ const PreviewArea = ({
   return (
     <div
       ref={scrollRef}
-      className="w-full max-w-4xl border border-primary/30 bg-background/85 backdrop-blur-xl min-h-[400px] max-h-[600px] 2xl:max-h-[800px] overflow-y-auto p-4 sm:p-8 md:p-12 transition-all duration-500 relative rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.5)]"
+      className="w-full max-w-4xl border border-primary/30 bg-background/90 backdrop-blur-2xl min-h-[400px] max-h-[600px] 2xl:max-h-[800px] overflow-y-auto p-4 sm:p-8 md:p-10 transition-all duration-500 relative shadow-[0_0_50px_rgba(0,0,0,0.8)] custom-scrollbar"
     >
+      <div className="tech-bracket-tl" />
+      <div className="tech-bracket-tr" />
+      <div className="tech-bracket-bl" />
+      <div className="tech-bracket-br" />
+
       {/* Command feedback toast */}
       {commandFeedback && (
         <div
-          className={`mb-4 px-4 py-2 text-sm font-body border animate-fade-in ${
+          className={`mb-6 px-4 py-3 text-xs font-mono border animate-fade-in relative overflow-hidden ${
             commandSuccess
-              ? "border-primary/40 text-primary bg-primary/5"
+              ? "border-accent/40 text-accent bg-accent/5"
               : "border-destructive/40 text-destructive/80 bg-destructive/5"
           }`}
         >
-          {commandFeedback}
+          <div className="flex items-center gap-2">
+            <span className="opacity-50">
+              [{commandSuccess ? "SUCCESS" : "ERROR"}]
+            </span>
+            {commandFeedback}
+          </div>
+          <div
+            className="absolute bottom-0 left-0 h-[1px] bg-accent/50 animate-[shimmer_2s_infinite]"
+            style={{ width: "100%" }}
+          />
         </div>
       )}
 
       {isLoading ? (
-        <div className="flex flex-col items-center justify-center h-full min-h-[160px] gap-4">
-          <Loader2 className="w-8 h-8 text-primary animate-spin" />
-          <p className="font-body text-lg italic text-primary/60">
-            Parsing document...
+        <div className="flex flex-col items-center justify-center h-full min-h-[300px] gap-6">
+          <div className="relative">
+            <Loader2 className="w-12 h-12 text-accent animate-spin" />
+            <div className="absolute inset-0 bg-accent/20 blur-xl animate-pulse" />
+          </div>
+          <p className="font-tech text-xs tracking-[0.4em] uppercase text-accent animate-pulse">
+            Analyzing Data Stream...
           </p>
         </div>
       ) : paragraphs.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-full min-h-[350px] gap-6 p-4 sm:p-8 relative">
-          <div className="absolute inset-0 bg-background/80 backdrop-blur-md z-0 rounded-lg" />
-
+        <div className="flex flex-col items-center justify-center h-full min-h-[450px] gap-6 p-4 sm:p-8 relative">
           <div className="relative z-10 flex flex-col items-center text-center w-full max-w-lg">
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4 border border-primary/30 gold-glow">
-              <FileText className="w-8 h-8 text-primary" />
+            <div className="w-20 h-20 rounded-sm bg-primary/5 flex items-center justify-center mb-6 border border-primary/20 relative group overflow-hidden">
+              <div className="absolute inset-0 bg-accent/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <FileText className="w-10 h-10 text-primary group-hover:text-accent transition-colors" />
+              <div className="tech-bracket-tl w-2 h-2" />
+              <div className="tech-bracket-br w-2 h-2" />
             </div>
-            <h3 className="font-heading text-xl sm:text-2xl text-primary tracking-widest mb-3 uppercase gold-text-glow">
-              Awaken the Scribe
+            <h3 className="font-tech text-lg sm:text-xl text-primary tracking-[0.3em] mb-4 uppercase">
+              Interface Standby
             </h3>
-            <p className="font-body text-base sm:text-lg text-foreground/80 mb-8 leading-relaxed px-4">
-              Upload a document to begin. Your words will materialize here,
-              ready to be shaped and refined solely by the power of your voice.
+            <p className="font-body text-base sm:text-lg text-foreground/70 mb-10 leading-relaxed px-4">
+              Awaiting document injection. Once initialized, your vocal commands
+              will modulate the content in real-time.
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full px-2">
-              <div className="flex items-start gap-3 p-3 sm:p-4 rounded-md bg-secondary/60 border border-primary/10 hover:border-primary/30 transition-colors text-left group">
-                <Mic className="w-5 h-5 text-primary mt-1 shrink-0 group-hover:scale-110 transition-transform" />
+              <div className="flex items-start gap-3 p-4 border border-primary/10 bg-primary/5 hover:border-accent/40 transition-all text-left group relative">
+                <div className="tech-bracket-tl w-1 h-1" />
+                <Mic className="w-5 h-5 text-primary mt-1 shrink-0 group-hover:text-accent group-hover:scale-110 transition-all" />
                 <div>
-                  <h4 className="font-heading text-xs sm:text-sm text-primary tracking-wider uppercase mb-1">
-                    Voice Control
+                  <h4 className="font-tech text-[10px] text-primary/80 tracking-widest uppercase mb-1">
+                    Vocal Synthesis
                   </h4>
-                  <p className="font-body text-[13px] sm:text-sm text-foreground/60 italic leading-snug">
-                    Say "Delete paragraph 2" or "Find student"
+                  <p className="font-mono text-[11px] text-foreground/50 leading-snug">
+                    "Delete segment 4"
                   </p>
                 </div>
               </div>
-              <div className="flex items-start gap-3 p-3 sm:p-4 rounded-md bg-secondary/60 border border-primary/10 hover:border-primary/30 transition-colors text-left group">
-                <Wand2 className="w-5 h-5 text-primary mt-1 shrink-0 group-hover:-rotate-12 transition-transform" />
+              <div className="flex items-start gap-3 p-4 border border-primary/10 bg-primary/5 hover:border-accent/40 transition-all text-left group relative">
+                <div className="tech-bracket-tl w-1 h-1" />
+                <Wand2 className="w-5 h-5 text-primary mt-1 shrink-0 group-hover:text-accent group-hover:-rotate-12 transition-all" />
                 <div>
-                  <h4 className="font-heading text-xs sm:text-sm text-primary tracking-wider uppercase mb-1">
-                    Style Alchemist
+                  <h4 className="font-tech text-[10px] text-primary/80 tracking-widest uppercase mb-1">
+                    Neural Rewrite
                   </h4>
-                  <p className="font-body text-[13px] sm:text-sm text-foreground/60 italic leading-snug">
-                    Say "Rewrite paragraph 1 to be professional"
+                  <p className="font-mono text-[11px] text-foreground/50 leading-snug">
+                    "Elevate tone for segment 1"
                   </p>
                 </div>
               </div>
-              <div className="flex items-start gap-3 p-3 sm:p-4 rounded-md bg-secondary/60 border border-primary/10 hover:border-primary/30 transition-colors text-left group">
-                <Languages className="w-5 h-5 text-primary mt-1 shrink-0 group-hover:scale-110 transition-transform" />
+              <div className="flex items-start gap-3 p-4 border border-primary/10 bg-primary/5 hover:border-accent/40 transition-all text-left group relative">
+                <div className="tech-bracket-tl w-1 h-1" />
+                <Languages className="w-5 h-5 text-primary mt-1 shrink-0 group-hover:text-accent transition-all" />
                 <div>
-                  <h4 className="font-heading text-xs sm:text-sm text-primary tracking-wider uppercase mb-1">
-                    Mystic Translation
+                  <h4 className="font-tech text-[10px] text-primary/80 tracking-widest uppercase mb-1">
+                    Cipher Lingua
                   </h4>
-                  <p className="font-body text-[13px] sm:text-sm text-foreground/60 italic leading-snug">
-                    Say "Translate paragraph 3 to Telugu"
+                  <p className="font-mono text-[11px] text-foreground/50 leading-snug">
+                    "Translate segment 3 to Hindi"
                   </p>
                 </div>
               </div>
-              <div className="flex items-start gap-3 p-3 sm:p-4 rounded-md bg-secondary/60 border border-primary/10 hover:border-primary/30 transition-colors text-left group">
-                <Eye className="w-5 h-5 text-primary mt-1 shrink-0 group-hover:text-primary/70 transition-colors" />
+              <div className="flex items-start gap-3 p-4 border border-primary/10 bg-primary/5 hover:border-accent/40 transition-all text-left group relative">
+                <div className="tech-bracket-tl w-1 h-1" />
+                <Eye className="w-5 h-5 text-primary mt-1 shrink-0 group-hover:text-accent transition-all" />
                 <div>
-                  <h4 className="font-heading text-xs sm:text-sm text-primary tracking-wider uppercase mb-1">
-                    Deep Focus
+                  <h4 className="font-tech text-[10px] text-primary/80 tracking-widest uppercase mb-1">
+                    Sensory Focus
                   </h4>
-                  <p className="font-body text-[13px] sm:text-sm text-foreground/60 italic leading-snug">
-                    Say "Enter focus mode"
+                  <p className="font-mono text-[11px] text-foreground/50 leading-snug">
+                    "Activate Focus Mode"
                   </p>
                 </div>
               </div>
@@ -121,31 +143,55 @@ const PreviewArea = ({
         </div>
       ) : (
         <div className="space-y-1 relative z-10">
-          {pageCount && (
-            <div className="flex items-center gap-2 text-primary/70 text-xs font-heading tracking-widest uppercase mb-3 drop-shadow-sm">
-              <FileText className="w-4 h-4" />
-              {pageCount} page{pageCount > 1 ? "s" : ""} · {paragraphs.length}{" "}
-              paragraph{paragraphs.length > 1 ? "s" : ""}
+          <div className="flex items-center justify-between border-b border-primary/20 pb-4 mb-6">
+            <div className="flex items-center gap-4">
+              <div className="flex flex-col">
+                <span className="font-tech text-[8px] text-primary/40 tracking-[0.2em] mb-1">
+                  DOCUMENT_ID
+                </span>
+                <span className="font-mono text-[11px] text-primary tracking-tight">
+                  VCORE_{Math.random().toString(36).substring(7).toUpperCase()}
+                </span>
+              </div>
+              <div className="w-[1px] h-8 bg-primary/10" />
+              <div className="flex flex-col">
+                <span className="font-tech text-[8px] text-primary/40 tracking-[0.2em] mb-1">
+                  SEGMENTS
+                </span>
+                <span className="font-mono text-[11px] text-primary tracking-tight">
+                  {paragraphs.length}
+                </span>
+              </div>
             </div>
-          )}
-          {paragraphs.map((para, i) => (
-            <div
-              key={i}
-              ref={(el) => (paraRefs.current[i] = el)}
-              className={`group flex gap-3 py-2 border-b border-primary/10 last:border-0 transition-all duration-700 ${
-                lastEditedIndices.includes(i)
-                  ? "ink-flow rounded-md px-2 -mx-2 mb-1"
-                  : ""
-              }`}
-            >
-              <span className="text-primary/50 text-xs font-heading mt-1 shrink-0 w-5 text-right drop-shadow-sm">
-                {i + 1}
-              </span>
-              <p className="font-body text-base text-foreground/90 leading-relaxed transition-colors duration-200 group-hover:text-foreground drop-shadow-sm">
-                {para}
-              </p>
-            </div>
-          ))}
+            {pageCount && (
+              <div className="px-3 py-1 border border-accent/20 bg-accent/5 rounded-sm">
+                <span className="font-tech text-[9px] text-accent tracking-[0.2em]">
+                  {pageCount} PG_UNITS
+                </span>
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-4">
+            {paragraphs.map((para, i) => (
+              <div
+                key={i}
+                ref={(el) => (paraRefs.current[i] = el)}
+                className={`group flex gap-4 py-3 px-2 border-l-2 border-transparent hover:border-primary/20 transition-all duration-300 ${
+                  lastEditedIndices.includes(i)
+                    ? "bg-accent/5 border-l-accent/50 rounded-r-lg"
+                    : ""
+                }`}
+              >
+                <span className="text-primary/30 font-mono text-[10px] mt-1 shrink-0 w-8 tabular-nums">
+                  [{String(i + 1).padStart(2, "0")}]
+                </span>
+                <p className="font-body text-base text-foreground/90 leading-relaxed transition-colors duration-200 group-hover:text-foreground">
+                  {para}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>

@@ -1,4 +1,5 @@
 import { Upload } from "lucide-react";
+import { useSoundEffects } from "@/hooks/useSoundEffects";
 
 interface UploadButtonProps {
   onUpload: () => void;
@@ -7,18 +8,24 @@ interface UploadButtonProps {
 }
 
 const UploadButton = ({ onUpload, hasFile, fileName }: UploadButtonProps) => {
+  const { playHover } = useSoundEffects();
+
   return (
     <button
       onClick={onUpload}
+      onMouseEnter={() => playHover()}
       className="
         group flex items-center justify-center gap-3 px-6 sm:px-8 py-2.5 sm:py-3
-        border border-primary/60 bg-transparent
-        text-primary font-heading text-xs sm:text-sm tracking-[0.2em] uppercase
+        border border-primary/30 bg-primary/5
+        text-primary font-tech text-[10px] sm:text-[11px] tracking-[0.25em] uppercase
         transition-all duration-300 w-full sm:w-auto
-        hover:border-primary hover:bg-primary/5
-        gold-glow-hover cursor-pointer
+        hover:border-accent hover:bg-accent/5 hover:text-accent
+        relative cursor-pointer
       "
     >
+      <div className="tech-bracket-tl w-1 h-1" />
+      <div className="tech-bracket-br w-1 h-1" />
+
       <Upload className="w-4 h-4 transition-transform duration-300 group-hover:-translate-y-0.5" />
       {hasFile ? (
         <span
@@ -28,8 +35,11 @@ const UploadButton = ({ onUpload, hasFile, fileName }: UploadButtonProps) => {
           {fileName}
         </span>
       ) : (
-        <span className="whitespace-nowrap font-bold tracking-[0.25em] gold-text-glow">
-          Upload <span className="opacity-80 text-[11px] ml-1">PDF · TXT</span>
+        <span className="whitespace-nowrap font-bold tracking-[0.25em]">
+          Inject{" "}
+          <span className="opacity-60 text-[9px] ml-1">
+            DATA_STREAM [PDF·TXT]
+          </span>
         </span>
       )}
     </button>
