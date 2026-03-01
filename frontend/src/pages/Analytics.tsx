@@ -80,7 +80,7 @@ const Analytics = () => {
           <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
         </div>
       ) : (
-        <div className="space-y-10">
+        <div className="space-y-6 sm:space-y-10">
           {/* Stats Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
@@ -106,7 +106,7 @@ const Analytics = () => {
                 className="p-4 border border-primary/10 bg-primary/5 rounded-sm hover:border-accent/30 transition-all group"
               >
                 <Icon className="w-4 h-4 text-accent/60 mb-2 group-hover:text-accent transition-colors" />
-                <div className="font-heading text-2xl text-primary mb-1">
+                <div className="font-heading text-xl sm:text-2xl text-primary mb-1">
                   {value}
                 </div>
                 <div className="font-mono text-[9px] text-primary/40 uppercase tracking-widest">
@@ -212,7 +212,7 @@ const Analytics = () => {
               <Layers className="w-4 h-4 text-accent" />
               Biometric_Sync
             </h3>
-            <div className="flex justify-around bg-primary/5 p-4 rounded-sm border border-primary/10">
+            <div className="flex flex-wrap justify-around gap-4 bg-primary/5 p-4 rounded-sm border border-primary/10">
               {[
                 { label: "Auth_Link", value: user ? "Established" : "Severed" },
                 { label: "DB_Sync", value: "Stable" },
