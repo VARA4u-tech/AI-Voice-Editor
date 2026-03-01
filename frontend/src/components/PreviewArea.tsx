@@ -1,5 +1,17 @@
-import { FileText, Loader2, Mic, Wand2, Languages, Eye } from "lucide-react";
-import { useEffect, useRef } from "react";
+import {
+  FileText,
+  Loader2,
+  Mic,
+  Wand2,
+  Languages,
+  Eye,
+  Type,
+  AlignLeft,
+  Clock,
+  Search,
+  X,
+} from "lucide-react";
+import { useEffect, useRef, useMemo, useState } from "react";
 
 interface PreviewAreaProps {
   paragraphs: string[];
@@ -20,6 +32,42 @@ const PreviewArea = ({
 }: PreviewAreaProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const paraRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [matchIndex, setMatchIndex] = useState(0);
+
+  const matchingIndices = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    const q = searchQuery.toLowerCase();
+    return paragraphs.reduce<number[]>((acc, p, i) => {
+      if (p.toLowerCase().includes(q)) acc.push(i);
+      return acc;
+    }, []);
+  }, [searchQuery, paragraphs]);
+
+  useEffect(() => {
+    if (matchingIndices.length > 0) {
+      const idx = matchingIndices[matchIndex % matchingIndices.length];
+      paraRefs.current[idx]?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  }, [matchIndex, matchingIndices]);
+
+  const handleSearchKey = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") setMatchIndex((prev) => prev + 1);
+  };
+
+  const stats = useMemo(() => {
+    const fullText = paragraphs.join(" ");
+    const wordCount =
+      fullText.trim() === "" ? 0 : fullText.trim().split(/\s+/).length;
+    const sentenceCount = fullText
+      .split(/[.!?]+/)
+      .filter((s) => s.trim().length > 0).length;
+    const readingMins = Math.max(1, Math.ceil(wordCount / 200));
+    return { wordCount, sentenceCount, readingMins };
+  }, [paragraphs]);
 
   useEffect(() => {
     if (lastEditedIndices.length > 0) {
@@ -143,54 +191,130 @@ const PreviewArea = ({
         </div>
       ) : (
         <div className="space-y-1 relative z-10">
-          <div className="flex items-center justify-between border-b border-primary/20 pb-4 mb-6">
-            <div className="flex items-center gap-4">
-              <div className="flex flex-col">
-                <span className="font-tech text-[8px] text-primary/40 tracking-[0.2em] mb-1">
-                  DOCUMENT_ID
+          <div className="flex flex-col border-b border-primary/20 pb-4 mb-6 gap-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="flex flex-col">
+                  <span className="font-tech text-[8px] text-primary/40 tracking-[0.2em] mb-1">
+                    DOCUMENT_ID
+                  </span>
+                  <span className="font-mono text-[11px] text-primary tracking-tight">
+                    VCORE_
+                    {Math.random().toString(36).substring(7).toUpperCase()}
+                  </span>
+                </div>
+                <div className="w-[1px] h-8 bg-primary/10" />
+                <div className="flex flex-col">
+                  <span className="font-tech text-[8px] text-primary/40 tracking-[0.2em] mb-1">
+                    SEGMENTS
+                  </span>
+                  <span className="font-mono text-[11px] text-primary tracking-tight">
+                    {paragraphs.length}
+                  </span>
+                </div>
+              </div>
+              {pageCount && (
+                <div className="px-3 py-1 border border-accent/20 bg-accent/5 rounded-sm">
+                  <span className="font-tech text-[9px] text-accent tracking-[0.2em]">
+                    {pageCount} PG_UNITS
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Live Stats Bar */}
+            <div className="flex flex-wrap gap-3 pt-2">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/5 border border-primary/10 rounded-sm">
+                <Type className="w-3 h-3 text-accent/60" />
+                <span className="font-mono text-[10px] text-primary/70">
+                  {stats.wordCount.toLocaleString()}
                 </span>
-                <span className="font-mono text-[11px] text-primary tracking-tight">
-                  VCORE_{Math.random().toString(36).substring(7).toUpperCase()}
+                <span className="font-tech text-[8px] text-primary/30 uppercase tracking-widest">
+                  Words
                 </span>
               </div>
-              <div className="w-[1px] h-8 bg-primary/10" />
-              <div className="flex flex-col">
-                <span className="font-tech text-[8px] text-primary/40 tracking-[0.2em] mb-1">
-                  SEGMENTS
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/5 border border-primary/10 rounded-sm">
+                <AlignLeft className="w-3 h-3 text-accent/60" />
+                <span className="font-mono text-[10px] text-primary/70">
+                  {stats.sentenceCount}
                 </span>
-                <span className="font-mono text-[11px] text-primary tracking-tight">
-                  {paragraphs.length}
+                <span className="font-tech text-[8px] text-primary/30 uppercase tracking-widest">
+                  Sentences
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/5 border border-primary/10 rounded-sm">
+                <Clock className="w-3 h-3 text-accent/60" />
+                <span className="font-mono text-[10px] text-primary/70">
+                  ~{stats.readingMins} min
+                </span>
+                <span className="font-tech text-[8px] text-primary/30 uppercase tracking-widest">
+                  Read
                 </span>
               </div>
             </div>
-            {pageCount && (
-              <div className="px-3 py-1 border border-accent/20 bg-accent/5 rounded-sm">
-                <span className="font-tech text-[9px] text-accent tracking-[0.2em]">
-                  {pageCount} PG_UNITS
+          </div>
+
+          {/* Search Bar */}
+          <div className="relative flex items-center mb-4">
+            <Search className="absolute left-3 w-3.5 h-3.5 text-primary/30" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setMatchIndex(0);
+              }}
+              onKeyDown={handleSearchKey}
+              placeholder="Search_Archive... (Enter = next match)"
+              className="w-full bg-primary/5 border border-primary/10 focus:border-accent/30 rounded-sm pl-9 pr-20 py-2 text-[11px] font-mono text-primary placeholder:text-primary/20 focus:outline-none transition-colors"
+            />
+            {searchQuery && (
+              <div className="absolute right-3 flex items-center gap-2">
+                <span className="font-mono text-[9px] text-accent/60">
+                  {matchingIndices.length > 0
+                    ? `${(matchIndex % matchingIndices.length) + 1}/${matchingIndices.length}`
+                    : "0/0"}
                 </span>
+                <button
+                  onClick={() => {
+                    setSearchQuery("");
+                    setMatchIndex(0);
+                  }}
+                >
+                  <X className="w-3 h-3 text-primary/30 hover:text-primary transition-colors" />
+                </button>
               </div>
             )}
           </div>
 
           <div className="space-y-4">
-            {paragraphs.map((para, i) => (
-              <div
-                key={i}
-                ref={(el) => (paraRefs.current[i] = el)}
-                className={`group flex gap-4 py-3 px-2 border-l-2 border-transparent hover:border-primary/20 transition-all duration-300 ${
-                  lastEditedIndices.includes(i)
-                    ? "bg-accent/5 border-l-accent/50 rounded-r-lg"
-                    : ""
-                }`}
-              >
-                <span className="text-primary/30 font-mono text-[10px] mt-1 shrink-0 w-8 tabular-nums">
-                  [{String(i + 1).padStart(2, "0")}]
-                </span>
-                <p className="font-body text-base text-foreground/90 leading-relaxed transition-colors duration-200 group-hover:text-foreground">
-                  {para}
-                </p>
-              </div>
-            ))}
+            {paragraphs.map((para, i) => {
+              const isMatch = matchingIndices.includes(i);
+              const isActive =
+                matchingIndices[matchIndex % matchingIndices.length] === i;
+              return (
+                <div
+                  key={i}
+                  ref={(el) => (paraRefs.current[i] = el)}
+                  className={`group flex gap-4 py-3 px-2 border-l-2 border-transparent hover:border-primary/20 transition-all duration-300 ${
+                    isActive
+                      ? "bg-accent/10 border-l-accent rounded-r-lg"
+                      : isMatch
+                        ? "bg-accent/5 border-l-accent/30 rounded-r-lg"
+                        : lastEditedIndices.includes(i)
+                          ? "bg-accent/5 border-l-accent/50 rounded-r-lg"
+                          : ""
+                  }`}
+                >
+                  <span className="text-primary/30 font-mono text-[10px] mt-1 shrink-0 w-8 tabular-nums">
+                    [{String(i + 1).padStart(2, "0")}]
+                  </span>
+                  <p className="font-body text-base text-foreground/90 leading-relaxed transition-colors duration-200 group-hover:text-foreground">
+                    {para}
+                  </p>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

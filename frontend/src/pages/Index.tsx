@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { Download, X } from "lucide-react";
+import { Download, X, Wand2 } from "lucide-react";
 import FloatingParticles from "@/components/FloatingParticles";
 import GoldDivider from "@/components/GoldDivider";
 import MicButton from "@/components/MicButton";
@@ -22,6 +22,7 @@ import CommandHelp from "@/components/CommandHelp";
 import { parseDocument, type ParsedDocument } from "@/lib/documentParser";
 import { processVoiceCommand, type CommandResult } from "@/lib/voiceCommands";
 import { processCommandWithAI } from "@/lib/aiService";
+import { exportToPdf } from "@/lib/pdfExport";
 
 const STORAGE_KEY = "gilded-scribe-session";
 
@@ -371,46 +372,73 @@ const Index = () => {
     }
   };
 
-  // Export as styled HTML page that can be Print → Save as PDF
+  // Export as a properly formatted PDF using jsPDF
   const handleExport = () => {
-    const base = fileName ? fileName.replace(/\.[^.]+$/, "") : "document";
-    const html = `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>${base} — Gilded Voice Scribe</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400&family=Cormorant+Garamond:ital,wght@0,400;1,400&display=swap');
-    body { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 14pt; line-height: 1.8;
-           color: #1a1a1a; max-width: 720px; margin: 40px auto; padding: 0 40px; }
-    h1 { font-family: 'Cinzel', serif; font-size: 18pt; letter-spacing: 0.2em;
-         text-align: center; border-bottom: 1px solid #c8922a; padding-bottom: 16px;
-         margin-bottom: 32px; color: #7a5213; }
-    p { margin: 0 0 1.4em; text-align: justify; }
-    .para-num { font-family: 'Cinzel', serif; font-size: 8pt; color: #c8922a;
-                letter-spacing: 0.15em; margin-right: 8px; opacity: 0.6; }
-    footer { margin-top: 48px; border-top: 1px solid #ccc; padding-top: 12px;
-             font-size: 9pt; color: #999; text-align: center; font-style: italic; }
-    @media print { body { margin: 20px; padding: 0; } }
-  </style>
-</head>
-<body>
-  <h1>${base}</h1>
-  ${paragraphs.map((p, i) => `<p><span class="para-num">${i + 1}.</span>${p}</p>`).join("\n  ")}
-  <footer>Edited with Gilded Voice Scribe · ${new Date().toLocaleDateString()}</footer>
-  <script>window.onload = () => { window.print(); }<\/script>
-</body>
-</html>`;
-    const blob = new Blob([html], { type: "text/html" });
-    const url = URL.createObjectURL(blob);
+    if (!paragraphs.length) return;
+    exportToPdf(fileName, paragraphs);
     playSuccess();
-    window.open(url, "_blank");
-    setTimeout(() => URL.revokeObjectURL(url), 10000);
-    function playHover(): void {
-      throw new Error("Function not implemented.");
-    }
   };
+
+  // ── AI Auto-Title Generator ───────────────────────────────────────────────
+  const [isGeneratingTitle, setIsGeneratingTitle] = useState(false);
+
+  const handleGenerateTitle = useCallback(async () => {
+    if (!paragraphs.length) return;
+    setIsGeneratingTitle(true);
+    playClick();
+
+    const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
+    const siteUrl = import.meta.env.VITE_SITE_URL || "http://localhost:8080";
+    const siteName = import.meta.env.VITE_SITE_NAME || "AI Voice Editor";
+    const sample = paragraphs.slice(0, 5).join(" ").slice(0, 800);
+
+    try {
+      const response = await fetch(
+        "https://openrouter.ai/api/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            "HTTP-Referer": siteUrl,
+            "X-Title": siteName,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "stepfun/step-3.5-flash:free",
+            messages: [
+              {
+                role: "system",
+                content:
+                  "You are a document analyst. Reply ONLY with a concise, professional document title (5 words max, no quotes, no punctuation).",
+              },
+              {
+                role: "user",
+                content: `Generate a title for this document:\n\n${sample}`,
+              },
+            ],
+          }),
+        },
+      );
+      if (response.ok) {
+        const data = await response.json();
+        const suggested = data.choices?.[0]?.message?.content?.trim();
+        if (suggested) {
+          setFileName(suggested);
+          setCommandFeedback(`Title conjured: "${suggested}"`);
+          setCommandSuccess(true);
+          playSuccess();
+          clearFeedback();
+        }
+      }
+    } catch {
+      setCommandFeedback("Title generation failed. Check your API key.");
+      setCommandSuccess(false);
+      playError();
+      clearFeedback();
+    } finally {
+      setIsGeneratingTitle(false);
+    }
+  }, [paragraphs, playClick, playSuccess, playError, clearFeedback]);
 
   const displayTranscript =
     transcript +
@@ -485,6 +513,29 @@ const Index = () => {
 
           {paragraphs.length > 0 && (
             <>
+              {/* Auto-Title Button */}
+              <button
+                onClick={handleGenerateTitle}
+                onMouseEnter={() => playHover()}
+                disabled={isGeneratingTitle}
+                title="AI Auto-Title Generator"
+                className="group relative flex items-center justify-center gap-2 px-5 py-2.5 sm:py-3
+                    border border-primary/20 bg-primary/5
+                    text-primary font-tech text-[10px] sm:text-[11px] tracking-[0.2em] uppercase
+                    transition-all duration-300 w-full sm:w-auto
+                    hover:border-accent hover:bg-accent/5 hover:text-accent
+                    cursor-pointer animate-fade-in overflow-hidden disabled:opacity-50"
+              >
+                <div className="tech-bracket-tl w-1 h-1" />
+                <div className="tech-bracket-br w-1 h-1" />
+                {isGeneratingTitle ? (
+                  <div className="w-3.5 h-3.5 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Wand2 className="w-3.5 h-3.5 transition-transform duration-300 group-hover:-rotate-12" />
+                )}
+                {isGeneratingTitle ? "Conjuring..." : "Auto_Title"}
+              </button>
+
               <button
                 onClick={handleExport}
                 onMouseEnter={() => playHover()}
