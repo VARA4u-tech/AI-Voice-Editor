@@ -11,9 +11,9 @@ const CyberHero = ({ fileName, paragraphsCount }: CyberHeroProps) => {
   const { playHover } = useSoundEffects();
 
   return (
-    <div className="w-full max-w-4xl flex flex-col items-center mb-10 animate-fade-in relative pt-4">
-      {/* Decorative Outer Hexagon HUD */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] pointer-events-none opacity-10">
+    <div className="w-full max-w-4xl flex flex-col items-center mb-6 animate-fade-in relative pt-4">
+      {/* Decorative Outer Hexagon HUD — contained to logo area */}
+      <div className="absolute top-4 left-1/2 -translate-x-1/2 w-64 h-64 pointer-events-none opacity-10">
         <svg
           viewBox="0 0 100 100"
           className="w-full h-full text-accent stroke-current fill-none"
@@ -27,12 +27,12 @@ const CyberHero = ({ fileName, paragraphsCount }: CyberHeroProps) => {
       </div>
 
       {/* Main Logo Area */}
-      <div className="relative mb-12 group">
+      <div className="relative mb-6 group">
         <div className="absolute -inset-10 bg-accent/10 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
         <img
           src="/LOGO.png"
           alt="AI Voice Editor Logo"
-          className="w-72 sm:w-[480px] h-auto drop-shadow-[0_0_45px_hsl(var(--gold)/0.45)] relative z-10 transition-transform duration-700 group-hover:scale-105"
+          className="w-48 sm:w-[280px] h-auto drop-shadow-[0_0_45px_hsl(var(--gold)/0.45)] relative z-10 transition-transform duration-700 group-hover:scale-105"
         />
         <div className="tech-bracket-tl -top-2 -left-2 w-6 h-6 border-accent/40" />
         <div className="tech-bracket-br -bottom-2 -right-2 w-6 h-6 border-accent/40" />
@@ -126,7 +126,7 @@ const CyberHero = ({ fileName, paragraphsCount }: CyberHeroProps) => {
       </div>
 
       {/* Decorative Bottom Bar */}
-      <div className="mt-10 flex items-center justify-between w-full max-w-sm px-4">
+      <div className="mt-6 flex items-center justify-between w-full max-w-sm px-4">
         <div className="flex flex-col items-center">
           <span className="font-mono text-[8px] text-primary/30 uppercase">
             Uptime

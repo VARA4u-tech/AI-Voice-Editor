@@ -701,7 +701,7 @@ const Index = () => {
           className={`transition-all duration-700 flex flex-col items-center w-full overflow-hidden ${
             isFocusMode
               ? "max-h-0 opacity-0 pointer-events-none"
-              : "max-h-[400px] opacity-100"
+              : "max-h-[900px] opacity-100"
           }`}
         >
           <CyberHero fileName={fileName} paragraphsCount={paragraphs.length} />
@@ -711,8 +711,8 @@ const Index = () => {
         <div
           className={`transition-all duration-700 overflow-hidden w-full ${
             isFocusMode
-              ? "max-h-0 opacity-0 pointer-events-none"
-              : "max-h-40 opacity-100"
+              ? "max-h-0 opacity-0 pointer-events-none mb-0"
+              : "max-h-28 opacity-100 mb-4"
           }`}
         >
           <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 px-4 w-full">
