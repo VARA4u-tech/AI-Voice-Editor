@@ -1,5 +1,4 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { Download, X, Wand2 } from "lucide-react";
 import FloatingParticles from "@/components/FloatingParticles";
 import GoldDivider from "@/components/GoldDivider";
 import MicButton from "@/components/MicButton";
@@ -23,6 +22,10 @@ import { parseDocument, type ParsedDocument } from "@/lib/documentParser";
 import { processVoiceCommand, type CommandResult } from "@/lib/voiceCommands";
 import { processCommandWithAI } from "@/lib/aiService";
 import { exportToPdf } from "@/lib/pdfExport";
+import { useSessionTimer } from "@/hooks/useSessionTimer";
+import { Download, X, Wand2, Timer, Save } from "lucide-react";
+import OnboardingTutorial from "@/components/OnboardingTutorial";
+import SmartSuggestions from "@/components/SmartSuggestions";
 
 const STORAGE_KEY = "gilded-scribe-session";
 
@@ -47,10 +50,18 @@ const Index = () => {
   const [paragraphs, setParagraphs] = useState<string[]>(
     saved?.paragraphs ?? [],
   );
+  // Session timer — starts/resets with document
+  const { formatted: sessionTime } = useSessionTimer(
+    paragraphs.length > 0,
+    fileName,
+  );
   const [history, setHistory] = useState<string[][]>([]);
   const [pageCount, setPageCount] = useState(saved?.pageCount ?? 0);
   const [isParsing, setIsParsing] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [lastCommand, setLastCommand] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [pdfType, setPdfType] = useState<"text" | "scanned" | "mixed" | null>(
     null,
   );
@@ -76,6 +87,7 @@ const Index = () => {
     playStart,
     playStop,
     playTransition,
+    playTypewriterTick,
   } = useSoundEffects();
 
   // ── Sync with Supabase on Login ──
@@ -236,6 +248,13 @@ const Index = () => {
       }
 
       clearFeedback();
+
+      // Trigger Smart Suggestions after a successful AI command
+      if (result.success) {
+        setLastCommand(trimmedCmd);
+        setShowSuggestions(true);
+      }
+
       return result;
     },
     [
@@ -257,6 +276,11 @@ const Index = () => {
     startListening,
     stopListening,
   } = useSpeechRecognition();
+
+  // ── Typewriter Sound: plays a soft tick as voice text streams in ──
+  useEffect(() => {
+    if (interimTranscript) playTypewriterTick();
+  }, [interimTranscript, playTypewriterTick]);
 
   const handleMicToggle = useCallback(() => {
     if (isListening) {
@@ -379,6 +403,43 @@ const Index = () => {
     playSuccess();
   };
 
+  // ── Save Version ──────────────────────────────────────────────────────────
+  const [isSavingVersion, setIsSavingVersion] = useState(false);
+  const [versionLabel, setVersionLabel] = useState("");
+  const [showVersionModal, setShowVersionModal] = useState(false);
+
+  const handleSaveVersion = useCallback(async () => {
+    if (!paragraphs.length || !user) return;
+    setIsSavingVersion(true);
+    const label =
+      versionLabel.trim() ||
+      `v_${new Date().toISOString().slice(0, 16).replace("T", "_")}`;
+
+    const { error } = await supabase.from("user_documents").upsert(
+      {
+        user_id: user.id,
+        file_hash: label,
+        content: paragraphs,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id,file_hash" },
+    );
+
+    if (error) {
+      setCommandFeedback("Failed to save version to the archive.");
+      setCommandSuccess(false);
+      playError();
+    } else {
+      setCommandFeedback(`Version "${label}" sealed in the archive.`);
+      setCommandSuccess(true);
+      playSuccess();
+    }
+    setVersionLabel("");
+    setShowVersionModal(false);
+    setIsSavingVersion(false);
+    clearFeedback();
+  }, [paragraphs, user, versionLabel, playSuccess, playError, clearFeedback]);
+
   // ── AI Auto-Title Generator ───────────────────────────────────────────────
   const [isGeneratingTitle, setIsGeneratingTitle] = useState(false);
 
@@ -457,6 +518,21 @@ const Index = () => {
         className={`fixed inset-0 z-0 bg-background/60 backdrop-blur-sm pointer-events-none transition-opacity duration-1000 ${isFocusMode ? "opacity-100" : "opacity-0"}`}
       />
 
+      {/* Onboarding Tutorial */}
+      <OnboardingTutorial
+        forceShow={showOnboarding}
+        onClose={() => setShowOnboarding(false)}
+      />
+
+      {/* Help Button — bottom-left, re-opens tutorial */}
+      <button
+        onClick={() => setShowOnboarding(true)}
+        title="Open Tutorial"
+        className="fixed bottom-6 left-6 z-40 w-9 h-9 flex items-center justify-center rounded-full border border-primary/20 bg-background/60 backdrop-blur-md text-primary/50 hover:text-accent hover:border-accent/40 transition-all duration-300 font-tech text-sm"
+      >
+        ?
+      </button>
+
       {/* Sidebar Toggle Button */}
       <button
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -511,6 +587,19 @@ const Index = () => {
             fileName={fileName}
           />
 
+          {/* Session Timer Badge */}
+          {paragraphs.length > 0 && (
+            <div className="flex items-center gap-1.5 px-3 py-2 border border-primary/20 bg-primary/5 rounded-sm animate-fade-in">
+              <Timer className="w-3.5 h-3.5 text-accent/60 animate-pulse" />
+              <span className="font-mono text-[11px] text-primary/70 tracking-widest tabular-nums">
+                {sessionTime}
+              </span>
+              <span className="font-tech text-[8px] text-primary/30 uppercase">
+                Session
+              </span>
+            </div>
+          )}
+
           {paragraphs.length > 0 && (
             <>
               {/* Auto-Title Button */}
@@ -535,6 +624,26 @@ const Index = () => {
                 )}
                 {isGeneratingTitle ? "Conjuring..." : "Auto_Title"}
               </button>
+
+              {/* Save Version Button — only when logged in */}
+              {user && (
+                <button
+                  onClick={() => setShowVersionModal(true)}
+                  onMouseEnter={() => playHover()}
+                  title="Save Version to Archive"
+                  className="group relative flex items-center justify-center gap-2 px-5 py-2.5 sm:py-3
+                      border border-primary/20 bg-primary/5
+                      text-primary font-tech text-[10px] sm:text-[11px] tracking-[0.2em] uppercase
+                      transition-all duration-300 w-full sm:w-auto
+                      hover:border-accent hover:bg-accent/5 hover:text-accent
+                      cursor-pointer animate-fade-in overflow-hidden"
+                >
+                  <div className="tech-bracket-tl w-1 h-1" />
+                  <div className="tech-bracket-br w-1 h-1" />
+                  <Save className="w-3.5 h-3.5 transition-transform duration-300 group-hover:scale-110" />
+                  Save_Version
+                </button>
+              )}
 
               <button
                 onClick={handleExport}
@@ -621,6 +730,21 @@ const Index = () => {
             commandSuccess={commandSuccess}
             lastEditedIndices={lastEditedIndices}
           />
+
+          {/* Smart Suggestions — appears after each successful command */}
+          {paragraphs.length > 0 && (
+            <div className="mt-4 px-2 w-full">
+              <SmartSuggestions
+                paragraphs={paragraphs}
+                lastCommand={lastCommand}
+                isVisible={showSuggestions}
+                onSuggestionClick={(s) => {
+                  setShowSuggestions(false);
+                  handleCommand(s);
+                }}
+              />
+            </div>
+          )}
         </div>
       </main>
 
@@ -637,6 +761,59 @@ const Index = () => {
           The AI Voice Editor · MDXXVI
         </p>
       </footer>
+
+      {/* Save Version Modal */}
+      {showVersionModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-fade-in">
+          <div className="w-full max-w-md p-8 bg-background border border-accent/30 shadow-[0_0_60px_rgba(0,0,0,0.8)] relative mx-4">
+            <div className="tech-bracket-tl" />
+            <div className="tech-bracket-tr" />
+            <div className="tech-bracket-bl" />
+            <div className="tech-bracket-br" />
+            <h2 className="font-tech text-sm text-primary tracking-[0.3em] uppercase mb-2">
+              Seal Version to Archive
+            </h2>
+            <p className="font-mono text-[10px] text-primary/40 mb-6">
+              // Leave blank for auto-timestamp label
+            </p>
+            <input
+              type="text"
+              value={versionLabel}
+              onChange={(e) => setVersionLabel(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSaveVersion();
+                if (e.key === "Escape") setShowVersionModal(false);
+              }}
+              placeholder="e.g. Draft_v2 or Final_Review"
+              autoFocus
+              className="w-full bg-primary/5 border border-primary/20 focus:border-accent/40 rounded-sm px-4 py-3 text-sm font-mono text-primary placeholder:text-primary/20 focus:outline-none transition-colors mb-6"
+            />
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => {
+                  setShowVersionModal(false);
+                  setVersionLabel("");
+                }}
+                className="px-5 py-2 font-tech text-[10px] tracking-widest uppercase text-primary/40 hover:text-primary border border-primary/10 hover:border-primary/30 transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveVersion}
+                disabled={isSavingVersion}
+                className="px-5 py-2 font-tech text-[10px] tracking-widest uppercase text-accent border border-accent/30 bg-accent/5 hover:bg-accent/15 transition-all disabled:opacity-50 flex items-center gap-2"
+              >
+                {isSavingVersion ? (
+                  <div className="w-3 h-3 border border-accent border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Save className="w-3 h-3" />
+                )}
+                {isSavingVersion ? "Sealing..." : "Seal_Version"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
