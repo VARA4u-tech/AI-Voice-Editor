@@ -1,5 +1,10 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Sparkles, Loader2, ChevronRight } from "lucide-react";
+import {
+  suggestionCache,
+  docFingerprint,
+  minifyPrompt,
+} from "@/lib/tokenOptimizer";
 
 interface SmartSuggestionsProps {
   paragraphs: string[];
@@ -19,13 +24,28 @@ const SmartSuggestions = ({
 
   const fetchSuggestions = useCallback(async () => {
     if (!paragraphs.length || !lastCommand) return;
-    setLoading(true);
-    setSuggestions([]);
 
     const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
     const siteUrl = import.meta.env.VITE_SITE_URL || "http://localhost:8080";
     const siteName = import.meta.env.VITE_SITE_NAME || "AI Voice Editor";
-    const sample = paragraphs.slice(0, 5).join(" ").slice(0, 600);
+
+    // ── Cache lookup ─────────────────────────────────────────────────────
+    const fp = docFingerprint(paragraphs);
+    const cached = suggestionCache.get(lastCommand, fp);
+    if (cached) {
+      setSuggestions(cached as string[]);
+      return;
+    }
+
+    setLoading(true);
+    setSuggestions([]);
+
+    // Only send the first 400 chars of the document as context
+    const sample = paragraphs.slice(0, 4).join(" ").slice(0, 400);
+    const systemMsg = minifyPrompt(
+      `You are an AI editor. Based on the last command, suggest exactly 3 short follow-up voice commands.
+       Reply ONLY with a JSON array of 3 strings. Each under 8 words. Example: ["Fix grammar in segment 2","Shorten segment 3","Summarise segment 1"]`,
+    );
 
     try {
       const response = await fetch(
@@ -40,15 +60,13 @@ const SmartSuggestions = ({
           },
           body: JSON.stringify({
             model: "stepfun/step-3.5-flash:free",
+            max_tokens: 150, // suggestions are short — hard cap
+            temperature: 0.4,
             messages: [
-              {
-                role: "system",
-                content:
-                  "You are an AI editor assistant. Based on the last command and document excerpt, suggest exactly 3 short follow-up commands the user might want to run next. Reply ONLY with a JSON array of 3 strings. Each string must be a natural voice command like 'Summarise segment 1'. Keep each under 8 words.",
-              },
+              { role: "system", content: systemMsg },
               {
                 role: "user",
-                content: `Last command: "${lastCommand}"\n\nDocument excerpt:\n${sample}\n\nSuggest 3 next commands.`,
+                content: `Last command: "${lastCommand}"\nDoc excerpt: ${sample}`,
               },
             ],
           }),
@@ -61,7 +79,9 @@ const SmartSuggestions = ({
         const cleaned = raw.replace(/```json|```/g, "").trim();
         const parsed = JSON.parse(cleaned);
         if (Array.isArray(parsed)) {
-          setSuggestions(parsed.slice(0, 3));
+          const results = parsed.slice(0, 3);
+          setSuggestions(results);
+          suggestionCache.set(lastCommand, fp, results);
         }
       }
     } catch {

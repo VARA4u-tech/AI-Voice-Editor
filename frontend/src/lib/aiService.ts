@@ -1,47 +1,29 @@
 import { CommandResult } from "./voiceCommands";
+import {
+  commandCache,
+  dedupe,
+  buildSmartDocumentContext,
+  minifyPrompt,
+  docFingerprint,
+} from "./tokenOptimizer";
 
 /**
  * AI Service — OpenRouter Direct Signal Protocol
- * Model: stepfun/step-3.5-flash:free
+ * Optimised: caching, deduplication, smart context windowing, prompt minification
  */
 
-const SYSTEM_PROMPT = `You are the "Gilded Scribe", an AI voice editor assistant.
+const SYSTEM_PROMPT = minifyPrompt(`
+You are the "Gilded Scribe", an AI voice editor assistant.
 Interpret the user's command and apply it to the document (an array of paragraphs).
-
 RULES:
 1. Return ONLY a valid JSON object — no markdown, no explanation.
-2. Keep your "message" field short and mystical (1 sentence max).
-3. If the task is Q&A or analysis, put the result in "scribeResponse.content".
-
+2. Keep "message" short (1 sentence max).
+3. For Q&A or analysis put the result in "scribeResponse.content".
+4. updatedParagraphs must contain ALL paragraphs (unchanged ones included).
 JSON format:
-{
-  "success": boolean,
-  "message": "Short mystical confirmation",
-  "updatedParagraphs": string[],
-  "affectedIndices": number[],
-  "scribeResponse": {
-    "type": "summary" | "stats" | "info" | "error",
-    "content": "Full result text here",
-    "title": "Short title"
-  },
-  "structuredData": {
-    "action": "delete | replace | add | format | translate | analyze | qa",
-    "target": "string",
-    "replacement": "string"
-  }
-}`;
+{"success":boolean,"message":"Short confirmation","updatedParagraphs":string[],"affectedIndices":number[],"scribeResponse":{"type":"summary"|"stats"|"info"|"error","content":"result","title":"title"},"structuredData":{"action":"delete|replace|add|format|translate|analyze|qa","target":"string","replacement":"string"}}
+`);
 
-// Truncate document context to avoid token overload (keep first 20 paragraphs)
-function buildDocumentContext(paragraphs: string[]): string {
-  const sample = paragraphs.slice(0, 20);
-  const truncated = paragraphs.length > 20;
-  const context = sample.map((p, i) => `[${i}] ${p}`).join("\n");
-  return truncated
-    ? `${context}\n... (${paragraphs.length - 20} more paragraphs not shown)`
-    : context;
-}
-
-// Delay helper for retry backoff
 const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
 export async function processCommandWithAI(
@@ -62,6 +44,27 @@ export async function processCommandWithAI(
     };
   }
 
+  // ── Deduplication: skip if same command fired within 3s ──────────────────
+  if (dedupe.isDuplicate(command)) {
+    console.info("Token_Optimizer: Duplicate command blocked.", command);
+    return {
+      success: false,
+      message: "Duplicate command ignored. Please wait a moment.",
+      updatedParagraphs: paragraphs,
+    };
+  }
+
+  // ── Cache lookup ─────────────────────────────────────────────────────────
+  const fingerprint = docFingerprint(paragraphs);
+  const cached = commandCache.get(command, fingerprint);
+  if (cached) {
+    console.info("Token_Optimizer: Cache HIT — no API call needed.");
+    return cached as CommandResult;
+  }
+
+  // ── Build optimised context (smart windowing + per-para truncation) ──────
+  const documentContext = buildSmartDocumentContext(paragraphs, command, 12);
+
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
       console.log(
@@ -81,20 +84,22 @@ export async function processCommandWithAI(
           },
           body: JSON.stringify({
             model: "stepfun/step-3.5-flash:free",
+            max_tokens: 1024, // hard cap — free tier protection
+            temperature: 0.2, // lower = more deterministic, fewer wasted tokens
             messages: [
               { role: "system", content: SYSTEM_PROMPT },
               {
                 role: "user",
-                content: `Command: "${command}"\n\nDocument:\n${buildDocumentContext(paragraphs)}`,
+                content: `Command: "${command}"\n\nDocument:\n${documentContext}`,
               },
             ],
           }),
         },
       );
 
-      // 429 = rate limited — wait and retry
+      // 429 = rate limited
       if (response.status === 429) {
-        const waitTime = (attempt + 1) * 3000; // 3s, 6s
+        const waitTime = (attempt + 1) * 3000;
         console.warn(`Rate limited. Retrying in ${waitTime / 1000}s...`);
         if (attempt < retries) {
           await delay(waitTime);
@@ -119,10 +124,15 @@ export async function processCommandWithAI(
       try {
         const cleaned = aiContent.replace(/```json|```/g, "").trim();
         const parsedResult = JSON.parse(cleaned);
-        return {
+        const result: CommandResult = {
           ...parsedResult,
           updatedParagraphs: parsedResult.updatedParagraphs || paragraphs,
         };
+        // ── Cache the successful result ──────────────────────────────────
+        if (result.success) {
+          commandCache.set(command, fingerprint, result);
+        }
+        return result;
       } catch {
         console.error("AI Response Parsing Error:", aiContent);
         return {
@@ -144,7 +154,6 @@ export async function processCommandWithAI(
     }
   }
 
-  // Should never reach here
   return {
     success: false,
     message: "Unknown error.",

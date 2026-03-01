@@ -26,6 +26,7 @@ import { useSessionTimer } from "@/hooks/useSessionTimer";
 import { Download, X, Wand2, Timer, Save } from "lucide-react";
 import OnboardingTutorial from "@/components/OnboardingTutorial";
 import SmartSuggestions from "@/components/SmartSuggestions";
+import { titleCache, docFingerprint, minifyPrompt } from "@/lib/tokenOptimizer";
 
 const STORAGE_KEY = "gilded-scribe-session";
 
@@ -526,13 +527,30 @@ const Index = () => {
 
   const handleGenerateTitle = useCallback(async () => {
     if (!paragraphs.length) return;
-    setIsGeneratingTitle(true);
     playClick();
 
+    // ── Cache: same doc → same title, no extra API call ────────────────────
+    const fp = docFingerprint(paragraphs);
+    const cached = titleCache.get("auto-title", fp);
+    if (cached) {
+      const title = cached as string;
+      setFileName(title);
+      setCommandFeedback(`Title recalled from cache: "${title}"`);
+      setCommandSuccess(true);
+      playSuccess();
+      clearFeedback();
+      return;
+    }
+
+    setIsGeneratingTitle(true);
     const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
     const siteUrl = import.meta.env.VITE_SITE_URL || "http://localhost:8080";
     const siteName = import.meta.env.VITE_SITE_NAME || "AI Voice Editor";
-    const sample = paragraphs.slice(0, 5).join(" ").slice(0, 800);
+    // Only first 500 chars — plenty for a title
+    const sample = paragraphs.slice(0, 3).join(" ").slice(0, 500);
+    const sysMsg = minifyPrompt(
+      "You are a document analyst. Reply ONLY with a concise document title (5 words max, no quotes, no punctuation).",
+    );
 
     try {
       const response = await fetch(
@@ -547,16 +565,11 @@ const Index = () => {
           },
           body: JSON.stringify({
             model: "stepfun/step-3.5-flash:free",
+            max_tokens: 30, // a title is max 5 words — very small cap
+            temperature: 0.3,
             messages: [
-              {
-                role: "system",
-                content:
-                  "You are a document analyst. Reply ONLY with a concise, professional document title (5 words max, no quotes, no punctuation).",
-              },
-              {
-                role: "user",
-                content: `Generate a title for this document:\n\n${sample}`,
-              },
+              { role: "system", content: sysMsg },
+              { role: "user", content: `Title for: ${sample}` },
             ],
           }),
         },
@@ -565,6 +578,7 @@ const Index = () => {
         const data = await response.json();
         const suggested = data.choices?.[0]?.message?.content?.trim();
         if (suggested) {
+          titleCache.set("auto-title", fp, suggested);
           setFileName(suggested);
           setCommandFeedback(`Title conjured: "${suggested}"`);
           setCommandSuccess(true);
