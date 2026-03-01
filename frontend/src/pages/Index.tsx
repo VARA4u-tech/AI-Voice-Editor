@@ -443,6 +443,29 @@ const Index = () => {
       setCommandSuccess(true);
       playSuccess();
       clearFeedback();
+
+      // ── Auto-save to Supabase history on successful upload ────────────────
+      if (user) {
+        supabase
+          .from("user_documents")
+          .upsert(
+            {
+              user_id: user.id,
+              file_hash: file.name,
+              content: parsed.paragraphs,
+              page_count: parsed.pageCount, // ← now saved correctly
+              updated_at: new Date().toISOString(),
+            },
+            { onConflict: "user_id,file_hash" },
+          )
+          .then(({ error }) => {
+            if (error) {
+              console.error("History auto-save failed:", error.message);
+            } else {
+              console.info("History: Document auto-saved →", file.name);
+            }
+          });
+      }
     } catch (err) {
       console.error("Parse error:", err);
       const msg = err instanceof Error ? err.message : "";

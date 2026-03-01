@@ -28,6 +28,7 @@ interface UserDocument {
   file_hash: string;
   updated_at: string;
   content: string[];
+  page_count: number;
 }
 
 const SessionHistory = () => {
@@ -53,6 +54,7 @@ const SessionHistory = () => {
       const { data, error } = await supabase
         .from("user_documents")
         .select("*")
+        .eq("user_id", user.id) // ← only this user's documents
         .order("updated_at", { ascending: false });
 
       if (error) toast.error("Failed to fetch scrolls.");
@@ -125,41 +127,69 @@ const SessionHistory = () => {
             </div>
           ) : view === "documents" ? (
             documents.length > 0 ? (
-              documents.map((doc) => (
-                <div
-                  key={doc.id}
-                  className="group p-5 border border-primary/10 bg-primary/5 rounded-sm hover:border-accent/40 transition-all duration-300 relative overflow-hidden"
-                >
-                  <div className="absolute top-0 left-0 w-1 h-full bg-primary/20 group-hover:bg-accent" />
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-4">
-                      <FileText className="w-5 h-5 text-primary/60" />
-                      <div>
-                        <h4 className="font-heading text-sm text-primary uppercase">
-                          {doc.file_hash}
-                        </h4>
-                        <div className="flex gap-4 text-[10px] font-mono text-primary/40">
-                          <span>
-                            {new Date(doc.updated_at).toLocaleDateString()}
-                          </span>
-                          <span>{doc.content.length} Paragraphs</span>
+              documents
+                .filter((d) =>
+                  searchTerm
+                    ? d.file_hash
+                        .toLowerCase()
+                        .includes(searchTerm.toLowerCase())
+                    : true,
+                )
+                .map((doc) => (
+                  <div
+                    key={doc.id}
+                    className="group p-5 border border-primary/10 bg-primary/5 rounded-sm hover:border-accent/40 transition-all duration-300 relative overflow-hidden"
+                  >
+                    <div className="absolute top-0 left-0 w-1 h-full bg-primary/20 group-hover:bg-accent transition-colors" />
+                    <div className="flex justify-between items-center gap-4">
+                      <div className="flex items-center gap-4 min-w-0">
+                        <FileText className="w-5 h-5 text-primary/60 shrink-0" />
+                        <div className="min-w-0">
+                          <h4 className="font-heading text-sm text-primary uppercase truncate">
+                            {doc.file_hash}
+                          </h4>
+                          <div className="flex flex-wrap gap-3 text-[10px] font-mono text-primary/40 mt-0.5">
+                            <span>
+                              {new Date(doc.updated_at).toLocaleString()}
+                            </span>
+                            {doc.page_count > 0 && (
+                              <span>{doc.page_count} pages</span>
+                            )}
+                            <span>{doc.content.length} segments</span>
+                            <span>
+                              {doc.content
+                                .join(" ")
+                                .trim()
+                                .split(/\s+/)
+                                .length.toLocaleString()}{" "}
+                              words
+                            </span>
+                          </div>
                         </div>
                       </div>
+                      <button
+                        onClick={() => handleRestore(doc)}
+                        className="shrink-0 p-2 bg-accent/10 border border-accent/20 text-accent hover:bg-accent/20 transition-all rounded-sm flex items-center gap-2 text-[10px] font-tech uppercase tracking-widest"
+                      >
+                        <RotateCcw className="w-3 h-3" /> Restore
+                      </button>
                     </div>
-                    <button
-                      onClick={() => handleRestore(doc)}
-                      className="p-2 bg-accent/10 border border-accent/20 text-accent hover:bg-accent/20 transition-all rounded-sm flex items-center gap-2 text-[10px] font-tech uppercase tracking-widest"
-                    >
-                      <RotateCcw className="w-3 h-3" /> Restore
-                    </button>
                   </div>
-                </div>
-              ))
+                ))
             ) : (
-              <div className="text-center py-20 border border-dashed border-primary/10 rounded-sm">
+              <div className="text-center py-20 border border-dashed border-primary/10 rounded-sm space-y-3">
                 <p className="font-mono text-[10px] text-primary/40 uppercase tracking-widest">
                   // No scrolls indexed //
                 </p>
+                {!user ? (
+                  <p className="font-body text-xs text-primary/30 italic">
+                    Sign in to auto-save uploaded documents to your history.
+                  </p>
+                ) : (
+                  <p className="font-body text-xs text-primary/30 italic">
+                    Upload a PDF or TXT — it will appear here automatically.
+                  </p>
+                )}
               </div>
             )
           ) : logs.length > 0 ? (
