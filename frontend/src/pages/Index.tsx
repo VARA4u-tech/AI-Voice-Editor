@@ -13,12 +13,15 @@ import ScribeSidebar from "@/components/ScribeSidebar";
 import MysticalBackground from "@/components/MysticalBackground";
 import useSpeechRecognition from "@/hooks/useSpeechRecognition";
 import { useSoundEffects } from "@/hooks/useSoundEffects";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/lib/supabase";
 import { Sparkles } from "lucide-react";
 import MoonPhaseAnimation from "@/components/MoonPhaseAnimation";
 import GoldWaveform from "@/components/GoldWaveform";
 import CommandHelp from "@/components/CommandHelp";
 import { parseDocument, type ParsedDocument } from "@/lib/documentParser";
-import { processVoiceCommand } from "@/lib/voiceCommands";
+import { processVoiceCommand, type CommandResult } from "@/lib/voiceCommands";
+import { processCommandWithAI } from "@/lib/aiService";
 
 const STORAGE_KEY = "gilded-scribe-session";
 
@@ -37,6 +40,7 @@ function loadSession() {
 }
 
 const Index = () => {
+  const { user } = useAuth();
   const saved = loadSession();
   const [fileName, setFileName] = useState(saved?.fileName ?? "");
   const [paragraphs, setParagraphs] = useState<string[]>(
@@ -73,28 +77,67 @@ const Index = () => {
     playTransition,
   } = useSoundEffects();
 
-  // ── Persist session to localStorage on every change ──
+  // ── Sync with Supabase on Login ──
   useEffect(() => {
-    if (paragraphs.length === 0) {
+    if (user && paragraphs.length === 0) {
+      supabase
+        .from("user_documents")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("updated_at", { ascending: false })
+        .limit(1)
+        .single()
+        .then(({ data, error }) => {
+          if (data && !error) {
+            setFileName(data.file_hash);
+            setParagraphs(data.content);
+            setPageCount(data.page_count);
+            setCommandFeedback("Ritual_Restored: Cloud synchronize complete.");
+            playSuccess();
+          }
+        });
+    }
+  }, [user]);
+
+  // ── Persist session on every change ──
+  useEffect(() => {
+    // Local Persistence fallback
+    if (paragraphs.length > 0) {
+      try {
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({ fileName, paragraphs, pageCount }),
+        );
+      } catch {
+        /* ignore quota */
+      }
+    } else {
       localStorage.removeItem(STORAGE_KEY);
-      return;
     }
-    try {
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify({ fileName, paragraphs, pageCount }),
-      );
-    } catch {
-      /* quota exceeded — ignore silently */
+
+    // Supabase Persistence
+    if (user && paragraphs.length > 0) {
+      supabase
+        .from("user_documents")
+        .upsert({
+          user_id: user.id,
+          file_hash: fileName || "unnamed_ritual",
+          content: paragraphs,
+          page_count: pageCount,
+          updated_at: new Date().toISOString(),
+        })
+        .then(({ error }) => {
+          if (error) console.error("Ritual_Backup Failed:", error.message);
+        });
     }
-  }, [fileName, paragraphs, pageCount]);
+  }, [fileName, paragraphs, pageCount, user]);
 
   const clearFeedback = useCallback(() => {
     setTimeout(() => setCommandFeedback(null), 4000);
   }, []);
 
   const handleCommand = useCallback(
-    (command: string) => {
+    async (command: string) => {
       if (!paragraphs.length) {
         setCommandFeedback(
           "Upload a document first before using voice commands.",
@@ -104,27 +147,61 @@ const Index = () => {
         return;
       }
 
-      if (/^undo$/i.test(command.trim())) {
+      const trimmedCmd = command.trim();
+
+      // 1. Handle Undo (Special case, local only)
+      if (/^undo$/i.test(trimmedCmd)) {
         if (history.length > 0) {
           const prev = history[history.length - 1];
           setParagraphs(prev);
           setHistory((h) => h.slice(0, -1));
           setCommandFeedback("Undone last change.");
           setCommandSuccess(true);
+          playSuccess();
         } else {
           setCommandFeedback("Nothing to undo.");
           setCommandSuccess(false);
+          playError();
         }
         clearFeedback();
         return;
       }
 
-      const result = processVoiceCommand(command, paragraphs);
+      setIsProcessing(true);
+      let result: CommandResult;
+
+      // 2. Try the Regex Engine first (FAST)
+      result = processVoiceCommand(trimmedCmd, paragraphs);
+
+      // 3. Fallback to AI (LLM) if regex didn't recognize it
+      if (!result.success && result.message.includes("Not recognized")) {
+        setCommandFeedback("Scribe_AI: Decrypting intent...");
+        result = await processCommandWithAI(trimmedCmd, paragraphs);
+      }
+
       setCommandFeedback(result.message);
       setCommandSuccess(result.success);
+      setIsProcessing(false);
 
       if (result.success) {
         playSuccess();
+
+        // Log to Supabase Activity
+        if (user) {
+          supabase
+            .from("scribe_activity")
+            .insert({
+              user_id: user.id,
+              document_name: fileName || "unnamed_ritual",
+              command_type: result.structuredData?.action || "unknown",
+              transcript: trimmedCmd,
+              is_success: true,
+            })
+            .then(({ error }) => {
+              if (error) console.error("Ritual_Log Failed:", error.message);
+            });
+        }
+
         if (result.scribeResponse) {
           // Check for Focus Mode Toggle
           if (result.structuredData?.action === "focus_toggle") {
@@ -139,12 +216,17 @@ const Index = () => {
             ...prev,
           ]);
           setIsSidebarOpen(true);
-        } else {
+        }
+
+        // If the AI updated the paragraphs, save to history
+        if (
+          JSON.stringify(result.updatedParagraphs) !==
+          JSON.stringify(paragraphs)
+        ) {
           setHistory((h) => [...h, paragraphs]);
           setParagraphs(result.updatedParagraphs);
           if (result.affectedIndices) {
             setLastEditedIndices(result.affectedIndices);
-            // Clear highlights after 3 seconds
             setTimeout(() => setLastEditedIndices([]), 3000);
           }
         }
@@ -153,8 +235,17 @@ const Index = () => {
       }
 
       clearFeedback();
+      return result;
     },
-    [paragraphs, history, clearFeedback],
+    [
+      paragraphs,
+      history,
+      clearFeedback,
+      playSuccess,
+      playError,
+      user,
+      fileName,
+    ],
   );
 
   const {
@@ -170,11 +261,10 @@ const Index = () => {
     if (isListening) {
       stopListening();
       playStop();
-      setIsProcessing(true);
-      setTimeout(() => {
+      setTimeout(async () => {
         const cmd = transcript || "";
         if (cmd.trim()) {
-          handleCommand(cmd.trim());
+          await handleCommand(cmd.trim());
         }
         setIsProcessing(false);
       }, 600);
@@ -332,7 +422,7 @@ const Index = () => {
     >
       <MysticalBackground />
       <FloatingParticles />
-      <ChatWidget />
+      <ChatWidget paragraphs={paragraphs} onCommand={handleCommand} />
 
       {/* Focus Mode Backdrop overlay */}
       <div

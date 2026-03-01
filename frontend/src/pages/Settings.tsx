@@ -1,7 +1,60 @@
 import Layout from "@/components/Layout";
 import { Settings, Volume2, Mic, Palette, Bell, Save } from "lucide-react";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
+import { useSoundEffects } from "@/hooks/useSoundEffects";
 
 const SystemSettings = () => {
+  const { playClick, playSuccess } = useSoundEffects();
+  const [volume, setVolume] = useState(65);
+  const [ambience, setAmbience] = useState(40);
+  const [options, setOptions] = useState([
+    {
+      id: "sensitivity",
+      label: "High Sensitivity Mode",
+      value: true,
+      desc: "Increase detection range for whispered commands.",
+    },
+    {
+      id: "synthesis",
+      label: "Continuous Synthesis",
+      value: false,
+      desc: "AI will attempt to summarize document changes in real-time.",
+    },
+    {
+      id: "autoscroll",
+      label: "Auto-Scroll on Focus",
+      value: true,
+      desc: "Automatically center the document on the paragraph being edited.",
+    },
+  ]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("scribe_settings");
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      setVolume(parsed.volume);
+      setAmbience(parsed.ambience);
+      setOptions(parsed.options);
+    }
+  }, []);
+
+  const toggleOption = (id: string) => {
+    playClick();
+    setOptions((prev) =>
+      prev.map((opt) => (opt.id === id ? { ...opt, value: !opt.value } : opt)),
+    );
+  };
+
+  const handleSave = () => {
+    playSuccess();
+    localStorage.setItem(
+      "scribe_settings",
+      JSON.stringify({ volume, ambience, options }),
+    );
+    toast.success("Settings committed to neural core.");
+  };
+
   return (
     <Layout title="Settings" subtitle="Control_Panel" icon={Settings}>
       <div className="space-y-10">
@@ -13,21 +66,29 @@ const SystemSettings = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-4">
               <label className="block text-[10px] font-mono text-primary/40 uppercase">
-                System Volume
+                System Volume ({volume}%)
               </label>
-              <div className="relative h-2 w-full bg-primary/10 rounded-full">
-                <div className="absolute top-0 left-0 h-full w-[65%] bg-accent rounded-full shadow-[0_0_10px_hsl(var(--accent)/0.5)]" />
-                <div className="absolute top-1/2 left-[65%] -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-background border-2 border-accent rounded-full cursor-pointer" />
-              </div>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={volume}
+                onChange={(e) => setVolume(parseInt(e.target.value))}
+                className="w-full transition-all accent-accent bg-primary/10"
+              />
             </div>
             <div className="space-y-4">
               <label className="block text-[10px] font-mono text-primary/40 uppercase">
-                Ambience Saturation
+                Ambience Saturation ({ambience}%)
               </label>
-              <div className="relative h-2 w-full bg-primary/10 rounded-full">
-                <div className="absolute top-0 left-0 h-full w-[40%] bg-primary rounded-full shadow-[0_0_10px_hsl(var(--gold)/0.5)]" />
-                <div className="absolute top-1/2 left-[40%] -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-background border-2 border-primary rounded-full cursor-pointer" />
-              </div>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                value={ambience}
+                onChange={(e) => setAmbience(parseInt(e.target.value))}
+                className="w-full accent-primary bg-primary/10"
+              />
             </div>
           </div>
         </section>
@@ -38,25 +99,9 @@ const SystemSettings = () => {
             Voice_Engine_Options
           </h3>
           <div className="space-y-4">
-            {[
-              {
-                label: "High Sensitivity Mode",
-                value: true,
-                desc: "Increase detection range for whispered commands.",
-              },
-              {
-                label: "Continuous Synthesis",
-                value: false,
-                desc: "AI will attempt to summarize document changes in real-time.",
-              },
-              {
-                label: "Auto-Scroll on Focus",
-                value: true,
-                desc: "Automatically center the document on the paragraph being edited.",
-              },
-            ].map((option, i) => (
+            {options.map((option) => (
               <div
-                key={i}
+                key={option.id}
                 className="flex justify-between items-start gap-8 p-4 border border-primary/5 bg-primary/5 rounded-sm"
               >
                 <div>
@@ -67,13 +112,14 @@ const SystemSettings = () => {
                     {option.desc}
                   </p>
                 </div>
-                <div
-                  className={`shrink-0 w-10 h-5 rounded-full relative transition-colors cursor-pointer ${option.value ? "bg-accent/40" : "bg-primary/5 border border-primary/20"}`}
+                <button
+                  onClick={() => toggleOption(option.id)}
+                  className={`shrink-0 w-10 h-5 rounded-full relative transition-colors ${option.value ? "bg-accent/40" : "bg-primary/5 border border-primary/20"}`}
                 >
                   <div
                     className={`absolute top-1 w-3 h-3 rounded-full transition-all ${option.value ? "right-1 bg-accent" : "left-1 bg-primary/40"}`}
                   />
-                </div>
+                </button>
               </div>
             ))}
           </div>
@@ -101,7 +147,10 @@ const SystemSettings = () => {
         </section>
 
         <div className="pt-8 flex justify-end">
-          <button className="flex items-center gap-2 px-8 py-3 bg-accent/20 border border-accent/40 text-accent font-tech text-[11px] tracking-widest uppercase hover:bg-accent/30 transition-all group">
+          <button
+            onClick={handleSave}
+            className="flex items-center gap-2 px-8 py-3 bg-accent/20 border border-accent/40 text-accent font-tech text-[11px] tracking-widest uppercase hover:bg-accent/30 transition-all group"
+          >
             <Save className="w-4 h-4" />
             Commit_Changes
           </button>

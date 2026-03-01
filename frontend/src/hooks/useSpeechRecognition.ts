@@ -33,7 +33,8 @@ const useSpeechRecognition = (): UseSpeechRecognitionResult => {
     if (!isSupported) return;
 
     const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
     recognition.continuous = true;
     recognition.interimResults = true;
@@ -57,6 +58,8 @@ const useSpeechRecognition = (): UseSpeechRecognitionResult => {
     };
 
     recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+      if (event.error === "aborted") return; // Ignore intentional aborts
+
       console.error("Speech recognition error:", event.error);
       if (event.error !== "no-speech") {
         setIsListening(false);
@@ -76,24 +79,35 @@ const useSpeechRecognition = (): UseSpeechRecognitionResult => {
   }, [isSupported]);
 
   const startListening = useCallback(() => {
-    if (recognitionRef.current && !isListening) {
+    if (!recognitionRef.current) return;
+
+    try {
       setTranscript("");
       setInterimTranscript("");
-      try {
-        recognitionRef.current.start();
+      recognitionRef.current.start();
+      setIsListening(true);
+    } catch (e) {
+      // If already started, just sync the state
+      if (e instanceof Error && e.message.includes("already started")) {
         setIsListening(true);
-      } catch (e) {
+      } else {
         console.error("Failed to start recognition:", e);
       }
     }
-  }, [isListening]);
+  }, []);
 
   const stopListening = useCallback(() => {
-    if (recognitionRef.current && isListening) {
+    if (!recognitionRef.current) return;
+
+    try {
       recognitionRef.current.stop();
       setIsListening(false);
+    } catch (e) {
+      console.error("Failed to stop recognition:", e);
+      // Force state update regardless of error
+      setIsListening(false);
     }
-  }, [isListening]);
+  }, []);
 
   const resetTranscript = useCallback(() => {
     setTranscript("");

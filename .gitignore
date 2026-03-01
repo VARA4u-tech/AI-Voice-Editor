@@ -1,5 +1,6 @@
 # Node modules
 node_modules/
+frontend/node_modules/
 
 # Environment variables
 .env
@@ -9,7 +10,9 @@ node_modules/
 
 # Build artifacts
 dist/
+frontend/dist/
 dist-ssr/
+frontend/dist-ssr/
 
 # Logs
 logs
@@ -38,6 +41,15 @@ Thumbs.db
 *.sln
 *.sw?
 
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
 # Bun
 bun.lock
 bun.lockb
+
+# Local tests
+tmp_test_api.js

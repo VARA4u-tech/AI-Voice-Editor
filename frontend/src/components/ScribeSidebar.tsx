@@ -11,8 +11,12 @@ import {
   Info,
   Activity,
   Sparkles,
+  User,
+  LogIn,
+  LogOut,
 } from "lucide-react";
 import { useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 interface ScribeSidebarProps {
   isOpen: boolean;
@@ -32,6 +36,7 @@ const ScribeSidebar = ({
   scribeLog,
   paragraphs,
 }: ScribeSidebarProps) => {
+  const { user, signOut } = useAuth();
   // Real-time Insights Calculation
   const allText = paragraphs.join(" ");
   const wordCount = allText.trim() ? allText.trim().split(/\s+/).length : 0;
@@ -96,6 +101,9 @@ const ScribeSidebar = ({
               <Link to="/info" title="System Info">
                 <Info className="w-5 h-5 hover:text-primary transition-colors cursor-pointer" />
               </Link>
+              <Link to="/auth" title="Authentication">
+                <User className="w-5 h-5 hover:text-primary transition-colors cursor-pointer text-accent" />
+              </Link>
             </div>
           </div>
         </div>
@@ -109,15 +117,28 @@ const ScribeSidebar = ({
                 Neural Center
               </h2>
               <p className="text-[9px] font-mono text-accent/60 uppercase tracking-widest mt-1">
-                // System_Active: Protocol_4.2
+                {user
+                  ? `// Identity: ${user.email?.split("@")[0]}`
+                  : "// System_Active: Protocol_4.2"}
               </p>
             </div>
-            <button
-              onClick={onClose}
-              className="group p-2 hover:bg-white/5 rounded-full transition-all border border-transparent hover:border-primary/10"
-            >
-              <X className="w-5 h-5 text-primary/40 group-hover:text-primary group-hover:rotate-90 transition-all duration-300" />
-            </button>
+            <div className="flex items-center gap-2">
+              {user && (
+                <button
+                  onClick={() => signOut()}
+                  className="p-2 hover:bg-red-500/10 rounded-full transition-colors text-red-500/40 hover:text-red-500 border border-transparent hover:border-red-500/20"
+                  title="Sever Neural Link"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              )}
+              <button
+                onClick={onClose}
+                className="group p-2 hover:bg-white/5 rounded-full transition-all border border-transparent hover:border-primary/10"
+              >
+                <X className="w-5 h-5 text-primary/40 group-hover:text-primary group-hover:rotate-90 transition-all duration-300" />
+              </button>
+            </div>
           </div>
 
           {/* Scrolling Content */}

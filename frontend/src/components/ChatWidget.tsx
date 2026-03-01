@@ -9,7 +9,12 @@ interface Message {
   timestamp: Date;
 }
 
-const ChatWidget = () => {
+interface ChatWidgetProps {
+  paragraphs: string[];
+  onCommand: (command: string) => Promise<any>;
+}
+
+const ChatWidget = ({ paragraphs, onCommand }: ChatWidgetProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([
@@ -32,7 +37,7 @@ const ChatWidget = () => {
     scrollToBottom();
   }, [messages, isTyping]);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!input.trim()) return;
 
     const userMsg: Message = {
@@ -46,29 +51,40 @@ const ChatWidget = () => {
     setInput("");
     setIsTyping(true);
 
-    // Simulate AI response
-    setTimeout(() => {
+    try {
+      // Execute the command through the main handleCommand flow
+      // which already includes regex + AI fallback
+      const result = await onCommand(userMsg.text);
+
+      let responseText = "Command processed. No specific output recorded.";
+
+      if (result) {
+        if (result.scribeResponse?.content) {
+          responseText = result.scribeResponse.content;
+        } else if (result.message) {
+          responseText = result.message;
+        }
+      }
+
       const botMsg: Message = {
         id: (Date.now() + 1).toString(),
-        text: getBotResponse(input),
+        text: responseText,
         sender: "bot",
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, botMsg]);
+    } catch (err) {
+      const botMsg: Message = {
+        id: (Date.now() + 1).toString(),
+        text: "The neural link encountered an error during transmission.",
+        sender: "bot",
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, botMsg]);
+    } finally {
       setIsTyping(false);
       playSuccess();
-    }, 1500);
-  };
-
-  const getBotResponse = (text: string) => {
-    const input = text.toLowerCase();
-    if (input.includes("hello") || input.includes("hi"))
-      return "Neural connection established. How shall we transmute your text today?";
-    if (input.includes("help"))
-      return "I can explain voice commands, help with formatting, or summarize your loaded data stream.";
-    if (input.includes("clear"))
-      return "You can clear the ritual scroll by clicking the 'X' button near the export tool.";
-    return "Query processed. I am standing by to assist with your Gilded Scribe ritual.";
+    }
   };
 
   return (
