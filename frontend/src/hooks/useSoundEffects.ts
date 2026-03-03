@@ -37,14 +37,14 @@ function getSystemVolume(): number {
   return 0.7; // Default 70% if not found
 }
 
-/** Soft "click" — short sine blip */
+/** Distinct "click" — snappy triangle blip */
 function synthClick(ctx: AudioContext, vol: number) {
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
-  osc.type = "sine";
-  osc.frequency.setValueAtTime(900, ctx.currentTime);
-  osc.frequency.exponentialRampToValueAtTime(400, ctx.currentTime + 0.06);
-  gain.gain.setValueAtTime(0.3 * vol, ctx.currentTime);
+  osc.type = "triangle";
+  osc.frequency.setValueAtTime(1200, ctx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + 0.06);
+  gain.gain.setValueAtTime(0.6 * vol, ctx.currentTime);
   gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.07);
   osc.connect(gain);
   gain.connect(ctx.destination);
@@ -52,48 +52,48 @@ function synthClick(ctx: AudioContext, vol: number) {
   osc.stop(ctx.currentTime + 0.07);
 }
 
-/** Ascending 2-tone chime — success */
+/** Ascending 2-tone chime — bright success */
 function synthSuccess(ctx: AudioContext, vol: number) {
   [
-    [660, 0],
-    [880, 0.1],
+    [700, 0],
+    [1050, 0.12],
   ].forEach(([freq, delay]) => {
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
-    osc.type = "sine";
+    osc.type = "triangle";
     osc.frequency.value = freq;
     const t = ctx.currentTime + delay;
-    gain.gain.setValueAtTime(0.4 * vol, t);
-    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
+    gain.gain.setValueAtTime(0.8 * vol, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
     osc.connect(gain);
     gain.connect(ctx.destination);
     osc.start(t);
-    osc.stop(t + 0.25);
+    osc.stop(t + 0.3);
   });
 }
 
-/** Descending buzz — error */
+/** Descending hard buzz — error */
 function synthError(ctx: AudioContext, vol: number) {
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
   osc.type = "sawtooth";
-  osc.frequency.setValueAtTime(320, ctx.currentTime);
-  osc.frequency.exponentialRampToValueAtTime(120, ctx.currentTime + 0.18);
-  gain.gain.setValueAtTime(0.3 * vol, ctx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
+  osc.frequency.setValueAtTime(250, ctx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.25);
+  gain.gain.setValueAtTime(0.7 * vol, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.28);
   osc.connect(gain);
   gain.connect(ctx.destination);
   osc.start();
-  osc.stop(ctx.currentTime + 0.2);
+  osc.stop(ctx.currentTime + 0.28);
 }
 
-/** Whisper-soft high tick — hover */
+/** Clear high tick — hover */
 function synthHover(ctx: AudioContext, vol: number) {
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
   osc.type = "sine";
-  osc.frequency.value = 1400;
-  gain.gain.setValueAtTime(0.12 * vol, ctx.currentTime);
+  osc.frequency.value = 1800;
+  gain.gain.setValueAtTime(0.25 * vol, ctx.currentTime);
   gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.04);
   osc.connect(gain);
   gain.connect(ctx.destination);
@@ -101,14 +101,14 @@ function synthHover(ctx: AudioContext, vol: number) {
   osc.stop(ctx.currentTime + 0.04);
 }
 
-/** Rising sweep — start listening */
+/** Rising digital sweep — start listening */
 function synthStart(ctx: AudioContext, vol: number) {
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
-  osc.type = "sine";
-  osc.frequency.setValueAtTime(440, ctx.currentTime);
-  osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.2);
-  gain.gain.setValueAtTime(0.3 * vol, ctx.currentTime);
+  osc.type = "triangle";
+  osc.frequency.setValueAtTime(500, ctx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(1000, ctx.currentTime + 0.2);
+  gain.gain.setValueAtTime(0.6 * vol, ctx.currentTime);
   gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.22);
   osc.connect(gain);
   gain.connect(ctx.destination);
@@ -116,14 +116,14 @@ function synthStart(ctx: AudioContext, vol: number) {
   osc.stop(ctx.currentTime + 0.22);
 }
 
-/** Falling sweep — stop listening */
+/** Falling digital sweep — stop listening */
 function synthStop(ctx: AudioContext, vol: number) {
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
-  osc.type = "sine";
-  osc.frequency.setValueAtTime(660, ctx.currentTime);
-  osc.frequency.exponentialRampToValueAtTime(330, ctx.currentTime + 0.18);
-  gain.gain.setValueAtTime(0.25 * vol, ctx.currentTime);
+  osc.type = "triangle";
+  osc.frequency.setValueAtTime(800, ctx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(400, ctx.currentTime + 0.18);
+  gain.gain.setValueAtTime(0.55 * vol, ctx.currentTime);
   gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
   osc.connect(gain);
   gain.connect(ctx.destination);
@@ -131,7 +131,7 @@ function synthStop(ctx: AudioContext, vol: number) {
   osc.stop(ctx.currentTime + 0.2);
 }
 
-/** Soft page-turn whoosh — transition / navigation */
+/** Page-turn whoosh — transition / navigation */
 function synthTransition(ctx: AudioContext, vol: number) {
   const bufferSize = Math.floor(ctx.sampleRate * 0.12);
   const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
@@ -143,9 +143,9 @@ function synthTransition(ctx: AudioContext, vol: number) {
   source.buffer = buffer;
   const filter = ctx.createBiquadFilter();
   filter.type = "highpass";
-  filter.frequency.value = 2000;
+  filter.frequency.value = 1800;
   const gain = ctx.createGain();
-  gain.gain.setValueAtTime(0.2 * vol, ctx.currentTime);
+  gain.gain.setValueAtTime(0.5 * vol, ctx.currentTime);
   gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
   source.connect(filter);
   filter.connect(gain);
@@ -153,7 +153,7 @@ function synthTransition(ctx: AudioContext, vol: number) {
   source.start();
 }
 
-/** Typewriter key tick — bandpass noise burst */
+/** Snappy typewriter key tick — bandpass noise burst */
 function synthTypewriterTick(ctx: AudioContext, vol: number) {
   const bufferSize = Math.floor(ctx.sampleRate * 0.04);
   const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
@@ -165,10 +165,10 @@ function synthTypewriterTick(ctx: AudioContext, vol: number) {
   source.buffer = buffer;
   const filter = ctx.createBiquadFilter();
   filter.type = "bandpass";
-  filter.frequency.value = 3200;
-  filter.Q.value = 0.5;
+  filter.frequency.value = 3500;
+  filter.Q.value = 0.6;
   const gain = ctx.createGain();
-  gain.gain.setValueAtTime(0.2 * vol, ctx.currentTime);
+  gain.gain.setValueAtTime(0.5 * vol, ctx.currentTime);
   gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.035);
   source.connect(filter);
   filter.connect(gain);
