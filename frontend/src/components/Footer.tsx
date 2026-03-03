@@ -73,7 +73,7 @@ const Footer = () => {
                 { label: "Dashboard", to: "/", icon: Cpu },
                 { label: "History_Logs", to: "/history", icon: History },
                 { label: "System_Config", to: "/settings", icon: Settings },
-                { label: "Intel_Hub", to: "#", icon: HelpCircle },
+                { label: "Intel_Hub", to: "/intel", icon: HelpCircle },
               ].map((link, i) => (
                 <li key={i}>
                   <Link
@@ -161,24 +161,24 @@ const Footer = () => {
             </p>
           </div>
           <div className="flex items-center gap-6">
-            <a
-              href="#"
+            <Link
+              to="/privacy"
               className="font-tech text-[9px] tracking-widest text-primary/60 hover:text-primary transition-colors uppercase"
             >
               Privacy_Seal
-            </a>
-            <a
-              href="#"
+            </Link>
+            <Link
+              to="/terms"
               className="font-tech text-[9px] tracking-widest text-primary/60 hover:text-primary transition-colors uppercase"
             >
               Terms_of_Sync
-            </a>
-            <a
-              href="#"
+            </Link>
+            <Link
+              to="/logs"
               className="font-tech text-[9px] tracking-widest text-primary/60 hover:text-primary transition-colors uppercase"
             >
               Root_Log
-            </a>
+            </Link>
           </div>
         </div>
       </div>

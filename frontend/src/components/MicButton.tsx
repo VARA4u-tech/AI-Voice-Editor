@@ -10,65 +10,103 @@ const MicButton = ({ isListening, onClick }: MicButtonProps) => {
   const { playHover } = useSoundEffects();
 
   return (
-    <button
-      onClick={onClick}
-      onMouseEnter={() => playHover()}
-      className={`
-        relative w-28 h-28 rounded-full
-        flex items-center justify-center
-        transition-all duration-700 cursor-pointer group
-        ${isListening ? "scale-105" : "hover:scale-105"}
-      `}
-      style={{
-        background: isListening
-          ? "radial-gradient(circle at center, hsla(180, 100%, 50%, 0.15) 0%, rgba(4, 10, 20, 0.8) 70%)"
-          : "radial-gradient(circle at center, rgba(191,149,63,0.05) 0%, rgba(4, 10, 20, 0.6) 80%)",
-        border: `1px solid hsla(var(--${isListening ? "accent" : "primary"}), ${isListening ? "0.6" : "0.2"})`,
-        boxShadow: isListening
-          ? "0 0 40px hsla(180, 100%, 50%, 0.2), inset 0 0 20px hsla(180, 100%, 50%, 0.1)"
-          : "0 0 20px rgba(0,0,0,0.5)",
-      }}
-      aria-label={isListening ? "Stop listening" : "Start listening"}
-    >
+    <div className="relative group p-8">
+      {/* Outer Hexagon HUD — subtle rotation */}
       <div
-        className={`absolute inset-0 rounded-full border border-primary/10 ${isListening ? "animate-[spin_4s_linear_infinite]" : ""}`}
+        className={`absolute inset-0 transition-all duration-1000 ${isListening ? "rotate-90 scale-110" : "rotate-0 scale-100"}`}
       >
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-3 bg-accent/40 blur-[1px]" />
+        <svg
+          viewBox="0 0 100 100"
+          className="w-full h-full text-primary/10 stroke-current fill-none"
+        >
+          <path
+            d="M50 5 L93.3 30 L93.3 70 L50 95 L6.7 70 L6.7 30 Z"
+            strokeWidth="0.5"
+          />
+          <circle
+            cx="50"
+            cy="50"
+            r="48"
+            strokeWidth="0.2"
+            strokeDasharray="1 4"
+          />
+        </svg>
       </div>
 
-      {/* Inner tech ring */}
-      <span
-        className={`absolute inset-3 rounded-full transition-all duration-500 ${isListening ? "border-accent/30" : "border-primary/10"}`}
-        style={{ borderStyle: "dashed", borderWidth: "1px" }}
+      {/* Rotating Tech Rings */}
+      <div
+        className={`absolute inset-4 border border-accent/20 rounded-full border-dashed transition-all duration-700 ${isListening ? "animate-[spin_8s_linear_infinite] opacity-100 border-accent/40" : "opacity-40"}`}
+      />
+      <div
+        className={`absolute inset-2 border border-primary/20 rounded-full border-dotted transition-all duration-700 ${isListening ? "animate-[spin_12s_linear_infinite_reverse] opacity-100 border-primary/40" : "opacity-30"}`}
       />
 
-      {/* Icon */}
-      {isListening ? (
-        <MicOff
-          className="w-10 h-10 transition-all duration-500"
-          style={{
-            color: "hsl(var(--accent))",
-            filter: "drop-shadow(0 0 8px hsl(var(--accent)))",
-          }}
-        />
-      ) : (
-        <Mic
-          className="w-10 h-10 transition-all duration-500 group-hover:text-primary"
-          style={{
-            color: "hsl(var(--primary) / 0.6)",
-            filter: "drop-shadow(0 0 4px rgba(191,149,63,0.2))",
-          }}
-        />
-      )}
+      <button
+        onClick={onClick}
+        onMouseEnter={() => playHover()}
+        className={`
+          relative w-32 h-32 rounded-full
+          flex flex-col items-center justify-center
+          transition-all duration-500 cursor-pointer z-10
+          overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)]
+          ${
+            isListening
+              ? "bg-accent/10 border-2 border-accent shadow-[0_0_40px_rgba(34,211,238,0.3)]"
+              : "bg-slate-900 border border-primary/30 hover:border-primary hover:shadow-[0_0_30px_rgba(191,149,63,0.2)]"
+          }
+        `}
+        aria-label={isListening ? "Stop listening" : "Start listening"}
+      >
+        {/* Internal Glow */}
+        <div
+          className={`absolute inset-0 transition-opacity duration-700 ${isListening ? "opacity-100" : "opacity-0"}`}
+        >
+          <div className="absolute inset-0 bg-radial-gradient from-accent/20 to-transparent" />
+        </div>
 
-      {/* Pulse rings */}
+        {/* Status Line */}
+        <div
+          className={`absolute top-4 font-tech text-[8px] tracking-[0.3em] uppercase transition-all duration-500 ${isListening ? "text-accent opacity-100 translate-y-0" : "text-primary/40 opacity-0 -translate-y-2"}`}
+        >
+          Signal_Locked
+        </div>
+
+        {/* Icon Container */}
+        <div className="relative group-hover:scale-110 transition-transform duration-500">
+          {isListening ? (
+            <MicOff className="w-12 h-12 text-accent drop-shadow-[0_0_12px_rgba(34,211,238,0.8)]" />
+          ) : (
+            <Mic className="w-12 h-12 text-primary drop-shadow-[0_0_8px_rgba(191,149,63,0.4)]" />
+          )}
+        </div>
+
+        {/* Bottom Label */}
+        <div
+          className={`absolute bottom-5 font-mono text-[9px] font-bold uppercase tracking-widest transition-all duration-500 ${isListening ? "text-accent/80" : "text-primary/40"}`}
+        >
+          {isListening ? "Recording" : "Ready"}
+        </div>
+
+        {/* Scanning Line Animation */}
+        {isListening && (
+          <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-full">
+            <div className="w-full h-1/2 bg-gradient-to-b from-transparent via-accent/5 to-transparent animate-[scan_2s_linear_infinite]" />
+          </div>
+        )}
+      </button>
+
+      {/* Pulse rings for active state */}
       {isListening && (
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute inset-[-4px] rounded-full border border-accent/20 animate-ping" />
-          <div className="absolute inset-[-12px] rounded-full border border-accent/10 animate-[ping_2s_linear_infinite]" />
+          <div className="absolute inset-0 rounded-full border-2 border-accent/30 animate-[ping_1.5s_cubic-bezier(0,0,0.2,1)_infinite]" />
+          <div className="absolute inset-[-10px] rounded-full border border-accent/10 animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite]" />
         </div>
       )}
-    </button>
+
+      {/* Static HUD brackets */}
+      <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-primary/20 rounded-tr-sm group-hover:border-accent/40 transition-colors" />
+      <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-primary/20 rounded-bl-sm group-hover:border-accent/40 transition-colors" />
+    </div>
   );
 };
 

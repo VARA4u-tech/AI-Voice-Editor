@@ -9,6 +9,10 @@ import SessionHistory from "./pages/History";
 import Security from "./pages/Security";
 import SystemSettings from "./pages/Settings";
 import SystemInfo from "./pages/SystemInfo";
+import IntelHub from "./pages/IntelHub";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
+import RootLog from "./pages/RootLog";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
@@ -29,6 +33,10 @@ const App = () => (
           <Route path="/security" element={<Security />} />
           <Route path="/settings" element={<SystemSettings />} />
           <Route path="/info" element={<SystemInfo />} />
+          <Route path="/intel" element={<IntelHub />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/logs" element={<RootLog />} />
           <Route path="/auth" element={<Auth />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
