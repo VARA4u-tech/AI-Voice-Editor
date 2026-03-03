@@ -7,8 +7,8 @@ interface MysticalHeroProps {
 const MysticalHero = ({ isListening }: MysticalHeroProps) => {
   return (
     <div
-      className={`relative flex flex-col items-center justify-center py-10 transition-all duration-700 w-full max-w-lg mx-auto ${
-        isListening ? "scale-105 opacity-100" : "scale-100 opacity-90"
+      className={`relative flex flex-col items-center justify-center py-12 transition-all duration-700 w-full max-w-xl mx-auto ${
+        isListening ? "scale-105 opacity-100" : "scale-100 opacity-95"
       }`}
     >
       {/* SVG Container wrapping the design */}
@@ -16,8 +16,8 @@ const MysticalHero = ({ isListening }: MysticalHeroProps) => {
         viewBox="0 0 300 350"
         className={`w-full transition-all duration-700 ${
           isListening
-            ? "drop-shadow-[0_0_35px_rgba(191,149,63,0.55)]"
-            : "drop-shadow-[0_0_20px_rgba(191,149,63,0.28)]"
+            ? "drop-shadow-[0_0_50px_rgba(191,149,63,0.6)]"
+            : "drop-shadow-[0_0_25px_rgba(191,149,63,0.35)]"
         }`}
       >
         <defs>
@@ -207,14 +207,15 @@ const MysticalHero = ({ isListening }: MysticalHeroProps) => {
         </g>
       </svg>
 
-      {/* ALL I SEE Text — wide tracked gold foil stamp matching the reference image */}
+      {/* ALL I SEE Text — wide tracked gold foil stamp — Significantly Boosted Visibility */}
       <h1
-        className="mt-6 mystical-gold-text select-none z-10 transition-all duration-700 hover:scale-105"
+        className="mt-8 mystical-gold-text select-none z-10 transition-all duration-700 hover:scale-110 drop-shadow-[0_0_15px_rgba(255,215,0,0.2)]"
         style={{
-          fontSize: "clamp(2rem, 8vw, 3.2rem)",
-          letterSpacing: "0.42em",
-          fontWeight: 400,
-          paddingLeft: "0.42em" /* compensate tracking for visual centering */,
+          fontSize: "clamp(2.5rem, 10vw, 4.5rem)",
+          letterSpacing: "0.5em",
+          fontWeight: 600,
+          paddingLeft: "0.5em",
+          opacity: 1,
         }}
       >
         ALL I SEE

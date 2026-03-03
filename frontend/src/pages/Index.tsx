@@ -791,7 +791,7 @@ const Index = () => {
       />
 
       <main
-        className={`w-full max-w-4xl flex flex-col items-center mx-auto relative transition-all duration-700 pt-8 sm:pt-12 ${
+        className={`w-full max-w-5xl flex flex-col items-center mx-auto relative transition-all duration-700 pt-8 sm:pt-16 gap-y-10 ${
           isListening
             ? "scale-[1.02] filter drop-shadow-[0_0_30px_hsl(var(--gold)/0.15)]"
             : "scale-100"
@@ -802,7 +802,7 @@ const Index = () => {
           className={`transition-all duration-700 flex flex-col items-center w-full overflow-hidden ${
             isFocusMode
               ? "max-h-0 opacity-0 pointer-events-none"
-              : "max-h-[900px] opacity-100"
+              : "max-h-[1600px] opacity-100"
           }`}
         >
           <CyberHero fileName={fileName} paragraphsCount={paragraphs.length} />
@@ -813,7 +813,7 @@ const Index = () => {
           className={`transition-all duration-700 overflow-hidden w-full ${
             isFocusMode
               ? "max-h-0 opacity-0 pointer-events-none mb-0"
-              : "max-h-28 opacity-100 mb-4"
+              : "max-h-[500px] opacity-100 mb-8"
           }`}
         >
           <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 px-4 w-full">

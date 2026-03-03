@@ -165,67 +165,68 @@ const PreviewArea = ({
           </p>
         </div>
       ) : paragraphs.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-full min-h-[450px] gap-6 p-4 sm:p-8 relative">
-          <div className="relative z-10 flex flex-col items-center text-center w-full max-w-lg">
-            <div className="w-20 h-20 rounded-sm bg-primary/5 flex items-center justify-center mb-6 border border-primary/20 relative group overflow-hidden">
-              <div className="absolute inset-0 bg-accent/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-              <FileText className="w-10 h-10 text-primary group-hover:text-accent transition-colors" />
-              <div className="tech-bracket-tl w-2 h-2" />
-              <div className="tech-bracket-br w-2 h-2" />
+        <div className="flex flex-col items-center justify-center h-full min-h-[500px] gap-8 p-6 sm:p-12 relative animate-fade-in">
+          <div className="relative z-10 flex flex-col items-center text-center w-full max-w-2xl">
+            <div className="w-24 h-24 rounded-sm bg-primary/5 flex items-center justify-center mb-8 border border-primary/20 relative group overflow-hidden shadow-[0_0_30px_rgba(255,215,0,0.05)]">
+              <div className="absolute inset-0 bg-accent/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <FileText className="w-12 h-12 text-primary group-hover:text-accent transition-all duration-500 group-hover:scale-110" />
+              <div className="tech-bracket-tl w-3 h-3" />
+              <div className="tech-bracket-br w-3 h-3" />
             </div>
-            <h3 className="font-tech text-lg sm:text-xl text-primary tracking-[0.3em] mb-4 uppercase">
+            <h3 className="font-tech text-2xl sm:text-4xl text-primary tracking-[0.4em] mb-6 uppercase gold-text-glow leading-tight">
               Interface Standby
             </h3>
-            <p className="font-body text-base sm:text-lg text-foreground/70 mb-10 leading-relaxed px-4">
+            <p className="font-body text-lg sm:text-xl text-foreground mb-12 leading-relaxed px-6 opacity-90">
               Awaiting document injection. Once initialized, your vocal commands
-              will modulate the content in real-time.
+              will modulate the content in real-time with sub-millisecond
+              latencies.
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full px-2">
-              <div className="flex items-start gap-3 p-4 border border-primary/10 bg-primary/5 hover:border-accent/40 transition-all text-left group relative">
-                <div className="tech-bracket-tl w-1 h-1" />
-                <Mic className="w-5 h-5 text-primary mt-1 shrink-0 group-hover:text-accent group-hover:scale-110 transition-all" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full px-4">
+              <div className="flex items-start gap-4 p-5 border border-primary/10 bg-primary/5 hover:border-accent/40 hover:bg-accent/5 transition-all text-left group relative rounded-sm">
+                <div className="tech-bracket-tl w-2 h-2" />
+                <Mic className="w-6 h-6 text-primary mt-1 shrink-0 group-hover:text-accent group-hover:scale-110 transition-all" />
                 <div>
-                  <h4 className="font-tech text-[10px] text-primary/80 tracking-widest uppercase mb-1">
+                  <h4 className="font-tech text-xs text-primary/80 tracking-widest uppercase mb-2 font-bold">
                     Vocal Synthesis
                   </h4>
-                  <p className="font-mono text-[11px] text-foreground/50 leading-snug">
+                  <p className="font-mono text-xs text-foreground/70 leading-snug">
                     "Delete segment 4"
                   </p>
                 </div>
               </div>
-              <div className="flex items-start gap-3 p-4 border border-primary/10 bg-primary/5 hover:border-accent/40 transition-all text-left group relative">
-                <div className="tech-bracket-tl w-1 h-1" />
-                <Wand2 className="w-5 h-5 text-primary mt-1 shrink-0 group-hover:text-accent group-hover:-rotate-12 transition-all" />
+              <div className="flex items-start gap-4 p-5 border border-primary/10 bg-primary/5 hover:border-accent/40 hover:bg-accent/5 transition-all text-left group relative rounded-sm">
+                <div className="tech-bracket-tl w-2 h-2" />
+                <Wand2 className="w-6 h-6 text-primary mt-1 shrink-0 group-hover:text-accent group-hover:-rotate-12 transition-all" />
                 <div>
-                  <h4 className="font-tech text-[10px] text-primary/80 tracking-widest uppercase mb-1">
+                  <h4 className="font-tech text-xs text-primary/80 tracking-widest uppercase mb-2 font-bold">
                     Neural Rewrite
                   </h4>
-                  <p className="font-mono text-[11px] text-foreground/50 leading-snug">
+                  <p className="font-mono text-xs text-foreground/70 leading-snug">
                     "Elevate tone for segment 1"
                   </p>
                 </div>
               </div>
-              <div className="flex items-start gap-3 p-4 border border-primary/10 bg-primary/5 hover:border-accent/40 transition-all text-left group relative">
-                <div className="tech-bracket-tl w-1 h-1" />
-                <Languages className="w-5 h-5 text-primary mt-1 shrink-0 group-hover:text-accent transition-all" />
+              <div className="flex items-start gap-4 p-5 border border-primary/10 bg-primary/5 hover:border-accent/40 hover:bg-accent/5 transition-all text-left group relative rounded-sm">
+                <div className="tech-bracket-tl w-2 h-2" />
+                <Languages className="w-6 h-6 text-primary mt-1 shrink-0 group-hover:text-accent transition-all" />
                 <div>
-                  <h4 className="font-tech text-[10px] text-primary/80 tracking-widest uppercase mb-1">
+                  <h4 className="font-tech text-xs text-primary/80 tracking-widest uppercase mb-2 font-bold">
                     Cipher Lingua
                   </h4>
-                  <p className="font-mono text-[11px] text-foreground/50 leading-snug">
+                  <p className="font-mono text-xs text-foreground/70 leading-snug">
                     "Translate segment 3 to Hindi"
                   </p>
                 </div>
               </div>
-              <div className="flex items-start gap-3 p-4 border border-primary/10 bg-primary/5 hover:border-accent/40 transition-all text-left group relative">
-                <div className="tech-bracket-tl w-1 h-1" />
-                <Eye className="w-5 h-5 text-primary mt-1 shrink-0 group-hover:text-accent transition-all" />
+              <div className="flex items-start gap-4 p-5 border border-primary/10 bg-primary/5 hover:border-accent/40 hover:bg-accent/5 transition-all text-left group relative rounded-sm">
+                <div className="tech-bracket-tl w-2 h-2" />
+                <Eye className="w-6 h-6 text-primary mt-1 shrink-0 group-hover:text-accent transition-all" />
                 <div>
-                  <h4 className="font-tech text-[10px] text-primary/80 tracking-widest uppercase mb-1">
+                  <h4 className="font-tech text-xs text-primary/80 tracking-widest uppercase mb-2 font-bold">
                     Sensory Focus
                   </h4>
-                  <p className="font-mono text-[11px] text-foreground/50 leading-snug">
+                  <p className="font-mono text-xs text-foreground/70 leading-snug">
                     "Activate Focus Mode"
                   </p>
                 </div>
