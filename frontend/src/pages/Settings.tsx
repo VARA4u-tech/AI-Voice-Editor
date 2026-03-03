@@ -1,5 +1,13 @@
 import Layout from "@/components/Layout";
-import { Settings, Volume2, Mic, Palette, Bell, Save } from "lucide-react";
+import {
+  Settings,
+  Volume2,
+  Mic,
+  Palette,
+  Bell,
+  Save,
+  Globe,
+} from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { useSoundEffects } from "@/hooks/useSoundEffects";
@@ -8,6 +16,7 @@ const SystemSettings = () => {
   const { playClick, playSuccess } = useSoundEffects();
   const [volume, setVolume] = useState(65);
   const [ambience, setAmbience] = useState(40);
+  const [language, setLanguage] = useState("en-US");
   const [options, setOptions] = useState([
     {
       id: "sensitivity",
@@ -33,9 +42,10 @@ const SystemSettings = () => {
     const saved = localStorage.getItem("scribe_settings");
     if (saved) {
       const parsed = JSON.parse(saved);
-      setVolume(parsed.volume);
-      setAmbience(parsed.ambience);
-      setOptions(parsed.options);
+      if (parsed.volume !== undefined) setVolume(parsed.volume);
+      if (parsed.ambience !== undefined) setAmbience(parsed.ambience);
+      if (parsed.options) setOptions(parsed.options);
+      if (parsed.language) setLanguage(parsed.language);
     }
   }, []);
 
@@ -50,7 +60,7 @@ const SystemSettings = () => {
     playSuccess();
     localStorage.setItem(
       "scribe_settings",
-      JSON.stringify({ volume, ambience, options }),
+      JSON.stringify({ volume, ambience, options, language }),
     );
     toast.success("Settings committed to neural core.");
   };
@@ -90,6 +100,48 @@ const SystemSettings = () => {
                 className="w-full accent-primary bg-primary/10"
               />
             </div>
+          </div>
+        </section>
+
+        <section className="space-y-6">
+          <h3 className="flex items-center gap-2 font-tech text-xs text-primary tracking-widest uppercase pb-2 border-b border-primary/10">
+            <Globe className="w-4 h-4 text-accent" />
+            Language_Configuration
+          </h3>
+          <div className="space-y-4 max-w-md">
+            <label className="block text-[10px] font-mono text-primary/40 uppercase">
+              Transcription Language
+            </label>
+            <select
+              value={language}
+              onChange={(e) => {
+                playClick();
+                setLanguage(e.target.value);
+              }}
+              className="w-full bg-primary/5 border border-primary/20 p-3 text-sm text-foreground focus:outline-none focus:border-accent font-tech tracking-wider rounded-sm"
+            >
+              <option className="bg-slate-900 text-foreground" value="en-US">
+                English (US)
+              </option>
+              <option className="bg-slate-900 text-foreground" value="en-GB">
+                English (UK)
+              </option>
+              <option className="bg-slate-900 text-foreground" value="hi-IN">
+                Hindi (India)
+              </option>
+              <option className="bg-slate-900 text-foreground" value="te-IN">
+                Telugu (India)
+              </option>
+              <option className="bg-slate-900 text-foreground" value="es-ES">
+                Spanish (Spain)
+              </option>
+              <option className="bg-slate-900 text-foreground" value="fr-FR">
+                French (France)
+              </option>
+              <option className="bg-slate-900 text-foreground" value="de-DE">
+                German (Germany)
+              </option>
+            </select>
           </div>
         </section>
 

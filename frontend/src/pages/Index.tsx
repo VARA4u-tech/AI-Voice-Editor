@@ -20,10 +20,20 @@ import GoldWaveform from "@/components/GoldWaveform";
 import CommandHelp from "@/components/CommandHelp";
 import { parseDocument, type ParsedDocument } from "@/lib/documentParser";
 import { processVoiceCommand, type CommandResult } from "@/lib/voiceCommands";
-import { processCommandWithAI } from "@/lib/aiService";
+import { processCommandWithAI, processChatOnly } from "@/lib/aiService";
 import { exportToPdf } from "@/lib/pdfExport";
 import { useSessionTimer } from "@/hooks/useSessionTimer";
-import { Download, X, Wand2, Timer, Save } from "lucide-react";
+import {
+  Download,
+  X,
+  Wand2,
+  Timer,
+  Save,
+  Target,
+  RotateCcw,
+  RotateCw,
+  History as HistoryIcon,
+} from "lucide-react";
 import OnboardingTutorial from "@/components/OnboardingTutorial";
 import SmartSuggestions from "@/components/SmartSuggestions";
 import { titleCache, docFingerprint, minifyPrompt } from "@/lib/tokenOptimizer";
@@ -81,6 +91,9 @@ const Index = () => {
   >([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isFocusMode, setIsFocusMode] = useState(false);
+  const [selectedParagraphIndex, setSelectedParagraphIndex] = useState<
+    number | null
+  >(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const {
     playClick,
@@ -113,7 +126,7 @@ const Index = () => {
           }
         });
     }
-  }, [user]);
+  }, [user, paragraphs.length, playSuccess]);
 
   // ── Persist session on every change ──
   useEffect(() => {
@@ -207,12 +220,31 @@ const Index = () => {
       let result: CommandResult;
 
       // 2. Try the Regex Engine first (FAST)
-      result = processVoiceCommand(trimmedCmd, paragraphs);
+      // Check if we are in "Targeted Mode" (Single Paragraph)
+      const targetParagraphs =
+        selectedParagraphIndex !== null
+          ? [paragraphs[selectedParagraphIndex]]
+          : paragraphs;
+
+      result = processVoiceCommand(trimmedCmd, targetParagraphs);
 
       // 3. Fallback to AI (LLM) if regex didn't recognize it
       if (!result.success && result.message.includes("Not recognized")) {
-        setCommandFeedback("Scribe_AI: Decrypting intent...");
-        result = await processCommandWithAI(trimmedCmd, paragraphs);
+        setCommandFeedback(
+          selectedParagraphIndex !== null
+            ? `Scribe_AI: Modulating Segment ${selectedParagraphIndex + 1}...`
+            : "Scribe_AI: Decrypting intent...",
+        );
+        result = await processCommandWithAI(trimmedCmd, targetParagraphs);
+      }
+
+      // If we were in targeted mode, we need to merge the result back into the full document
+      if (selectedParagraphIndex !== null && result.success) {
+        const newParagraphs = [...paragraphs];
+        newParagraphs[selectedParagraphIndex] = result.updatedParagraphs[0];
+        result.updatedParagraphs = newParagraphs;
+        // Adjust affected indices if they exist (though in single mode it's always just one)
+        result.affectedIndices = [selectedParagraphIndex];
       }
 
       setCommandFeedback(result.message);
@@ -283,12 +315,36 @@ const Index = () => {
     [
       paragraphs,
       history,
+      future,
       clearFeedback,
       playSuccess,
       playError,
       user,
       fileName,
+      selectedParagraphIndex,
     ],
+  );
+
+  const handleSelectParagraph = useCallback((index: number | null) => {
+    setSelectedParagraphIndex(index);
+    if (index !== null) {
+      setCommandFeedback(`Target_Locked: Segment ${index + 1} selected.`);
+      setCommandSuccess(true);
+    } else {
+      setCommandFeedback("Target_Released: Global editing active.");
+      setCommandSuccess(true);
+    }
+    setTimeout(() => setCommandFeedback(null), 3000);
+  }, []);
+
+  const handleChat = useCallback(
+    async (message: string) => {
+      setIsProcessing(true);
+      const response = await processChatOnly(message, paragraphs);
+      setIsProcessing(false);
+      return response;
+    },
+    [paragraphs, processChatOnly],
   );
 
   const {
@@ -413,7 +469,15 @@ const Index = () => {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [handleMicToggle, isFocusMode]);
+  }, [
+    handleMicToggle,
+    isFocusMode,
+    history,
+    paragraphs,
+    playSuccess,
+    clearFeedback,
+    future,
+  ]);
 
   const handleUpload = () => {
     playClick();
@@ -629,7 +693,7 @@ const Index = () => {
     >
       <MysticalBackground />
       <FloatingParticles />
-      <ChatWidget paragraphs={paragraphs} onCommand={handleCommand} />
+      <ChatWidget paragraphs={paragraphs} onChat={handleChat} />
 
       {/* ──────────────── Focus Mode Layers ──────────────── */}
       {/* 1. Deep vignette that covers the full screen */}
@@ -845,6 +909,61 @@ const Index = () => {
                 >
                   <X className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-90" />
                 </button>
+
+                <div className="flex items-center gap-2 bg-primary/5 px-3 py-1.5 border border-primary/20 rounded-full">
+                  <button
+                    onClick={() => {
+                      if (history.length > 0) {
+                        const prev = history[history.length - 1];
+                        setFuture((f) => [...f, paragraphs]);
+                        setParagraphs(prev);
+                        setHistory((h) => h.slice(0, -1));
+                        setCommandFeedback(
+                          `↩ Undo — ${history.length - 1} step(s) left`,
+                        );
+                        setCommandSuccess(true);
+                        playSuccess();
+                        clearFeedback();
+                      }
+                    }}
+                    disabled={history.length === 0}
+                    title="Undo (Ctrl+Z)"
+                    className="p-1.5 text-primary/40 hover:text-accent disabled:opacity-20 transition-all"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                  </button>
+                  <span className="w-[1px] h-4 bg-primary/10" />
+                  <button
+                    onClick={() => {
+                      if (future.length > 0) {
+                        const next = future[future.length - 1];
+                        setFuture((f) => f.slice(0, -1));
+                        setHistory((h) => [...h, paragraphs]);
+                        setParagraphs(next);
+                        setCommandFeedback(
+                          `↪ Redo — ${future.length - 1} step(s) left`,
+                        );
+                        setCommandSuccess(true);
+                        playSuccess();
+                        clearFeedback();
+                      }
+                    }}
+                    disabled={future.length === 0}
+                    title="Redo (Ctrl+Y)"
+                    className="p-1.5 text-primary/40 hover:text-accent disabled:opacity-20 transition-all"
+                  >
+                    <RotateCw className="w-4 h-4" />
+                  </button>
+                  <span className="w-[1px] h-4 bg-primary/10" />
+                  <button
+                    onClick={() => setShowHistoryPanel((p) => !p)}
+                    title="Toggle History Viewer (Ctrl+H)"
+                    className={`p-1.5 transition-all ${showHistoryPanel ? "text-accent" : "text-primary/40 hover:text-accent"}`}
+                  >
+                    <HistoryIcon className="w-4 h-4" />
+                  </button>
+                </div>
+
                 <button
                   onClick={() => {
                     setIsFocusMode((p) => !p);
@@ -882,6 +1001,19 @@ const Index = () => {
             }
           />
 
+          {selectedParagraphIndex !== null && (
+            <button
+              onClick={() => handleSelectParagraph(null)}
+              className="group flex items-center gap-2 px-3 py-1.5 border border-accent/40 bg-accent/10 rounded-full animate-fade-in hover:bg-accent/20 transition-all shadow-[0_0_15px_rgba(255,215,0,0.2)]"
+            >
+              <Target className="w-3 h-3 text-accent animate-spin-slow" />
+              <span className="font-tech text-[10px] text-accent tracking-[0.2em] uppercase">
+                Targeting Seg {selectedParagraphIndex + 1}
+              </span>
+              <X className="w-2.5 h-2.5 text-accent/50 group-hover:text-accent" />
+            </button>
+          )}
+
           {displayTranscript && isListening && (
             <div className="relative font-mono text-[11px] text-accent tracking-wider text-center max-w-md animate-fade-in group px-6 py-2 border-x border-accent/20">
               <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
@@ -907,71 +1039,6 @@ const Index = () => {
         </div>
 
         <GoldDivider />
-
-        {/* ── Undo / Redo Strip ── */}
-        {paragraphs.length > 0 && (
-          <div className="flex items-center gap-2 w-full justify-end pr-2 mt-4 mb-1">
-            <button
-              onClick={() => {
-                if (history.length > 0) {
-                  const prev = history[history.length - 1];
-                  setFuture((f) => [...f, paragraphs]);
-                  setParagraphs(prev);
-                  setHistory((h) => h.slice(0, -1));
-                  setCommandFeedback(
-                    `↩ Undo — ${history.length - 1} step(s) left`,
-                  );
-                  setCommandSuccess(true);
-                  playSuccess();
-                  clearFeedback();
-                }
-              }}
-              disabled={history.length === 0}
-              title="Undo (Ctrl+Z)"
-              className="flex items-center gap-1.5 px-3 py-1.5 font-tech text-[9px] uppercase tracking-widest border border-primary/15 bg-primary/5 text-primary/50 hover:text-primary hover:border-primary/30 disabled:opacity-25 transition-all rounded-sm"
-            >
-              ↩ Undo
-              {history.length > 0 && (
-                <span className="text-accent/60 font-mono">
-                  ({history.length})
-                </span>
-              )}
-            </button>
-            <button
-              onClick={() => {
-                if (future.length > 0) {
-                  const next = future[future.length - 1];
-                  setFuture((f) => f.slice(0, -1));
-                  setHistory((h) => [...h, paragraphs]);
-                  setParagraphs(next);
-                  setCommandFeedback(
-                    `↪ Redo — ${future.length - 1} step(s) left`,
-                  );
-                  setCommandSuccess(true);
-                  playSuccess();
-                  clearFeedback();
-                }
-              }}
-              disabled={future.length === 0}
-              title="Redo (Ctrl+Y)"
-              className="flex items-center gap-1.5 px-3 py-1.5 font-tech text-[9px] uppercase tracking-widest border border-primary/15 bg-primary/5 text-primary/50 hover:text-primary hover:border-primary/30 disabled:opacity-25 transition-all rounded-sm"
-            >
-              ↪ Redo
-              {future.length > 0 && (
-                <span className="text-accent/60 font-mono">
-                  ({future.length})
-                </span>
-              )}
-            </button>
-            <button
-              onClick={() => setShowHistoryPanel((p) => !p)}
-              title="Toggle History Panel (Ctrl+H)"
-              className={`flex items-center gap-1.5 px-3 py-1.5 font-tech text-[9px] uppercase tracking-widest border transition-all rounded-sm ${showHistoryPanel ? "border-accent/40 bg-accent/10 text-accent" : "border-primary/15 bg-primary/5 text-primary/40 hover:text-primary hover:border-primary/30"}`}
-            >
-              ⏱ History ({history.length})
-            </button>
-          </div>
-        )}
 
         {/* ── History Timeline Panel ── */}
         {showHistoryPanel && history.length > 0 && (
@@ -1055,6 +1122,8 @@ const Index = () => {
               playSuccess();
               clearFeedback();
             }}
+            selectedParagraphIndex={selectedParagraphIndex}
+            onSelectParagraph={handleSelectParagraph}
           />
 
           {/* Smart Suggestions — appears after each successful command */}

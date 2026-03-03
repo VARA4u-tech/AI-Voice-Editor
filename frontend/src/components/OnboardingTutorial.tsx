@@ -152,7 +152,7 @@ const OnboardingTutorial = ({
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
       {/* Modal */}
-      <div className="relative w-full max-w-lg bg-background border border-primary/30 shadow-[0_0_80px_rgba(0,0,0,0.9)] overflow-hidden">
+      <div className="relative w-full max-w-xl bg-background border border-primary/30 shadow-[0_0_80px_rgba(0,0,0,0.9)] overflow-hidden animate-in fade-in zoom-in duration-300">
         {/* Corner brackets */}
         <div className="tech-bracket-tl" />
         <div className="tech-bracket-tr" />
@@ -161,16 +161,16 @@ const OnboardingTutorial = ({
 
         {/* Gradient accent top */}
         <div
-          className={`absolute top-0 left-0 w-full h-32 bg-gradient-to-b ${current.color} pointer-events-none`}
+          className={`absolute top-0 left-0 w-full h-40 bg-gradient-to-b ${current.color} pointer-events-none opacity-60`}
         />
 
         {/* Close */}
         <button
           onClick={dismiss}
-          className="absolute top-4 right-4 p-1.5 text-primary/30 hover:text-primary transition-colors z-10"
+          className="absolute top-5 right-5 p-2 text-primary/40 hover:text-primary transition-colors z-10"
           title="Skip Tutorial"
         >
-          <X className="w-4 h-4" />
+          <X className="w-5 h-5" />
         </button>
 
         {/* Step content */}
@@ -178,19 +178,19 @@ const OnboardingTutorial = ({
           className={`p-8 pt-10 transition-all duration-150 ${animating ? "opacity-0 translate-y-2" : "opacity-100 translate-y-0"}`}
         >
           {/* Icon + Step counter */}
-          <div className="flex items-start justify-between mb-6">
-            <div className="p-3 border border-accent/30 bg-accent/5 text-accent">
+          <div className="flex items-start justify-between mb-8">
+            <div className="p-4 border border-accent/40 bg-accent/10 text-accent shadow-[0_0_20px_rgba(255,215,0,0.1)]">
               {current.icon}
             </div>
-            <div className="flex gap-1.5 items-center mt-2">
+            <div className="flex gap-2 items-center mt-3">
               {STEPS.map((_, i) => (
                 <button
                   key={i}
                   onClick={() => goTo(i)}
-                  className={`h-1 rounded-full transition-all duration-300 ${
+                  className={`h-1.5 rounded-full transition-all duration-500 ${
                     i === step
-                      ? "w-6 bg-accent"
-                      : "w-2 bg-primary/20 hover:bg-primary/40"
+                      ? "w-8 bg-accent shadow-[0_0_10px_rgba(255,215,0,0.4)]"
+                      : "w-2.5 bg-primary/20 hover:bg-primary/50"
                   }`}
                 />
               ))}
@@ -198,26 +198,26 @@ const OnboardingTutorial = ({
           </div>
 
           {/* Title */}
-          <h2 className="font-heading text-xl text-primary tracking-wide mb-1">
+          <h2 className="font-heading text-2xl sm:text-3xl text-primary tracking-tight mb-2 leading-tight">
             {current.title}
           </h2>
-          <p className="font-mono text-[10px] text-accent/70 uppercase tracking-[0.2em] mb-6">
+          <p className="font-mono text-xs sm:text-sm text-accent/90 uppercase tracking-[0.25em] mb-8 font-medium">
             {current.subtitle}
           </p>
 
           {/* Command Examples */}
           {current.commands.length > 0 && (
-            <ul className="space-y-2 mb-6">
+            <ul className="space-y-3 mb-8">
               {current.commands.map((cmd, i) => (
                 <li
                   key={i}
-                  className="flex items-start gap-3 px-4 py-2.5 bg-primary/5 border border-primary/10 rounded-sm"
-                  style={{ animationDelay: `${i * 60}ms` }}
+                  className="flex items-start gap-4 px-5 py-3.5 bg-primary/5 border border-primary/10 rounded-sm hover:border-primary/30 transition-colors"
+                  style={{ animationDelay: `${i * 80}ms` }}
                 >
-                  <span className="text-accent/50 font-mono text-[10px] mt-0.5 shrink-0">
+                  <span className="text-accent/60 font-mono text-xs mt-0.5 shrink-0">
                     ❯
                   </span>
-                  <span className="font-mono text-[11px] text-foreground/80">
+                  <span className="font-mono text-xs sm:text-sm text-foreground/90 leading-relaxed">
                     {cmd}
                   </span>
                 </li>
@@ -226,23 +226,24 @@ const OnboardingTutorial = ({
           )}
 
           {/* Tip */}
-          <div className="px-4 py-3 border-l-2 border-accent/40 bg-accent/5 mb-8">
-            <p className="font-body text-xs text-foreground/60 italic leading-relaxed">
-              💡 {current.tip}
+          <div className="px-5 py-4 border-l-3 border-accent/60 bg-accent/5 mb-10 ring-1 ring-inset ring-accent/5">
+            <p className="font-body text-sm text-foreground/80 italic leading-relaxed">
+              <span className="not-italic mr-2">💡</span>
+              {current.tip}
             </p>
           </div>
 
           {/* Navigation */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mt-auto">
             <button
               onClick={() => (isFirst ? dismiss() : goTo(step - 1))}
-              className="flex items-center gap-2 font-tech text-[10px] uppercase tracking-widest text-primary/40 hover:text-primary transition-colors"
+              className="flex items-center gap-2.5 font-tech text-xs uppercase tracking-widest text-primary/50 hover:text-primary transition-all hover:translate-x-[-2px]"
             >
               {isFirst ? (
-                <span>Skip Tutorial</span>
+                <span className="opacity-80">Skip Tutorial</span>
               ) : (
                 <>
-                  <ChevronLeft className="w-3.5 h-3.5" />
+                  <ChevronLeft className="w-4 h-4" />
                   <span>Back</span>
                 </>
               )}
@@ -250,15 +251,15 @@ const OnboardingTutorial = ({
 
             <button
               onClick={() => (isLast ? dismiss() : goTo(step + 1))}
-              className="flex items-center gap-2 px-6 py-2.5 font-tech text-[10px] uppercase tracking-widest bg-accent/10 border border-accent/30 text-accent hover:bg-accent/20 transition-all"
+              className="flex items-center gap-2.5 px-8 py-3.5 font-tech text-xs uppercase tracking-widest bg-accent/15 border border-accent/40 text-accent hover:bg-accent/25 hover:border-accent hover:shadow-[0_0_20px_rgba(255,215,0,0.15)] transition-all active:scale-95"
             >
               {isLast ? (
                 <>
-                  <Sparkles className="w-3.5 h-3.5" /> Begin Ritual
+                  <Sparkles className="w-4 h-4 animate-pulse" /> Begin Ritual
                 </>
               ) : (
                 <>
-                  Next <ChevronRight className="w-3.5 h-3.5" />
+                  Next <ChevronRight className="w-4 h-4" />
                 </>
               )}
             </button>

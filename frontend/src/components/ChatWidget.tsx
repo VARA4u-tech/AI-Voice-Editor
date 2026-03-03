@@ -11,16 +11,16 @@ interface Message {
 
 interface ChatWidgetProps {
   paragraphs: string[];
-  onCommand: (command: string) => Promise<unknown>;
+  onChat: (message: string) => Promise<string>;
 }
 
-const ChatWidget = ({ paragraphs, onCommand }: ChatWidgetProps) => {
+const ChatWidget = ({ paragraphs, onChat }: ChatWidgetProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
-      text: "Greetings, Scribe. I am the Logic_Alchemy core. How can I assist your document session today?",
+      text: "Greetings, Scribe. I am the Logic_Alchemy core. I am here for counsel and discourse. How can I assist you today?",
       sender: "bot",
       timestamp: new Date(),
     },
@@ -52,26 +52,8 @@ const ChatWidget = ({ paragraphs, onCommand }: ChatWidgetProps) => {
     setIsTyping(true);
 
     try {
-      // Execute the command through the main handleCommand flow
-      // which already includes regex + AI fallback
-      const result = await onCommand(userMsg.text);
-
-      let responseText = "Command processed. No specific output recorded.";
-
-      if (result && typeof result === "object") {
-        const res = result as Record<string, unknown>;
-        if (
-          res.scribeResponse &&
-          typeof res.scribeResponse === "object" &&
-          (res.scribeResponse as Record<string, unknown>).content
-        ) {
-          responseText = String(
-            (res.scribeResponse as Record<string, unknown>).content,
-          );
-        } else if (typeof res.message === "string") {
-          responseText = res.message;
-        }
-      }
+      // Execute simple chat transmission
+      const responseText = await onChat(userMsg.text);
 
       const botMsg: Message = {
         id: (Date.now() + 1).toString(),

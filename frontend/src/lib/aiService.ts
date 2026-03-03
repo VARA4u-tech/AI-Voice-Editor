@@ -24,7 +24,65 @@ JSON format:
 {"success":boolean,"message":"Short confirmation","updatedParagraphs":string[],"affectedIndices":number[],"scribeResponse":{"type":"summary"|"stats"|"info"|"error","content":"result","title":"title"},"structuredData":{"action":"delete|replace|add|format|translate|analyze|qa","target":"string","replacement":"string"}}
 `);
 
+const CHAT_SYSTEM_PROMPT = minifyPrompt(`
+You are the "Gilded Scribe", a wise and helpful assistant. 
+The user is currently editing a document, and you are here to chat, provide insights, answer questions, or just keep them company.
+IMPORTANT: You are in "Chat Mode". Do NOT attempt to edit the document. 
+If the user asks to "delete a paragraph" or "replace text", politely inform them that you are currently in chat mode and they should use voice commands or manual editing for that.
+Keep your responses helpful, concise, and slightly mystical in tone to match the Gilded Scribe aesthetic.
+`);
+
 const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
+
+export async function processChatOnly(
+  message: string,
+  paragraphs: string[],
+): Promise<string> {
+  const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
+  const siteUrl = import.meta.env.VITE_SITE_URL || "http://localhost:8080";
+  const siteName = import.meta.env.VITE_SITE_NAME || "AI Voice Editor";
+
+  if (!apiKey) return "Connection key missing.";
+
+  const documentContext = buildSmartDocumentContext(paragraphs, message, 5);
+
+  try {
+    const response = await fetch(
+      "https://openrouter.ai/api/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "HTTP-Referer": siteUrl,
+          "X-Title": siteName,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "stepfun/step-3.5-flash:free",
+          max_tokens: 512,
+          temperature: 0.7,
+          messages: [
+            { role: "system", content: CHAT_SYSTEM_PROMPT },
+            {
+              role: "user",
+              content: `Document Context (for reference):\n${documentContext}\n\nUser Message: "${message}"`,
+            },
+          ],
+        }),
+      },
+    );
+
+    if (!response.ok) throw new Error("Signal interference.");
+
+    const data = await response.json();
+    return (
+      data.choices?.[0]?.message?.content?.trim() || "The oracle is silent."
+    );
+  } catch (error) {
+    console.error("Chat API Error:", error);
+    return "The neural link encountered an error during transmission.";
+  }
+}
 
 export async function processCommandWithAI(
   command: string,

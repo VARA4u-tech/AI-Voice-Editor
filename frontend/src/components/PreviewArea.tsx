@@ -12,6 +12,7 @@ import {
   X,
   Pencil,
   Check,
+  Target,
 } from "lucide-react";
 import { useEffect, useRef, useMemo, useState, useCallback } from "react";
 
@@ -23,6 +24,8 @@ interface PreviewAreaProps {
   commandSuccess?: boolean;
   lastEditedIndices?: number[];
   onParagraphEdit?: (index: number, newText: string) => void;
+  selectedParagraphIndex?: number | null;
+  onSelectParagraph?: (index: number | null) => void;
 }
 
 const PreviewArea = ({
@@ -33,6 +36,8 @@ const PreviewArea = ({
   commandSuccess,
   lastEditedIndices = [],
   onParagraphEdit,
+  selectedParagraphIndex = null,
+  onSelectParagraph,
 }: PreviewAreaProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const paraRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -332,6 +337,8 @@ const PreviewArea = ({
               const isActive =
                 matchingIndices[matchIndex % matchingIndices.length] === i;
               const isEditing = editingIndex === i;
+              const isSelectedForVoice = selectedParagraphIndex === i;
+
               return (
                 <div
                   key={i}
@@ -339,19 +346,28 @@ const PreviewArea = ({
                   className={`group relative flex gap-4 py-3 px-2 border-l-2 border-transparent transition-all duration-300 ${
                     isEditing
                       ? "border-l-accent/80 bg-accent/5 rounded-r-lg"
-                      : isActive
-                        ? "bg-accent/10 border-l-accent rounded-r-lg"
-                        : isMatch
-                          ? "bg-accent/5 border-l-accent/30 rounded-r-lg"
-                          : lastEditedIndices.includes(i)
-                            ? "bg-accent/5 border-l-accent/50 rounded-r-lg"
-                            : "hover:border-primary/20"
+                      : isSelectedForVoice
+                        ? "bg-accent/15 border-l-accent rounded-r-lg shadow-[0_0_20px_rgba(255,215,0,0.1)]"
+                        : isActive
+                          ? "bg-accent/10 border-l-accent rounded-r-lg"
+                          : isMatch
+                            ? "bg-accent/5 border-l-accent/30 rounded-r-lg"
+                            : lastEditedIndices.includes(i)
+                              ? "bg-accent/5 border-l-accent/50 rounded-r-lg"
+                              : "hover:border-primary/20"
                   }`}
                 >
-                  {/* Paragraph number */}
-                  <span className="text-primary/30 font-mono text-[10px] mt-1 shrink-0 w-8 tabular-nums">
-                    [{String(i + 1).padStart(2, "00")}]
-                  </span>
+                  {/* Paragraph number + Target indicator */}
+                  <div className="flex flex-col items-center gap-1 shrink-0 w-8">
+                    <span
+                      className={`font-mono text-[10px] tabular-nums ${isSelectedForVoice ? "text-accent font-bold" : "text-primary/30"}`}
+                    >
+                      [{String(i + 1).padStart(2, "00")}]
+                    </span>
+                    {isSelectedForVoice && (
+                      <Target className="w-3 h-3 text-accent animate-pulse" />
+                    )}
+                  </div>
 
                   {/* Content — view or edit */}
                   <div className="flex-1 min-w-0">
@@ -400,21 +416,55 @@ const PreviewArea = ({
                         onClick={() => onParagraphEdit && startEdit(i, para)}
                         title={onParagraphEdit ? "Click to edit" : undefined}
                       >
-                        <p className="font-body text-base text-foreground/90 leading-relaxed transition-colors duration-200 group-hover:text-foreground pr-7">
+                        <p
+                          className={`font-body text-base leading-relaxed transition-colors duration-200 pr-12 ${
+                            isSelectedForVoice
+                              ? "text-accent font-medium"
+                              : "text-foreground/90 group-hover:text-foreground"
+                          }`}
+                        >
                           {para}
                         </p>
-                        {onParagraphEdit && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              startEdit(i, para);
-                            }}
-                            className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity p-1 text-primary/30 hover:text-accent"
-                            title="Edit paragraph"
-                          >
-                            <Pencil className="w-3 h-3" />
-                          </button>
-                        )}
+
+                        <div className="absolute top-0 right-0 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          {onSelectParagraph && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onSelectParagraph(
+                                  isSelectedForVoice ? null : i,
+                                );
+                              }}
+                              className={`p-1.5 transition-all rounded-full ${
+                                isSelectedForVoice
+                                  ? "text-accent bg-accent/10 ring-1 ring-accent/30"
+                                  : "text-primary/30 hover:text-accent hover:bg-accent/10"
+                              }`}
+                              title={
+                                isSelectedForVoice
+                                  ? "Deselect for voice edit"
+                                  : "Select for voice edit"
+                              }
+                            >
+                              <Target
+                                className={`w-3.5 h-3.5 ${isSelectedForVoice ? "animate-spin-slow" : ""}`}
+                              />
+                            </button>
+                          )}
+
+                          {onParagraphEdit && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                startEdit(i, para);
+                              }}
+                              className="p-1.5 text-primary/30 hover:text-accent hover:bg-accent/10 transition-all rounded-full"
+                              title="Manual edit"
+                            >
+                              <Pencil className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                        </div>
                       </div>
                     )}
                   </div>

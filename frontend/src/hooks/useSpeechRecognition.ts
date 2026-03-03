@@ -17,6 +17,20 @@ interface SpeechRecognitionErrorEvent extends Event {
   readonly message: string;
 }
 
+interface SpeechRecognitionResultEvent extends Event {
+  readonly resultIndex: number;
+  readonly results: {
+    readonly length: number;
+    [index: number]: {
+      readonly isFinal: boolean;
+      readonly length: number;
+      [index: number]: {
+        readonly transcript: string;
+      };
+    };
+  };
+}
+
 // Minimal interface describing the SpeechRecognition *instance* we use,
 // so we don't depend on the global `SpeechRecognition` type which isn't
 // reliably available in every TypeScript DOM lib version.
@@ -24,7 +38,7 @@ interface SpeechRecognitionInstance extends EventTarget {
   continuous: boolean;
   interimResults: boolean;
   lang: string;
-  onresult: ((event: any) => void) | null;
+  onresult: ((event: SpeechRecognitionResultEvent) => void) | null;
   onerror: ((event: SpeechRecognitionErrorEvent) => void) | null;
   onend: (() => void) | null;
   start(): void;
@@ -60,9 +74,20 @@ const useSpeechRecognition = (): UseSpeechRecognitionResult => {
     const recognition = new SpeechRecognition();
     recognition.continuous = true;
     recognition.interimResults = true;
-    recognition.lang = "en-US";
 
-    recognition.onresult = (event: any) => {
+    // Load preferred language from saved settings
+    let preferredLang = "en-US";
+    try {
+      const savedSettings = localStorage.getItem("scribe_settings");
+      if (savedSettings) {
+        preferredLang = JSON.parse(savedSettings).language || "en-US";
+      }
+    } catch (e) {
+      console.error("Failed to load language settings", e);
+    }
+    recognition.lang = preferredLang;
+
+    recognition.onresult = (event: SpeechRecognitionResultEvent) => {
       let final = "";
       let interim = "";
       for (let i = event.resultIndex; i < event.results.length; i++) {
