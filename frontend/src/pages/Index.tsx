@@ -345,7 +345,7 @@ const Index = () => {
       setIsProcessing(false);
       return response;
     },
-    [paragraphs, processChatOnly],
+    [paragraphs],
   );
 
   const {

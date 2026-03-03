@@ -8,7 +8,7 @@ import {
   Mic,
   RotateCcw,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -40,21 +40,14 @@ const SessionHistory = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [view, setView] = useState<"documents" | "activity">("documents");
 
-  useEffect(() => {
-    if (user) {
-      fetchData();
-    } else {
-      setLoading(false);
-    }
-  }, [user, view]);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
+    if (!user) return;
     setLoading(true);
     if (view === "documents") {
       const { data, error } = await supabase
         .from("user_documents")
         .select("*")
-        .eq("user_id", user.id) // ← only this user's documents
+        .eq("user_id", user.id)
         .order("updated_at", { ascending: false });
 
       if (error) toast.error("Failed to fetch scrolls.");
@@ -69,7 +62,15 @@ const SessionHistory = () => {
       else setLogs(data || []);
     }
     setLoading(false);
-  };
+  }, [user, view]);
+
+  useEffect(() => {
+    if (user) {
+      fetchData();
+    } else {
+      setLoading(false);
+    }
+  }, [user, fetchData]);
 
   const handleRestore = (doc: UserDocument) => {
     // We'll use localStorage to pass the data back to the Index page for now

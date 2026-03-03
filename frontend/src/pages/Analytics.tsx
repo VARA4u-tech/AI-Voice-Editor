@@ -8,7 +8,7 @@ import {
   Layers,
   Trophy,
 } from "lucide-react";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -24,12 +24,7 @@ const Analytics = () => {
   const [activity, setActivity] = useState<ActivityRow[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (user) fetchAnalytics();
-    else setLoading(false);
-  }, [user]);
-
-  const fetchAnalytics = async () => {
+  const fetchAnalytics = useCallback(async () => {
     setLoading(true);
     const { data, error } = await supabase
       .from("scribe_activity")
@@ -39,7 +34,12 @@ const Analytics = () => {
 
     if (!error && data) setActivity(data);
     setLoading(false);
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (user) fetchAnalytics();
+    else setLoading(false);
+  }, [user, fetchAnalytics]);
 
   const stats = useMemo(() => {
     const total = activity.length;
