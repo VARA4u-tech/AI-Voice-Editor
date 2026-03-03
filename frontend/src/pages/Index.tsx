@@ -36,6 +36,7 @@ import {
 } from "lucide-react";
 import OnboardingTutorial from "@/components/OnboardingTutorial";
 import SmartSuggestions from "@/components/SmartSuggestions";
+import Footer from "@/components/Footer";
 import { titleCache, docFingerprint, minifyPrompt } from "@/lib/tokenOptimizer";
 
 const STORAGE_KEY = "gilded-scribe-session";
@@ -1151,19 +1152,7 @@ const Index = () => {
         </div>
       </main>
 
-      {/* Mystical Footer */}
-      <footer className="w-full mt-10 sm:mt-20 pb-10 flex flex-col items-center gap-4 animate-fade-in pointer-events-none px-4 text-center">
-        <div className="flex items-center gap-4 sm:gap-6">
-          <div className="w-12 sm:w-20 h-[1px] bg-gradient-to-r from-transparent to-primary" />
-          <span className="font-heading text-[13px] sm:text-[15px] tracking-[0.5em] uppercase text-primary font-bold gold-text-glow">
-            Hand-Crafted in Silence
-          </span>
-          <div className="w-12 sm:w-20 h-[1px] bg-gradient-to-l from-transparent to-primary" />
-        </div>
-        <p className="font-body text-[13px] sm:text-[15px] italic text-primary font-medium tracking-wide">
-          The AI Voice Editor · MDXXVI
-        </p>
-      </footer>
+      <Footer />
 
       {/* Save Version Modal */}
       {showVersionModal && (

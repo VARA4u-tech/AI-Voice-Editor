@@ -4,6 +4,7 @@ import FloatingParticles from "../components/FloatingParticles";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Sparkles } from "lucide-react";
 import { useSoundEffects } from "../hooks/useSoundEffects";
+import Footer from "./Footer";
 
 interface LayoutProps {
   children: ReactNode;
@@ -77,16 +78,7 @@ const Layout = ({ children, title, subtitle, icon: Icon }: LayoutProps) => {
         </div>
       </main>
 
-      {/* ── Footer ── */}
-      <footer className="w-full mt-8 sm:mt-16 pb-6 flex flex-col items-center gap-3 pointer-events-none opacity-40">
-        <div className="flex items-center gap-3 sm:gap-4">
-          <div className="w-8 sm:w-12 h-[1px] bg-gradient-to-r from-transparent to-primary" />
-          <span className="font-heading text-[10px] sm:text-[11px] tracking-[0.3em] sm:tracking-[0.4em] uppercase text-primary font-bold">
-            Gilded Scribe
-          </span>
-          <div className="w-8 sm:w-12 h-[1px] bg-gradient-to-l from-transparent to-primary" />
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };
