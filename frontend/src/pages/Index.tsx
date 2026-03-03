@@ -14,7 +14,7 @@ import useSpeechRecognition from "@/hooks/useSpeechRecognition";
 import { useSoundEffects } from "@/hooks/useSoundEffects";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/lib/supabase";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Activity } from "lucide-react";
 import MoonPhaseAnimation from "@/components/MoonPhaseAnimation";
 import GoldWaveform from "@/components/GoldWaveform";
 import CommandHelp from "@/components/CommandHelp";
@@ -762,16 +762,24 @@ const Index = () => {
       <button
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
         onMouseEnter={() => playHover()}
-        className="fixed top-6 right-6 z-40 p-3 rounded-full border border-primary/20 bg-background/40 backdrop-blur-md text-primary hover:bg-primary/10 transition-all duration-300 shadow-xl group"
+        className="fixed top-6 right-6 z-40 flex items-center gap-2.5 px-4 py-2.5 bg-slate-950/80 backdrop-blur-xl border border-primary/20 text-primary hover:border-accent/50 transition-all duration-300 shadow-[0_0_20px_rgba(0,0,0,0.4)] group overflow-hidden rounded-sm"
       >
-        <Sparkles className="w-5 h-5 group-hover:scale-110 transition-transform" />
+        <div className="absolute inset-0 bg-accent/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+        <div className="tech-bracket-tl w-1.5 h-1.5" />
+        <div className="tech-bracket-br w-1.5 h-1.5" />
+
+        <Activity className="w-4 h-4 group-hover:text-accent group-hover:scale-110 transition-all" />
+        <span className="font-tech text-xs tracking-[0.2em] uppercase mt-0.5 group-hover:text-accent font-bold transition-colors hidden sm:block">
+          System Log
+        </span>
+
         {scribeLog.length > 0 && (
-          <span className="absolute -top-1 -right-1 flex h-4 w-4">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-4 w-4 bg-primary text-[10px] items-center justify-center text-background font-bold">
+          <div className="ml-1 sm:ml-2 flex items-center justify-center px-2 py-0.5 bg-accent/20 border border-accent/40 rounded-sm relative">
+            <span className="absolute inset-0 bg-accent/20 animate-ping opacity-50 rounded-sm" />
+            <span className="font-mono text-[10px] text-accent font-bold tabular-nums relative z-10">
               {scribeLog.length}
             </span>
-          </span>
+          </div>
         )}
       </button>
 
