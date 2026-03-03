@@ -271,4 +271,3 @@ const OnboardingTutorial = ({
 };
 
 export default OnboardingTutorial;
-export { ONBOARDING_KEY };
