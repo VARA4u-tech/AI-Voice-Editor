@@ -1,6 +1,8 @@
 <div align="center">
 
 # 🎙️ Gilded Voice Scribe
+![FAVICON](https://github.com/user-attachments/assets/e7b5a78b-5f25-4d47-bd97-1d568d31b7d5)
+
 
 ### _AI-Powered Voice-Controlled PDF Editor_
 
