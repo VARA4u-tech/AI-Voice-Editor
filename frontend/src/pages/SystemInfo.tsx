@@ -1,5 +1,14 @@
 import Layout from "@/components/Layout";
-import { Info, Code, Cpu, Globe, Mail, Github, Instagram } from "lucide-react";
+import {
+  Info,
+  Code,
+  Cpu,
+  Globe,
+  Mail,
+  Github,
+  Instagram,
+  LinkedinIcon,
+} from "lucide-react";
 
 const SystemInfo = () => {
   return (
@@ -60,10 +69,10 @@ const SystemInfo = () => {
                   <Github className="w-5 h-5" />
                 </a>
                 <a
-                  href="https://www.instagram.com/d_v_p6/"
+                  href="https://www.linkedin.com/in/durga-vara-prasad-pappuri-1797701b6"
                   className="p-3 border border-primary/20 bg-primary/5 rounded-full hover:border-accent hover:text-accent transition-all group"
                 >
-                  <Instagram className="w-5 h-5" />
+                  <LinkedinIcon className="w-5 h-5" />
                 </a>
                 <a
                   href="https://mail.google.com/mail/u/0/pappuridurgavaraprasad4pl@gmail.com"
