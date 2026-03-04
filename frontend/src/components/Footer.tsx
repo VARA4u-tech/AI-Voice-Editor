@@ -9,6 +9,7 @@ import {
   Settings,
   HelpCircle,
   ExternalLink,
+  LinkedinIcon,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useSoundEffects } from "@/hooks/useSoundEffects";
@@ -60,6 +61,14 @@ const Footer = () => {
                 title="Neural Stream"
               >
                 <Instagram className="w-4 h-4" />
+              </a>
+              <a
+                href="https://www.linkedin.com/in/durga-vara-prasad-pappuri-1797701b6"
+                className="p-2 text-primary/70 hover:text-accent border border-primary/10 hover:border-accent/30 rounded-sm transition-all"
+                onMouseEnter={() => playHover()}
+                title="Neural Stream"
+              >
+                <LinkedinIcon className="w-4 h-4" />
               </a>
             </div>
           </div>
