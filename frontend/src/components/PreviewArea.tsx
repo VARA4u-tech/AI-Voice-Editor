@@ -132,6 +132,9 @@ const PreviewArea = ({
       <div className="tech-bracket-bl" />
       <div className="tech-bracket-br" />
 
+      {/* Tailwind SAFELIST for dynamic AI rendered content */}
+      <div className="hidden bg-red-500/20 text-red-500 px-1 rounded" />
+
       {/* Command feedback toast */}
       {commandFeedback && (
         <div
@@ -423,9 +426,8 @@ const PreviewArea = ({
                               ? "text-accent font-medium"
                               : "text-foreground/90 group-hover:text-foreground"
                           }`}
-                        >
-                          {para}
-                        </p>
+                          dangerouslySetInnerHTML={{ __html: para }}
+                        />
 
                         <div className="absolute top-0 right-0 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                           {onSelectParagraph && (

@@ -20,8 +20,15 @@ RULES:
 2. Keep "message" short (1 sentence max).
 3. For Q&A or analysis put the result in "scribeResponse.content".
 4. updatedParagraphs must contain ALL paragraphs (unchanged ones included).
+5. If asked to 'simplify' or 'shorten' text, analyze it and provide a shorter, simpler version with correct grammar in updatedParagraphs.
+6. If asked to check grammar or highlight mistakes, YOU MUST detect errors, put your analysis in scribeResponse.content, and highlight the mistakes directly inside updatedParagraphs using exact HTML: <mark class='bg-red-500/20 text-red-500 px-1 rounded'>mistake</mark> (CRITICAL: use SINGLE QUOTES for HTML attributes to keep JSON valid). Do not escape HTML. If there are no mistakes, say so in the message.
 JSON format:
 {"success":boolean,"message":"Short confirmation","updatedParagraphs":string[],"affectedIndices":number[],"scribeResponse":{"type":"summary"|"stats"|"info"|"error","content":"result","title":"title"},"structuredData":{"action":"delete|replace|add|format|translate|analyze|qa","target":"string","replacement":"string"}}
+
+EXAMPLE FOR GRAMMAR CHECK:
+User says: "Check grammar"
+Input paragraphs: ["He do not like apples."]
+Your JSON Output: {"success":true, "message":"Grammar checked.", "updatedParagraphs":["He <mark class='bg-red-500/20 text-red-500 px-1 rounded'>do</mark> not like apples."], "affectedIndices":[0], "scribeResponse":{"type":"info", "content":"Found mistake: 'do' should be 'does'.", "title":"Grammar Analysis"}}
 `);
 
 const CHAT_SYSTEM_PROMPT = minifyPrompt(`

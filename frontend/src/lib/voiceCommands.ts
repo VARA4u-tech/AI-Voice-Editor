@@ -218,6 +218,66 @@ const commands: CommandPattern[] = [
   },
   {
     pattern:
+      /^(?:summarize|summary)(?:\s+the)?\s+(?:selected\s+)?(?:line|text)$/i,
+    description: "Summarize selected text (AI)",
+    example: "summarize the selected line",
+    handler: (paragraphs) => {
+      if (paragraphs.length > 1) {
+        return {
+          success: false,
+          message: "Please select a specific line/paragraph first.",
+          updatedParagraphs: paragraphs,
+        };
+      }
+      return {
+        success: false,
+        message: "Not recognized. Route to AI",
+        updatedParagraphs: paragraphs,
+      };
+    },
+  },
+  {
+    pattern:
+      /^(?:simplify|shorten)(?:\s+the)?\s+(?:selected\s+)?(?:line|text)$/i,
+    description: "Simplify selected text (AI)",
+    example: "simplify the selected line",
+    handler: (paragraphs) => {
+      if (paragraphs.length > 1) {
+        return {
+          success: false,
+          message: "Please select a specific line/paragraph first.",
+          updatedParagraphs: paragraphs,
+        };
+      }
+      return {
+        success: false,
+        message: "Not recognized. Route to AI",
+        updatedParagraphs: paragraphs,
+      };
+    },
+  },
+  {
+    pattern:
+      /^(?:check|analyze|highlight|fix)?\s*(?:grammar|grammar\s+mistakes)(?:\s+in)?(?:\s+the)?\s*(?:selected\s+)?(?:line|text)?$/i,
+    description: "Check grammar in selected text (AI)",
+    example: "check grammar in the selected line",
+    handler: (paragraphs) => {
+      if (paragraphs.length > 1) {
+        return {
+          success: false,
+          message: "Please select a specific line/paragraph first.",
+          updatedParagraphs: paragraphs,
+        };
+      }
+      return {
+        success: false,
+        message: "Not recognized. Route to AI",
+        updatedParagraphs: paragraphs,
+      };
+    },
+  },
+  {
+    pattern:
       /^(?:show|get)\s+(?:stats|statistics|info)(?:\s+for)?\s+(?:the)?\s+(?:document|pdf|file)$/i,
     description: "Show word count, read time & stats",
     example: "get stats for the document",
