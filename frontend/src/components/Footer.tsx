@@ -2,6 +2,7 @@ import React from "react";
 import {
   Github,
   Twitter,
+  Instagram,
   ShieldCheck,
   Cpu,
   History,
@@ -45,7 +46,7 @@ const Footer = () => {
             </p>
             <div className="flex gap-4 mt-2">
               <a
-                href="#"
+                href="https://github.com/VARA4u-tech"
                 className="p-2 text-primary/70 hover:text-accent border border-primary/10 hover:border-accent/30 rounded-sm transition-all"
                 onMouseEnter={() => playHover()}
                 title="GitHub Archive"
@@ -53,12 +54,12 @@ const Footer = () => {
                 <Github className="w-4 h-4" />
               </a>
               <a
-                href="#"
+                href="https://www.instagram.com/d_v_p6/"
                 className="p-2 text-primary/70 hover:text-accent border border-primary/10 hover:border-accent/30 rounded-sm transition-all"
                 onMouseEnter={() => playHover()}
                 title="Neural Stream"
               >
-                <Twitter className="w-4 h-4" />
+                <Instagram className="w-4 h-4" />
               </a>
             </div>
           </div>
@@ -154,7 +155,7 @@ const Footer = () => {
               Built and Engineered with Love by VARA
             </p>
             <p className="font-mono text-[10px] text-primary/70 uppercase tracking-[0.2em]">
-              © MDXXVI - MMXXVI AI VOICE EDITOR ARCHIVE
+              © 2026 - 2027 AI VOICE EDITOR ARCHIVE
             </p>
             <p className="font-mono text-[8px] text-primary/50 uppercase tracking-[0.3em]">
               All Transmissions Decrypted // Locally Processed
