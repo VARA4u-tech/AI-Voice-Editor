@@ -221,31 +221,35 @@ const Index = () => {
       let result: CommandResult;
 
       // 2. Try the Regex Engine first (FAST)
-      // Check if we are in "Targeted Mode" (Single Paragraph)
-      const targetParagraphs =
-        selectedParagraphIndex !== null
-          ? [paragraphs[selectedParagraphIndex]]
-          : paragraphs;
-
-      result = processVoiceCommand(trimmedCmd, targetParagraphs);
+      // Regex commands generally apply to the whole document, unless it's a specific targeting command
+      result = processVoiceCommand(
+        trimmedCmd,
+        paragraphs,
+        selectedParagraphIndex,
+      );
 
       // 3. Fallback to AI (LLM) if regex didn't recognize it
       if (!result.success && result.message.includes("Not recognized")) {
+        const targetParagraphs =
+          selectedParagraphIndex !== null
+            ? [paragraphs[selectedParagraphIndex]]
+            : paragraphs;
+
         setCommandFeedback(
           selectedParagraphIndex !== null
             ? `Scribe_AI: Modulating Segment ${selectedParagraphIndex + 1}...`
             : "Scribe_AI: Decrypting intent...",
         );
         result = await processCommandWithAI(trimmedCmd, targetParagraphs);
-      }
 
-      // If we were in targeted mode, we need to merge the result back into the full document
-      if (selectedParagraphIndex !== null && result.success) {
-        const newParagraphs = [...paragraphs];
-        newParagraphs[selectedParagraphIndex] = result.updatedParagraphs[0];
-        result.updatedParagraphs = newParagraphs;
-        // Adjust affected indices if they exist (though in single mode it's always just one)
-        result.affectedIndices = [selectedParagraphIndex];
+        // If we were in targeted mode for the AI fallback, we need to merge the result back into the full document
+        if (selectedParagraphIndex !== null && result.success) {
+          const newParagraphs = [...paragraphs];
+          newParagraphs[selectedParagraphIndex] = result.updatedParagraphs[0];
+          result.updatedParagraphs = newParagraphs;
+          // Adjust affected indices if they exist (though in single mode it's always just one)
+          result.affectedIndices = [selectedParagraphIndex];
+        }
       }
 
       setCommandFeedback(result.message);

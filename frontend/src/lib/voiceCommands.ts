@@ -18,6 +18,7 @@ export interface CommandResult {
 type CommandHandler = (
   paragraphs: string[],
   match: RegExpMatchArray,
+  selectedParagraphIndex?: number | null,
 ) => CommandResult;
 
 interface CommandPattern {
@@ -221,8 +222,11 @@ const commands: CommandPattern[] = [
       /^(?:summarize|summary)(?:\s+the)?\s+(?:selected\s+)?(?:line|text)$/i,
     description: "Summarize selected text (AI)",
     example: "summarize the selected line",
-    handler: (paragraphs) => {
-      if (paragraphs.length > 1) {
+    handler: (paragraphs, match, selectedParagraphIndex) => {
+      if (
+        selectedParagraphIndex === null ||
+        selectedParagraphIndex === undefined
+      ) {
         return {
           success: false,
           message: "Please select a specific line/paragraph first.",
@@ -241,8 +245,11 @@ const commands: CommandPattern[] = [
       /^(?:simplify|shorten)(?:\s+the)?\s+(?:selected\s+)?(?:line|text)$/i,
     description: "Simplify selected text (AI)",
     example: "simplify the selected line",
-    handler: (paragraphs) => {
-      if (paragraphs.length > 1) {
+    handler: (paragraphs, match, selectedParagraphIndex) => {
+      if (
+        selectedParagraphIndex === null ||
+        selectedParagraphIndex === undefined
+      ) {
         return {
           success: false,
           message: "Please select a specific line/paragraph first.",
@@ -261,8 +268,11 @@ const commands: CommandPattern[] = [
       /^(?:check|analyze|highlight|fix)?\s*(?:grammar|grammar\s+mistakes)(?:\s+in)?(?:\s+the)?\s*(?:selected\s+)?(?:line|text)?$/i,
     description: "Check grammar in selected text (AI)",
     example: "check grammar in the selected line",
-    handler: (paragraphs) => {
-      if (paragraphs.length > 1) {
+    handler: (paragraphs, match, selectedParagraphIndex) => {
+      if (
+        selectedParagraphIndex === null ||
+        selectedParagraphIndex === undefined
+      ) {
         return {
           success: false,
           message: "Please select a specific line/paragraph first.",
@@ -630,14 +640,15 @@ function escapeRegex(str: string): string {
 export function processVoiceCommand(
   command: string,
   paragraphs: string[],
+  selectedParagraphIndex?: number | null,
 ): CommandResult {
-  const trimmed = command.trim();
+  const trimmed = command.trim().replace(/[.,!?;]+$/, "");
   const lowerCmd = trimmed.toLowerCase();
 
   for (const cmd of commands) {
     const match = trimmed.match(cmd.pattern);
     if (match) {
-      return cmd.handler([...paragraphs], match);
+      return cmd.handler([...paragraphs], match, selectedParagraphIndex);
     }
   }
 
