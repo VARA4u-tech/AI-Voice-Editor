@@ -1,5 +1,5 @@
 import Layout from "@/components/Layout";
-import { Info, Code, Cpu, Globe, Mail, Github } from "lucide-react";
+import { Info, Code, Cpu, Globe, Mail, Github, Instagram } from "lucide-react";
 
 const SystemInfo = () => {
   return (
@@ -54,19 +54,19 @@ const SystemInfo = () => {
               </p>
               <div className="flex gap-6">
                 <a
-                  href="#"
+                  href="https://github.com/VARA4u-tech"
                   className="p-3 border border-primary/20 bg-primary/5 rounded-full hover:border-accent hover:text-accent transition-all group"
                 >
                   <Github className="w-5 h-5" />
                 </a>
                 <a
-                  href="#"
+                  href="https://www.instagram.com/d_v_p6/"
                   className="p-3 border border-primary/20 bg-primary/5 rounded-full hover:border-accent hover:text-accent transition-all group"
                 >
-                  <Globe className="w-5 h-5" />
+                  <Instagram className="w-5 h-5" />
                 </a>
                 <a
-                  href="#"
+                  href="https://mail.google.com/mail/u/0/pappuridurgavaraprasad4pl@gmail.com"
                   className="p-3 border border-primary/20 bg-primary/5 rounded-full hover:border-accent hover:text-accent transition-all group"
                 >
                   <Mail className="w-5 h-5" />
