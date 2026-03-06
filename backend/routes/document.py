@@ -2,8 +2,9 @@
 Document routes — upload a PDF and extract its text content.
 """
 import io
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
 from fastapi.responses import JSONResponse
+from auth import verify_supabase_token
 import PyPDF2
 
 router = APIRouter(prefix="/document", tags=["Document Processing"])
@@ -12,6 +13,7 @@ router = APIRouter(prefix="/document", tags=["Document Processing"])
 @router.post("/extract-text")
 async def extract_text_from_pdf(
     file: UploadFile = File(..., description="PDF file to extract text from"),
+    user=Depends(verify_supabase_token),
 ):
     """
     Extract plain text from an uploaded PDF file.
@@ -24,6 +26,8 @@ async def extract_text_from_pdf(
         )
 
     pdf_bytes = await file.read()
+    if len(pdf_bytes) > 25 * 1024 * 1024:
+        raise HTTPException(status_code=413, detail="File too large. Maximum size is 25MB.")
     if not pdf_bytes:
         raise HTTPException(status_code=400, detail="Uploaded PDF is empty.")
 

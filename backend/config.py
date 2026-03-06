@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     openai_api_key: str = ""
     supabase_url: str = ""
     supabase_anon_key: str = ""
+    supabase_jwt_secret: str = ""
     frontend_origin: str = "http://localhost:8080"
     host: str = "0.0.0.0"
     port: int = 8000

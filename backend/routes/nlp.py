@@ -1,7 +1,8 @@
 """
 NLP routes — Text analysis and language identification.
 """
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
+from auth import verify_supabase_token
 from pydantic import BaseModel
 import langdetect
 from langdetect.lang_detect_exception import LangDetectException
@@ -34,7 +35,10 @@ LANGUAGE_MAP = {
 }
 
 @router.post("/detect-language")
-async def detect_language(body: TextRequest):
+async def detect_language(
+    body: TextRequest,
+    user=Depends(verify_supabase_token),
+):
     """
     Identifies the language of the provided text.
     Specifically supports detecting Hindi ('hi') and Telugu ('te').

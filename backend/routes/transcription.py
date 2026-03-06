@@ -7,6 +7,7 @@ from fastapi.responses import JSONResponse
 from openai import AsyncOpenAI
 
 from config import Settings, get_settings
+from auth import verify_supabase_token
 
 router = APIRouter(prefix="/transcribe", tags=["Transcription"])
 
@@ -21,6 +22,7 @@ def get_openai_client(settings: Settings = Depends(get_settings)) -> AsyncOpenAI
 async def transcribe_audio(
     file: UploadFile = File(..., description="Audio file (wav, mp3, webm, ogg, m4a)"),
     client: AsyncOpenAI = Depends(get_openai_client),
+    user=Depends(verify_supabase_token),
 ):
     """
     Transcribe an audio file using OpenAI Whisper.
@@ -40,6 +42,8 @@ async def transcribe_audio(
         )
 
     audio_bytes = await file.read()
+    if len(audio_bytes) > 25 * 1024 * 1024:
+        raise HTTPException(status_code=413, detail="File too large. Maximum size is 25MB.")
     if len(audio_bytes) == 0:
         raise HTTPException(status_code=400, detail="Uploaded audio file is empty.")
 

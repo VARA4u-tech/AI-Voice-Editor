@@ -3,7 +3,9 @@ AI editing routes — uses GPT-4o to improve/edit transcribed text.
 """
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import StreamingResponse
+from auth import verify_supabase_token
 from pydantic import BaseModel
+from typing import List, Dict, Any, Optional
 from openai import AsyncOpenAI
 
 from config import Settings, get_settings
@@ -32,6 +34,13 @@ class EditResponse(BaseModel):
     model: str
 
 
+class ChatRequest(BaseModel):
+    model: str
+    messages: List[Dict[str, Any]]
+    temperature: Optional[float] = 0.2
+    max_tokens: Optional[int] = 1024
+
+
 SYSTEM_PROMPT = (
     "You are an expert editor for spoken-word transcriptions. "
     "The user will give you a raw transcription and an editing instruction. "
@@ -43,6 +52,7 @@ SYSTEM_PROMPT = (
 async def edit_text(
     body: EditRequest,
     client: AsyncOpenAI = Depends(get_openai_client),
+    user=Depends(verify_supabase_token),
 ):
     """Edit / improve a transcription with GPT."""
     if not body.text.strip():
@@ -70,6 +80,7 @@ async def edit_text(
 async def edit_text_stream(
     body: EditRequest,
     client: AsyncOpenAI = Depends(get_openai_client),
+    user=Depends(verify_supabase_token),
 ):
     """Stream edited text token-by-token using Server-Sent Events."""
     if not body.text.strip():
@@ -94,3 +105,22 @@ async def edit_text_stream(
         yield "data: [DONE]\n\n"
 
     return StreamingResponse(token_generator(), media_type="text/event-stream")
+
+@router.post("/chat")
+async def proxy_chat(
+    body: ChatRequest,
+    client: AsyncOpenAI = Depends(get_openai_client),
+    user=Depends(verify_supabase_token),
+):
+    """Secure proxy for frontend chat completions."""
+    try:
+        response = await client.chat.completions.create(
+            model=body.model,
+            messages=body.messages,
+            temperature=body.temperature,
+            max_tokens=body.max_tokens,
+        )
+        # return the raw dict so it matches OpenAI response format expected by frontend
+        return response.model_dump()
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"OpenAI API error: {exc}") from exc
