@@ -73,14 +73,15 @@ const SessionHistory = () => {
   }, [user, fetchData]);
 
   const handleRestore = (doc: UserDocument) => {
-    // We'll use localStorage to pass the data back to the Index page for now
-    // or we could use a global state manager (Context/Redux)
+    // Strip the "__timestamp" suffix that was added during insert to make the
+    // key unique, so the user sees a clean filename after restoring.
+    const displayName = doc.file_hash.replace(/__\d+$/, "");
     localStorage.setItem(
       "gilded-scribe-session",
       JSON.stringify({
-        fileName: doc.file_hash,
+        fileName: displayName,
         paragraphs: doc.content,
-        pageCount: 0, // We don't store pageCount per doc yet
+        pageCount: doc.page_count || 0,
       }),
     );
     toast.success("Ritual Restored. Redirecting to Core...");
@@ -129,54 +130,60 @@ const SessionHistory = () => {
           ) : view === "documents" ? (
             documents.length > 0 ? (
               documents
-                .filter((d) =>
-                  searchTerm
-                    ? d.file_hash
+                .filter((d) => {
+                  // Strip the timestamp suffix added during insert
+                  const displayName = d.file_hash.replace(/__\d+$/, "");
+                  return searchTerm
+                    ? displayName
                         .toLowerCase()
                         .includes(searchTerm.toLowerCase())
-                    : true,
-                )
-                .map((doc) => (
-                  <div
-                    key={doc.id}
-                    className="group p-5 border border-primary/10 bg-primary/5 rounded-sm hover:border-accent/40 transition-all duration-300 relative overflow-hidden"
-                  >
-                    <div className="absolute top-0 left-0 w-1 h-full bg-primary/20 group-hover:bg-accent transition-colors" />
-                    <div className="flex justify-between items-center gap-4">
-                      <div className="flex items-center gap-4 min-w-0">
-                        <FileText className="w-5 h-5 text-primary/60 shrink-0" />
-                        <div className="min-w-0">
-                          <h4 className="font-heading text-sm text-primary uppercase truncate">
-                            {doc.file_hash}
-                          </h4>
-                          <div className="flex flex-wrap gap-3 text-[10px] font-mono text-primary/40 mt-0.5">
-                            <span>
-                              {new Date(doc.updated_at).toLocaleString()}
-                            </span>
-                            {doc.page_count > 0 && (
-                              <span>{doc.page_count} pages</span>
-                            )}
-                            <span>{doc.content.length} segments</span>
-                            <span>
-                              {doc.content
-                                .join(" ")
-                                .trim()
-                                .split(/\s+/)
-                                .length.toLocaleString()}{" "}
-                              words
-                            </span>
+                    : true;
+                })
+                .map((doc) => {
+                  // Strip the "__timestamp" suffix for a clean display name
+                  const displayName = doc.file_hash.replace(/__\d+$/, "");
+                  return (
+                    <div
+                      key={doc.id}
+                      className="group p-5 border border-primary/10 bg-primary/5 rounded-sm hover:border-accent/40 transition-all duration-300 relative overflow-hidden"
+                    >
+                      <div className="absolute top-0 left-0 w-1 h-full bg-primary/20 group-hover:bg-accent transition-colors" />
+                      <div className="flex justify-between items-center gap-4">
+                        <div className="flex items-center gap-4 min-w-0">
+                          <FileText className="w-5 h-5 text-primary/60 shrink-0" />
+                          <div className="min-w-0">
+                            <h4 className="font-heading text-sm text-primary uppercase truncate">
+                              {displayName}
+                            </h4>
+                            <div className="flex flex-wrap gap-3 text-[10px] font-mono text-primary/40 mt-0.5">
+                              <span>
+                                {new Date(doc.updated_at).toLocaleString()}
+                              </span>
+                              {doc.page_count > 0 && (
+                                <span>{doc.page_count} pages</span>
+                              )}
+                              <span>{doc.content.length} segments</span>
+                              <span>
+                                {doc.content
+                                  .join(" ")
+                                  .trim()
+                                  .split(/\s+/)
+                                  .length.toLocaleString()}{" "}
+                                words
+                              </span>
+                            </div>
                           </div>
                         </div>
+                        <button
+                          onClick={() => handleRestore(doc)}
+                          className="shrink-0 p-2 bg-accent/10 border border-accent/20 text-accent hover:bg-accent/20 transition-all rounded-sm flex items-center gap-2 text-[10px] font-tech uppercase tracking-widest"
+                        >
+                          <RotateCcw className="w-3 h-3" /> Restore
+                        </button>
                       </div>
-                      <button
-                        onClick={() => handleRestore(doc)}
-                        className="shrink-0 p-2 bg-accent/10 border border-accent/20 text-accent hover:bg-accent/20 transition-all rounded-sm flex items-center gap-2 text-[10px] font-tech uppercase tracking-widest"
-                      >
-                        <RotateCcw className="w-3 h-3" /> Restore
-                      </button>
                     </div>
-                  </div>
-                ))
+                  );
+                })
             ) : (
               <div className="text-center py-20 border border-dashed border-primary/10 rounded-sm space-y-3">
                 <p className="font-mono text-[10px] text-primary/40 uppercase tracking-widest">

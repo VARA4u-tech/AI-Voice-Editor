@@ -145,19 +145,50 @@ const Index = () => {
       localStorage.removeItem(STORAGE_KEY);
     }
 
-    // Supabase Persistence
+    // Supabase Persistence — fallback to select + update/insert manually
+    // since the database lacks a unique constraint for upsert to use onConflict.
     if (user && paragraphs.length > 0) {
+      const activeName = fileName || "unnamed_ritual";
       supabase
         .from("user_documents")
-        .upsert({
-          user_id: user.id,
-          file_hash: fileName || "unnamed_ritual",
-          content: paragraphs,
-          page_count: pageCount,
-          updated_at: new Date().toISOString(),
-        })
-        .then(({ error }) => {
-          if (error) console.error("Ritual_Backup Failed:", error.message);
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("file_hash", activeName)
+        .maybeSingle()
+        .then(({ data, error: selectError }) => {
+          if (selectError) {
+            console.error("Ritual_Backup Fetch Failed:", selectError.message);
+            return;
+          }
+
+          if (data?.id) {
+            supabase
+              .from("user_documents")
+              .update({
+                content: paragraphs,
+                page_count: pageCount,
+                updated_at: new Date().toISOString(),
+              })
+              .eq("id", data.id)
+              .then(({ error }) => {
+                if (error)
+                  console.error("Ritual_Backup Update Failed:", error.message);
+              });
+          } else {
+            supabase
+              .from("user_documents")
+              .insert({
+                user_id: user.id,
+                file_hash: activeName,
+                content: paragraphs,
+                page_count: pageCount,
+                updated_at: new Date().toISOString(),
+              })
+              .then(({ error }) => {
+                if (error)
+                  console.error("Ritual_Backup Insert Failed:", error.message);
+              });
+          }
         });
     }
   }, [fileName, paragraphs, pageCount, user]);
@@ -513,25 +544,26 @@ const Index = () => {
       playSuccess();
       clearFeedback();
 
-      // ── Auto-save to Supabase history on successful upload ────────────────
+      // ── Auto-save to Supabase history on successful upload ─────────────────
+      // Use INSERT (not upsert) so every uploaded PDF gets its own history
+      // entry. A timestamp is appended to file_hash to make the key unique,
+      // allowing the same file to be re-uploaded and appear as a separate entry.
       if (user) {
+        const historyKey = `${file.name}__${Date.now()}`;
         supabase
           .from("user_documents")
-          .upsert(
-            {
-              user_id: user.id,
-              file_hash: file.name,
-              content: parsed.paragraphs,
-              page_count: parsed.pageCount, // ← now saved correctly
-              updated_at: new Date().toISOString(),
-            },
-            { onConflict: "user_id,file_hash" },
-          )
+          .insert({
+            user_id: user.id,
+            file_hash: historyKey,
+            content: parsed.paragraphs,
+            page_count: parsed.pageCount,
+            updated_at: new Date().toISOString(),
+          })
           .then(({ error }) => {
             if (error) {
               console.error("History auto-save failed:", error.message);
             } else {
-              console.info("History: Document auto-saved →", file.name);
+              console.info("History: Document inserted →", historyKey);
             }
           });
       }
@@ -589,15 +621,36 @@ const Index = () => {
       versionLabel.trim() ||
       `v_${new Date().toISOString().slice(0, 16).replace("T", "_")}`;
 
-    const { error } = await supabase.from("user_documents").upsert(
-      {
-        user_id: user.id,
-        file_hash: label,
-        content: paragraphs,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "user_id,file_hash" },
-    );
+    const { data: existingDoc } = await supabase
+      .from("user_documents")
+      .select("id")
+      .eq("user_id", user.id)
+      .eq("file_hash", label)
+      .maybeSingle();
+
+    let error;
+    if (existingDoc?.id) {
+      const { error: updateError } = await supabase
+        .from("user_documents")
+        .update({
+          content: paragraphs,
+          page_count: pageCount, // Add pageCount to ensure consistency
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", existingDoc.id);
+      error = updateError;
+    } else {
+      const { error: insertError } = await supabase
+        .from("user_documents")
+        .insert({
+          user_id: user.id,
+          file_hash: label,
+          content: paragraphs,
+          page_count: pageCount,
+          updated_at: new Date().toISOString(),
+        });
+      error = insertError;
+    }
 
     if (error) {
       setCommandFeedback("Failed to save version to the archive.");
