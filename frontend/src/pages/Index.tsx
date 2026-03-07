@@ -212,6 +212,16 @@ const Index = () => {
 
   const handleCommand = useCallback(
     async (command: string) => {
+      // 0. Auth Guard
+      if (!user) {
+        setCommandFeedback(
+          "Authentication Required. Please log in to use voice commands.",
+        );
+        setCommandSuccess(false);
+        clearFeedback();
+        return;
+      }
+
       // 0. Cooldown Guard
       if (isCooldown) {
         setCommandFeedback("System Rebooting | Please wait 3s...");
@@ -402,12 +412,21 @@ const Index = () => {
 
   const handleChat = useCallback(
     async (message: string) => {
+      if (!user) {
+        setCommandFeedback(
+          "Authentication Required. Please log in to connect.",
+        );
+        setCommandSuccess(false);
+        clearFeedback();
+        playError();
+        return;
+      }
       setIsProcessing(true);
       const response = await processChatOnly(message, paragraphs);
       setIsProcessing(false);
       return response;
     },
-    [paragraphs],
+    [paragraphs, user, clearFeedback, playError],
   );
 
   const {
@@ -425,6 +444,14 @@ const Index = () => {
   }, [interimTranscript, playTypewriterTick]);
 
   const handleMicToggle = useCallback(() => {
+    if (!user) {
+      setCommandFeedback("Authentication Required. Please log in to connect.");
+      setCommandSuccess(false);
+      clearFeedback();
+      playError();
+      return;
+    }
+
     if (isListening) {
       stopListening();
       playStop();
@@ -447,6 +474,9 @@ const Index = () => {
     handleCommand,
     playStart,
     playStop,
+    user,
+    clearFeedback,
+    playError,
   ]);
 
   // ── Keyboard shortcut: Space (when not typing) or Ctrl+M ──
@@ -706,7 +736,15 @@ const Index = () => {
     setShowVersionModal(false);
     setIsSavingVersion(false);
     clearFeedback();
-  }, [paragraphs, user, versionLabel, playSuccess, playError, clearFeedback]);
+  }, [
+    paragraphs,
+    user,
+    versionLabel,
+    playSuccess,
+    playError,
+    clearFeedback,
+    pageCount,
+  ]);
 
   // ── AI Auto-Title Generator ───────────────────────────────────────────────
   const [isGeneratingTitle, setIsGeneratingTitle] = useState(false);
@@ -794,7 +832,7 @@ const Index = () => {
 
   return (
     <div
-      className={`relative min-h-screen emerald-gradient-bg flex flex-col items-center justify-center p-4 overflow-hidden transition-all duration-1000 ${isFocusMode ? "bg-black/80" : ""}`}
+      className={`emerald-gradient-bg relative flex min-h-screen flex-col items-center justify-center overflow-hidden p-4 transition-all duration-1000 ${isFocusMode ? "bg-black/80" : ""}`}
     >
       <MysticalBackground />
       <FloatingParticles />
@@ -803,7 +841,7 @@ const Index = () => {
       {/* ──────────────── Focus Mode Layers ──────────────── */}
       {/* 1. Deep vignette that covers the full screen */}
       <div
-        className={`fixed inset-0 z-[5] pointer-events-none transition-opacity duration-700 ${
+        className={`pointer-events-none fixed inset-0 z-[5] transition-opacity duration-700 ${
           isFocusMode ? "opacity-100" : "opacity-0"
         }`}
         style={{
@@ -813,14 +851,14 @@ const Index = () => {
       />
       {/* 2. Blur overlay for background chrome */}
       <div
-        className={`fixed inset-0 z-[4] bg-background/80 backdrop-blur-sm pointer-events-none transition-opacity duration-700 ${
+        className={`pointer-events-none fixed inset-0 z-[4] bg-background/80 backdrop-blur-sm transition-opacity duration-700 ${
           isFocusMode ? "opacity-100" : "opacity-0"
         }`}
       />
       {/* 3. Pulsing ambient glow behind the document */}
       {isFocusMode && (
         <div
-          className="fixed z-[6] pointer-events-none"
+          className="pointer-events-none fixed z-[6]"
           style={{
             top: "50%",
             left: "50%",
@@ -835,12 +873,12 @@ const Index = () => {
       )}
       {/* 4. Floating Exit Focus Mode pill */}
       {isFocusMode && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[60] animate-fade-in">
+        <div className="fixed bottom-8 left-1/2 z-[60] -translate-x-1/2 animate-fade-in">
           <button
             onClick={() => setIsFocusMode(false)}
-            className="flex items-center gap-2.5 px-6 py-2.5 bg-background/80 border border-accent/30 backdrop-blur-md text-accent font-tech text-[10px] uppercase tracking-[0.25em] hover:bg-accent/10 transition-all duration-300 shadow-[0_0_30px_rgba(0,0,0,0.5)]"
+            className="font-tech flex items-center gap-2.5 border border-accent/30 bg-background/80 px-6 py-2.5 text-[10px] uppercase tracking-[0.25em] text-accent shadow-[0_0_30px_rgba(0,0,0,0.5)] backdrop-blur-md transition-all duration-300 hover:bg-accent/10"
           >
-            <X className="w-3.5 h-3.5" />
+            <X className="h-3.5 w-3.5" />
             Exit_Focus · Esc
           </button>
         </div>
@@ -857,7 +895,7 @@ const Index = () => {
         <button
           onClick={() => setShowOnboarding(true)}
           title="Open Tutorial"
-          className="fixed bottom-6 left-6 z-40 w-9 h-9 flex items-center justify-center rounded-full border border-primary/20 bg-background/60 backdrop-blur-md text-primary/50 hover:text-accent hover:border-accent/40 transition-all duration-300 font-tech text-sm"
+          className="font-tech fixed bottom-6 left-6 z-40 flex h-9 w-9 items-center justify-center rounded-full border border-primary/20 bg-background/60 text-sm text-primary/50 backdrop-blur-md transition-all duration-300 hover:border-accent/40 hover:text-accent"
         >
           ?
         </button>
@@ -867,21 +905,21 @@ const Index = () => {
       <button
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
         onMouseEnter={() => playHover()}
-        className="fixed top-6 right-6 z-40 flex items-center gap-2.5 px-4 py-2.5 bg-slate-950/80 backdrop-blur-xl border border-primary/20 text-primary hover:border-accent/50 transition-all duration-300 shadow-[0_0_20px_rgba(0,0,0,0.4)] group overflow-hidden rounded-sm"
+        className="group fixed right-6 top-6 z-40 flex items-center gap-2.5 overflow-hidden rounded-sm border border-primary/20 bg-slate-950/80 px-4 py-2.5 text-primary shadow-[0_0_20px_rgba(0,0,0,0.4)] backdrop-blur-xl transition-all duration-300 hover:border-accent/50"
       >
-        <div className="absolute inset-0 bg-accent/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-        <div className="tech-bracket-tl w-1.5 h-1.5" />
-        <div className="tech-bracket-br w-1.5 h-1.5" />
+        <div className="absolute inset-0 bg-accent/5 opacity-0 transition-opacity group-hover:opacity-100" />
+        <div className="tech-bracket-tl h-1.5 w-1.5" />
+        <div className="tech-bracket-br h-1.5 w-1.5" />
 
-        <Activity className="w-4 h-4 group-hover:text-accent group-hover:scale-110 transition-all" />
-        <span className="font-tech text-xs tracking-[0.2em] uppercase mt-0.5 group-hover:text-accent font-bold transition-colors hidden sm:block">
+        <Activity className="h-4 w-4 transition-all group-hover:scale-110 group-hover:text-accent" />
+        <span className="font-tech mt-0.5 hidden text-xs font-bold uppercase tracking-[0.2em] transition-colors group-hover:text-accent sm:block">
           System Log
         </span>
 
         {scribeLog.length > 0 && (
-          <div className="ml-1 sm:ml-2 flex items-center justify-center px-2 py-0.5 bg-accent/20 border border-accent/40 rounded-sm relative">
-            <span className="absolute inset-0 bg-accent/20 animate-ping opacity-50 rounded-sm" />
-            <span className="font-mono text-[10px] text-accent font-bold tabular-nums relative z-10">
+          <div className="relative ml-1 flex items-center justify-center rounded-sm border border-accent/40 bg-accent/20 px-2 py-0.5 sm:ml-2">
+            <span className="absolute inset-0 animate-ping rounded-sm bg-accent/20 opacity-50" />
+            <span className="relative z-10 font-mono text-[10px] font-bold tabular-nums text-accent">
               {scribeLog.length}
             </span>
           </div>
@@ -890,25 +928,25 @@ const Index = () => {
 
       {/* User Status / Auth Navigation — top left */}
       {!isFocusMode && (
-        <div className="fixed top-6 left-6 z-40">
+        <div className="fixed left-6 top-6 z-40">
           {user ? (
             <UserProfileIcon />
           ) : (
-            <div className="flex items-center gap-4 animate-fade-in">
+            <div className="flex animate-fade-in items-center gap-4">
               <Link
                 to="/login"
                 onMouseEnter={() => playHover()}
-                className="flex items-center gap-2 px-4 py-2 bg-slate-950/80 backdrop-blur-xl border border-primary/20 text-primary/80 hover:text-primary hover:border-primary/40 transition-all duration-300 rounded-sm font-tech text-[10px] uppercase tracking-widest group"
+                className="font-tech group flex items-center gap-2 rounded-sm border border-primary/20 bg-slate-950/80 px-4 py-2 text-[10px] uppercase tracking-widest text-primary/80 backdrop-blur-xl transition-all duration-300 hover:border-primary/40 hover:text-primary"
               >
-                <LogIn className="w-3.5 h-3.5 text-primary/40 group-hover:text-accent transition-colors" />
+                <LogIn className="h-3.5 w-3.5 text-primary/40 transition-colors group-hover:text-accent" />
                 Login_Connection
               </Link>
               <Link
                 to="/signup"
                 onMouseEnter={() => playHover()}
-                className="flex items-center gap-2 px-4 py-2 bg-accent/5 backdrop-blur-xl border border-accent/20 text-accent/80 hover:text-accent hover:border-accent/40 transition-all duration-300 rounded-sm font-tech text-[10px] uppercase tracking-widest group shadow-[0_0_15px_rgba(255,215,0,0.15)]"
+                className="font-tech group flex items-center gap-2 rounded-sm border border-accent/20 bg-accent/5 px-4 py-2 text-[10px] uppercase tracking-widest text-accent/80 shadow-[0_0_15px_rgba(255,215,0,0.15)] backdrop-blur-xl transition-all duration-300 hover:border-accent/40 hover:text-accent"
               >
-                <UserPlus className="w-3.5 h-3.5 text-accent/40 group-hover:text-accent transition-colors" />
+                <UserPlus className="h-3.5 w-3.5 text-accent/40 transition-colors group-hover:text-accent" />
                 Sign_Up_Protocol
               </Link>
             </div>
@@ -932,17 +970,17 @@ const Index = () => {
       />
 
       <main
-        className={`w-full max-w-5xl flex flex-col items-center mx-auto relative transition-all duration-700 pt-8 sm:pt-16 gap-y-10 ${
+        className={`relative mx-auto flex w-full max-w-5xl flex-col items-center gap-y-10 pt-8 transition-all duration-700 sm:pt-16 ${
           isListening
-            ? "scale-[1.02] filter drop-shadow-[0_0_30px_hsl(var(--gold)/0.15)]"
+            ? "scale-[1.02] drop-shadow-[0_0_30px_hsl(var(--gold)/0.15)] filter"
             : "scale-100"
         } ${isFocusMode ? "z-[10]" : "z-10"} animate-fade-in`}
       >
         {/* Hero — collapses in focus mode */}
         <div
-          className={`transition-all duration-700 flex flex-col items-center w-full overflow-hidden ${
+          className={`flex w-full flex-col items-center overflow-hidden transition-all duration-700 ${
             isFocusMode
-              ? "max-h-0 opacity-0 pointer-events-none"
+              ? "pointer-events-none max-h-0 opacity-0"
               : "max-h-[1600px] opacity-100"
           }`}
         >
@@ -951,13 +989,13 @@ const Index = () => {
 
         {/* Upload + Export + Clear row — collapses in Focus Mode */}
         <div
-          className={`transition-all duration-700 overflow-hidden w-full ${
+          className={`w-full overflow-hidden transition-all duration-700 ${
             isFocusMode
-              ? "max-h-0 opacity-0 pointer-events-none mb-0"
-              : "max-h-[500px] opacity-100 mb-8"
+              ? "pointer-events-none mb-0 max-h-0 opacity-0"
+              : "mb-8 max-h-[500px] opacity-100"
           }`}
         >
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 px-4 w-full">
+          <div className="flex w-full flex-wrap items-center justify-center gap-3 px-4 sm:gap-4">
             <UploadButton
               onUpload={handleUpload}
               hasFile={!!fileName}
@@ -966,12 +1004,12 @@ const Index = () => {
 
             {/* Session Timer Badge */}
             {paragraphs.length > 0 && (
-              <div className="flex items-center gap-1.5 px-3 py-2 border border-primary/20 bg-primary/5 rounded-sm animate-fade-in">
-                <Timer className="w-3.5 h-3.5 text-accent/60 animate-pulse" />
-                <span className="font-mono text-[11px] text-primary/70 tracking-widest tabular-nums">
+              <div className="flex animate-fade-in items-center gap-1.5 rounded-sm border border-primary/20 bg-primary/5 px-3 py-2">
+                <Timer className="h-3.5 w-3.5 animate-pulse text-accent/60" />
+                <span className="font-mono text-[11px] tabular-nums tracking-widest text-primary/70">
                   {sessionTime}
                 </span>
-                <span className="font-tech text-[8px] text-primary/30 uppercase">
+                <span className="font-tech text-[8px] uppercase text-primary/30">
                   Session
                 </span>
               </div>
@@ -985,19 +1023,14 @@ const Index = () => {
                   onMouseEnter={() => playHover()}
                   disabled={isGeneratingTitle}
                   title="AI Auto-Title Generator"
-                  className="group relative flex items-center justify-center gap-2 px-5 py-2.5 sm:py-3
-                    border border-primary/20 bg-primary/5
-                    text-primary font-tech text-[10px] sm:text-[11px] tracking-[0.2em] uppercase
-                    transition-all duration-300 w-full sm:w-auto
-                    hover:border-accent hover:bg-accent/5 hover:text-accent
-                    cursor-pointer animate-fade-in overflow-hidden disabled:opacity-50"
+                  className="font-tech group relative flex w-full animate-fade-in cursor-pointer items-center justify-center gap-2 overflow-hidden border border-primary/20 bg-primary/5 px-5 py-2.5 text-[10px] uppercase tracking-[0.2em] text-primary transition-all duration-300 hover:border-accent hover:bg-accent/5 hover:text-accent disabled:opacity-50 sm:w-auto sm:py-3 sm:text-[11px]"
                 >
-                  <div className="tech-bracket-tl w-1 h-1" />
-                  <div className="tech-bracket-br w-1 h-1" />
+                  <div className="tech-bracket-tl h-1 w-1" />
+                  <div className="tech-bracket-br h-1 w-1" />
                   {isGeneratingTitle ? (
-                    <div className="w-3.5 h-3.5 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+                    <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-accent border-t-transparent" />
                   ) : (
-                    <Wand2 className="w-3.5 h-3.5 transition-transform duration-300 group-hover:-rotate-12" />
+                    <Wand2 className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-rotate-12" />
                   )}
                   {isGeneratingTitle ? "Conjuring..." : "Auto_Title"}
                 </button>
@@ -1008,16 +1041,11 @@ const Index = () => {
                     onClick={() => setShowVersionModal(true)}
                     onMouseEnter={() => playHover()}
                     title="Save Version to Archive"
-                    className="group relative flex items-center justify-center gap-2 px-5 py-2.5 sm:py-3
-                      border border-primary/20 bg-primary/5
-                      text-primary font-tech text-[10px] sm:text-[11px] tracking-[0.2em] uppercase
-                      transition-all duration-300 w-full sm:w-auto
-                      hover:border-accent hover:bg-accent/5 hover:text-accent
-                      cursor-pointer animate-fade-in overflow-hidden"
+                    className="font-tech group relative flex w-full animate-fade-in cursor-pointer items-center justify-center gap-2 overflow-hidden border border-primary/20 bg-primary/5 px-5 py-2.5 text-[10px] uppercase tracking-[0.2em] text-primary transition-all duration-300 hover:border-accent hover:bg-accent/5 hover:text-accent sm:w-auto sm:py-3 sm:text-[11px]"
                   >
-                    <div className="tech-bracket-tl w-1 h-1" />
-                    <div className="tech-bracket-br w-1 h-1" />
-                    <Save className="w-3.5 h-3.5 transition-transform duration-300 group-hover:scale-110" />
+                    <div className="tech-bracket-tl h-1 w-1" />
+                    <div className="tech-bracket-br h-1 w-1" />
+                    <Save className="h-3.5 w-3.5 transition-transform duration-300 group-hover:scale-110" />
                     Save_Version
                   </button>
                 )}
@@ -1026,19 +1054,14 @@ const Index = () => {
                   onClick={handleExport}
                   onMouseEnter={() => playHover()}
                   disabled={isExporting}
-                  className="group relative flex items-center justify-center gap-2 px-6 py-2.5 sm:py-3
-                    border border-primary/20 bg-primary/5
-                    text-primary font-tech text-[10px] sm:text-[11px] tracking-[0.2em] uppercase
-                    transition-all duration-300 w-full sm:w-auto
-                    hover:border-accent hover:bg-accent/5 hover:text-accent
-                    cursor-pointer animate-fade-in overflow-hidden disabled:opacity-50"
+                  className="font-tech group relative flex w-full animate-fade-in cursor-pointer items-center justify-center gap-2 overflow-hidden border border-primary/20 bg-primary/5 px-6 py-2.5 text-[10px] uppercase tracking-[0.2em] text-primary transition-all duration-300 hover:border-accent hover:bg-accent/5 hover:text-accent disabled:opacity-50 sm:w-auto sm:py-3 sm:text-[11px]"
                 >
-                  <div className="tech-bracket-tl w-1 h-1" />
-                  <div className="tech-bracket-br w-1 h-1" />
+                  <div className="tech-bracket-tl h-1 w-1" />
+                  <div className="tech-bracket-br h-1 w-1" />
                   {isExporting ? (
-                    <div className="w-3.5 h-3.5 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+                    <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-accent border-t-transparent" />
                   ) : (
-                    <Download className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-y-0.5" />
+                    <Download className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-y-0.5" />
                   )}
                   {isExporting ? "Sealing..." : "Export_Out"}
                 </button>
@@ -1047,16 +1070,12 @@ const Index = () => {
                   onClick={handleClearDocument}
                   onMouseEnter={() => playHover()}
                   title="Clear document"
-                  className="group flex items-center justify-center p-2.5 sm:p-3
-                    border border-destructive/40 bg-transparent rounded-full
-                    text-destructive/80 transition-all duration-300
-                    hover:border-destructive hover:bg-destructive/10 hover:text-destructive
-                    cursor-pointer animate-fade-in"
+                  className="group flex animate-fade-in cursor-pointer items-center justify-center rounded-full border border-destructive/40 bg-transparent p-2.5 text-destructive/80 transition-all duration-300 hover:border-destructive hover:bg-destructive/10 hover:text-destructive sm:p-3"
                 >
-                  <X className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-90" />
+                  <X className="h-4 w-4 transition-transform duration-300 group-hover:rotate-90 group-hover:scale-110 sm:h-5 sm:w-5" />
                 </button>
 
-                <div className="flex items-center gap-2 bg-primary/5 px-3 py-1.5 border border-primary/20 rounded-full">
+                <div className="flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5">
                   <button
                     onClick={() => {
                       if (history.length > 0) {
@@ -1074,11 +1093,11 @@ const Index = () => {
                     }}
                     disabled={history.length === 0}
                     title="Undo (Ctrl+Z)"
-                    className="p-1.5 text-primary/40 hover:text-accent disabled:opacity-20 transition-all"
+                    className="p-1.5 text-primary/40 transition-all hover:text-accent disabled:opacity-20"
                   >
-                    <RotateCcw className="w-4 h-4" />
+                    <RotateCcw className="h-4 w-4" />
                   </button>
-                  <span className="w-[1px] h-4 bg-primary/10" />
+                  <span className="h-4 w-[1px] bg-primary/10" />
                   <button
                     onClick={() => {
                       if (future.length > 0) {
@@ -1096,17 +1115,17 @@ const Index = () => {
                     }}
                     disabled={future.length === 0}
                     title="Redo (Ctrl+Y)"
-                    className="p-1.5 text-primary/40 hover:text-accent disabled:opacity-20 transition-all"
+                    className="p-1.5 text-primary/40 transition-all hover:text-accent disabled:opacity-20"
                   >
-                    <RotateCw className="w-4 h-4" />
+                    <RotateCw className="h-4 w-4" />
                   </button>
-                  <span className="w-[1px] h-4 bg-primary/10" />
+                  <span className="h-4 w-[1px] bg-primary/10" />
                   <button
                     onClick={() => setShowHistoryPanel((p) => !p)}
                     title="Toggle History Viewer (Ctrl+H)"
                     className={`p-1.5 transition-all ${showHistoryPanel ? "text-accent" : "text-primary/40 hover:text-accent"}`}
                   >
-                    <HistoryIcon className="w-4 h-4" />
+                    <HistoryIcon className="h-4 w-4" />
                   </button>
                 </div>
 
@@ -1117,13 +1136,9 @@ const Index = () => {
                   }}
                   onMouseEnter={() => playHover()}
                   title="Toggle Focus Mode (Ctrl+Shift+F)"
-                  className="group flex items-center justify-center p-2.5 sm:p-3
-                    border border-primary/20 bg-transparent rounded-full
-                    text-primary/50 transition-all duration-300
-                    hover:border-accent/40 hover:text-accent
-                    cursor-pointer animate-fade-in"
+                  className="group flex animate-fade-in cursor-pointer items-center justify-center rounded-full border border-primary/20 bg-transparent p-2.5 text-primary/50 transition-all duration-300 hover:border-accent/40 hover:text-accent sm:p-3"
                 >
-                  <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:scale-110" />
+                  <Sparkles className="h-4 w-4 transition-transform duration-300 group-hover:scale-110 sm:h-5 sm:w-5" />
                 </button>
               </>
             )}
@@ -1132,13 +1147,13 @@ const Index = () => {
         {/* end collapsing toolbar wrapper */}
 
         {!isSupported && (
-          <p className="text-destructive/80 font-body text-sm italic mt-2">
+          <p className="mt-2 font-body text-sm italic text-destructive/80">
             Speech recognition is not supported in this browser
           </p>
         )}
 
         {/* Mic + Waveform */}
-        <div className="flex flex-col items-center gap-3 my-6">
+        <div className="my-6 flex flex-col items-center gap-3">
           <MicButton isListening={isListening} onClick={handleMicToggle} />
           <GoldWaveform isActive={isListening} />
           <StatusIndicator
@@ -1151,37 +1166,37 @@ const Index = () => {
           {selectedParagraphIndex !== null && (
             <button
               onClick={() => handleSelectParagraph(null)}
-              className="group flex items-center gap-2 px-3 py-1.5 border border-accent/40 bg-accent/10 rounded-full animate-fade-in hover:bg-accent/20 transition-all shadow-[0_0_15px_rgba(255,215,0,0.2)]"
+              className="group flex animate-fade-in items-center gap-2 rounded-full border border-accent/40 bg-accent/10 px-3 py-1.5 shadow-[0_0_15px_rgba(255,215,0,0.2)] transition-all hover:bg-accent/20"
             >
-              <Target className="w-3 h-3 text-accent animate-spin-slow" />
-              <span className="font-tech text-[10px] text-accent tracking-[0.2em] uppercase">
+              <Target className="animate-spin-slow h-3 w-3 text-accent" />
+              <span className="font-tech text-[10px] uppercase tracking-[0.2em] text-accent">
                 Targeting Seg {selectedParagraphIndex + 1}
               </span>
-              <X className="w-2.5 h-2.5 text-accent/50 group-hover:text-accent" />
+              <X className="h-2.5 w-2.5 text-accent/50 group-hover:text-accent" />
             </button>
           )}
 
           {displayTranscript && isListening && (
-            <div className="relative font-mono text-[11px] text-accent tracking-wider text-center max-w-md animate-fade-in group px-6 py-2 border-x border-accent/20">
-              <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
-              <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
+            <div className="group relative max-w-md animate-fade-in border-x border-accent/20 px-6 py-2 text-center font-mono text-[11px] tracking-wider text-accent">
+              <div className="absolute left-0 top-0 h-[1px] w-full bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
+              <div className="absolute bottom-0 left-0 h-[1px] w-full bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
               <p className="relative z-10 uppercase opacity-80">
-                <span className="opacity-40 mr-2">Capture:</span>"
+                <span className="mr-2 opacity-40">Capture:</span>"
                 {displayTranscript}"
-                <span className="inline-block w-1.5 h-3 bg-accent/60 ml-1 animate-pulse" />
+                <span className="ml-1 inline-block h-3 w-1.5 animate-pulse bg-accent/60" />
               </p>
             </div>
           )}
 
           {/* Keyboard shortcut hint */}
           {!isListening && isSupported && (
-            <p className="font-heading text-[10px] sm:text-xs tracking-[0.25em] font-bold uppercase text-primary/80 gold-text-glow mt-1 select-none">
+            <p className="gold-text-glow mt-1 select-none font-heading text-[10px] font-bold uppercase tracking-[0.25em] text-primary/80 sm:text-xs">
               Space · Ctrl+M to speak
             </p>
           )}
         </div>
 
-        <div className="flex justify-center w-full mb-6 relative z-20">
+        <div className="relative z-20 mb-6 flex w-full justify-center">
           <CommandHelp />
         </div>
 
@@ -1189,30 +1204,30 @@ const Index = () => {
 
         {/* ── History Timeline Panel ── */}
         {showHistoryPanel && history.length > 0 && (
-          <div className="w-full mb-4 border border-primary/10 bg-primary/5 rounded-sm overflow-hidden animate-fade-in">
-            <div className="flex items-center justify-between px-4 py-2 border-b border-primary/10 bg-primary/5">
-              <span className="font-tech text-[9px] text-primary/40 uppercase tracking-widest">
+          <div className="mb-4 w-full animate-fade-in overflow-hidden rounded-sm border border-primary/10 bg-primary/5">
+            <div className="flex items-center justify-between border-b border-primary/10 bg-primary/5 px-4 py-2">
+              <span className="font-tech text-[9px] uppercase tracking-widest text-primary/40">
                 Edit_Timeline — {history.length} snapshot
                 {history.length !== 1 ? "s" : ""}
               </span>
               <button
                 onClick={() => setShowHistoryPanel(false)}
-                className="text-primary/30 hover:text-primary transition-colors"
+                className="text-primary/30 transition-colors hover:text-primary"
               >
-                <X className="w-3 h-3" />
+                <X className="h-3 w-3" />
               </button>
             </div>
-            <div className="max-h-48 overflow-y-auto divide-y divide-primary/5">
+            <div className="max-h-48 divide-y divide-primary/5 overflow-y-auto">
               {[...history].reverse().map((snap, i) => {
                 const idx = history.length - 1 - i;
                 const wordCount = snap.join(" ").trim().split(/\s+/).length;
                 return (
                   <div
                     key={i}
-                    className="flex items-center justify-between px-4 py-2.5 hover:bg-primary/10 transition-colors group"
+                    className="group flex items-center justify-between px-4 py-2.5 transition-colors hover:bg-primary/10"
                   >
                     <div className="flex items-center gap-3">
-                      <span className="font-mono text-[9px] text-primary/20 w-5 tabular-nums">
+                      <span className="w-5 font-mono text-[9px] tabular-nums text-primary/20">
                         {idx + 1}
                       </span>
                       <div>
@@ -1233,7 +1248,7 @@ const Index = () => {
                         clearFeedback();
                         setShowHistoryPanel(false);
                       }}
-                      className="opacity-0 group-hover:opacity-100 px-3 py-1 font-tech text-[8px] uppercase tracking-widest border border-accent/20 text-accent bg-accent/5 hover:bg-accent/15 transition-all rounded-sm"
+                      className="font-tech rounded-sm border border-accent/20 bg-accent/5 px-3 py-1 text-[8px] uppercase tracking-widest text-accent opacity-0 transition-all hover:bg-accent/15 group-hover:opacity-100"
                     >
                       Restore
                     </button>
@@ -1245,7 +1260,7 @@ const Index = () => {
         )}
 
         <div
-          className={`transition-all duration-1000 w-full flex flex-col items-center ${isFocusMode ? "mt-12" : "mt-0"}`}
+          className={`flex w-full flex-col items-center transition-all duration-1000 ${isFocusMode ? "mt-12" : "mt-0"}`}
         >
           <PreviewArea
             paragraphs={paragraphs}
@@ -1275,7 +1290,7 @@ const Index = () => {
 
           {/* Smart Suggestions — appears after each successful command */}
           {paragraphs.length > 0 && (
-            <div className="mt-4 px-2 w-full">
+            <div className="mt-4 w-full px-2">
               <SmartSuggestions
                 paragraphs={paragraphs}
                 lastCommand={lastCommand}
@@ -1294,16 +1309,16 @@ const Index = () => {
 
       {/* Save Version Modal */}
       {showVersionModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-fade-in">
-          <div className="w-full max-w-md p-8 bg-background border border-accent/30 shadow-[0_0_60px_rgba(0,0,0,0.8)] relative mx-4">
+        <div className="fixed inset-0 z-50 flex animate-fade-in items-center justify-center bg-black/70 backdrop-blur-sm">
+          <div className="relative mx-4 w-full max-w-md border border-accent/30 bg-background p-8 shadow-[0_0_60px_rgba(0,0,0,0.8)]">
             <div className="tech-bracket-tl" />
             <div className="tech-bracket-tr" />
             <div className="tech-bracket-bl" />
             <div className="tech-bracket-br" />
-            <h2 className="font-tech text-sm text-primary tracking-[0.3em] uppercase mb-2">
+            <h2 className="font-tech mb-2 text-sm uppercase tracking-[0.3em] text-primary">
               Seal Version to Archive
             </h2>
-            <p className="font-mono text-[10px] text-primary/40 mb-6">
+            <p className="mb-6 font-mono text-[10px] text-primary/40">
               // Leave blank for auto-timestamp label
             </p>
             <input
@@ -1316,27 +1331,27 @@ const Index = () => {
               }}
               placeholder="e.g. Draft_v2 or Final_Review"
               autoFocus
-              className="w-full bg-primary/5 border border-primary/20 focus:border-accent/40 rounded-sm px-4 py-3 text-sm font-mono text-primary placeholder:text-primary/20 focus:outline-none transition-colors mb-6"
+              className="mb-6 w-full rounded-sm border border-primary/20 bg-primary/5 px-4 py-3 font-mono text-sm text-primary transition-colors placeholder:text-primary/20 focus:border-accent/40 focus:outline-none"
             />
-            <div className="flex gap-3 justify-end">
+            <div className="flex justify-end gap-3">
               <button
                 onClick={() => {
                   setShowVersionModal(false);
                   setVersionLabel("");
                 }}
-                className="px-5 py-2 font-tech text-[10px] tracking-widest uppercase text-primary/40 hover:text-primary border border-primary/10 hover:border-primary/30 transition-all"
+                className="font-tech border border-primary/10 px-5 py-2 text-[10px] uppercase tracking-widest text-primary/40 transition-all hover:border-primary/30 hover:text-primary"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSaveVersion}
                 disabled={isSavingVersion}
-                className="px-5 py-2 font-tech text-[10px] tracking-widest uppercase text-accent border border-accent/30 bg-accent/5 hover:bg-accent/15 transition-all disabled:opacity-50 flex items-center gap-2"
+                className="font-tech flex items-center gap-2 border border-accent/30 bg-accent/5 px-5 py-2 text-[10px] uppercase tracking-widest text-accent transition-all hover:bg-accent/15 disabled:opacity-50"
               >
                 {isSavingVersion ? (
-                  <div className="w-3 h-3 border border-accent border-t-transparent rounded-full animate-spin" />
+                  <div className="h-3 w-3 animate-spin rounded-full border border-accent border-t-transparent" />
                 ) : (
-                  <Save className="w-3 h-3" />
+                  <Save className="h-3 w-3" />
                 )}
                 {isSavingVersion ? "Sealing..." : "Seal_Version"}
               </button>

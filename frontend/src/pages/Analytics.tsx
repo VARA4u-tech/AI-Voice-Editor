@@ -77,12 +77,12 @@ const Analytics = () => {
     <Layout title="Analytics" subtitle="Transmission_Metrics" icon={BarChart3}>
       {loading ? (
         <div className="flex justify-center py-20">
-          <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-accent border-t-transparent" />
         </div>
       ) : (
         <div className="space-y-6 sm:space-y-10">
           {/* Stats Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             {[
               {
                 label: "Total Commands",
@@ -103,13 +103,13 @@ const Analytics = () => {
             ].map(({ label, value, icon: Icon }) => (
               <div
                 key={label}
-                className="p-4 border border-primary/10 bg-primary/5 rounded-sm hover:border-accent/30 transition-all group"
+                className="group rounded-sm border border-primary/10 bg-primary/5 p-4 transition-all hover:border-accent/30"
               >
-                <Icon className="w-4 h-4 text-accent/60 mb-2 group-hover:text-accent transition-colors" />
-                <div className="font-heading text-xl sm:text-2xl text-primary mb-1">
+                <Icon className="mb-2 h-4 w-4 text-accent/60 transition-colors group-hover:text-accent" />
+                <div className="mb-1 font-heading text-xl text-primary sm:text-2xl">
                   {value}
                 </div>
-                <div className="font-mono text-[9px] text-primary/40 uppercase tracking-widest">
+                <div className="font-mono text-[9px] uppercase tracking-widest text-primary/40">
                   {label}
                 </div>
               </div>
@@ -118,8 +118,8 @@ const Analytics = () => {
 
           {/* Success Rate Bar */}
           <section className="space-y-3">
-            <h3 className="flex items-center gap-2 font-tech text-xs text-primary tracking-widest uppercase">
-              <Activity className="w-4 h-4 text-accent" />
+            <h3 className="font-tech flex items-center gap-2 text-xs uppercase tracking-widest text-primary">
+              <Activity className="h-4 w-4 text-accent" />
               Processing_Velocity
             </h3>
             <div className="space-y-3">
@@ -129,11 +129,11 @@ const Analytics = () => {
                 { label: "Signal Stability", value: 92 },
               ].map((s) => (
                 <div key={s.label} className="space-y-1">
-                  <div className="flex justify-between text-[11px] font-mono text-primary/60">
+                  <div className="flex justify-between font-mono text-[11px] text-primary/60">
                     <span>{s.label}</span>
                     <span className="text-accent">{s.value}%</span>
                   </div>
-                  <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/5">
                     <div
                       className="h-full rounded-full transition-all duration-1000"
                       style={{
@@ -150,14 +150,14 @@ const Analytics = () => {
 
           {/* Command Leaderboard */}
           <section className="space-y-4">
-            <h3 className="flex items-center gap-2 font-tech text-xs text-primary tracking-widest uppercase">
-              <Trophy className="w-4 h-4 text-accent" />
+            <h3 className="font-tech flex items-center gap-2 text-xs uppercase tracking-widest text-primary">
+              <Trophy className="h-4 w-4 text-accent" />
               Command_Leaderboard
             </h3>
 
             {leaderboard.length === 0 ? (
-              <div className="text-center py-10 border border-dashed border-primary/10 rounded-sm">
-                <p className="font-mono text-[10px] text-primary/30 uppercase tracking-widest">
+              <div className="rounded-sm border border-dashed border-primary/10 py-10 text-center">
+                <p className="font-mono text-[10px] uppercase tracking-widest text-primary/30">
                   // No commands logged yet. Start speaking! //
                 </p>
               </div>
@@ -166,24 +166,24 @@ const Analytics = () => {
                 {leaderboard.map(({ rank, type, count }) => (
                   <div
                     key={type}
-                    className="group flex items-center gap-4 p-3 border border-primary/10 bg-primary/5 rounded-sm hover:border-accent/30 transition-all"
+                    className="group flex items-center gap-4 rounded-sm border border-primary/10 bg-primary/5 p-3 transition-all hover:border-accent/30"
                   >
                     {/* Rank */}
                     <div
-                      className={`w-6 text-center font-tech text-sm shrink-0 ${MEDAL_COLORS[rank - 1] || "text-primary/40"}`}
+                      className={`font-tech w-6 shrink-0 text-center text-sm ${MEDAL_COLORS[rank - 1] || "text-primary/40"}`}
                     >
                       {rank <= 3 ? ["🥇", "🥈", "🥉"][rank - 1] : `#${rank}`}
                     </div>
 
                     {/* Command Type */}
-                    <div className="flex-1 min-w-0">
-                      <div className="font-tech text-[10px] text-primary uppercase tracking-widest truncate">
+                    <div className="min-w-0 flex-1">
+                      <div className="font-tech truncate text-[10px] uppercase tracking-widest text-primary">
                         {type}
                       </div>
                       {/* Bar */}
-                      <div className="mt-1 h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                      <div className="mt-1 h-1 w-full overflow-hidden rounded-full bg-white/5">
                         <div
-                          className="h-full bg-accent/60 rounded-full transition-all duration-700"
+                          className="h-full rounded-full bg-accent/60 transition-all duration-700"
                           style={{
                             width: `${Math.round((count / maxCount) * 100)}%`,
                           }}
@@ -196,7 +196,7 @@ const Analytics = () => {
                       <span className="font-mono text-xs text-accent">
                         {count}
                       </span>
-                      <div className="font-tech text-[8px] text-primary/30 uppercase">
+                      <div className="font-tech text-[8px] uppercase text-primary/30">
                         uses
                       </div>
                     </div>
@@ -208,21 +208,21 @@ const Analytics = () => {
 
           {/* Biometric Sync */}
           <section>
-            <h3 className="flex items-center gap-2 font-tech text-xs text-primary tracking-widest uppercase mb-4">
-              <Layers className="w-4 h-4 text-accent" />
+            <h3 className="font-tech mb-4 flex items-center gap-2 text-xs uppercase tracking-widest text-primary">
+              <Layers className="h-4 w-4 text-accent" />
               Biometric_Sync
             </h3>
-            <div className="flex flex-wrap justify-around gap-4 bg-primary/5 p-4 rounded-sm border border-primary/10">
+            <div className="flex flex-wrap justify-around gap-4 rounded-sm border border-primary/10 bg-primary/5 p-4">
               {[
                 { label: "Auth_Link", value: user ? "Established" : "Severed" },
                 { label: "DB_Sync", value: "Stable" },
                 { label: "AI_Core", value: "Online" },
               ].map(({ label, value }) => (
                 <div key={label} className="text-center">
-                  <div className="text-[10px] font-mono text-primary/40 uppercase mb-1">
+                  <div className="mb-1 font-mono text-[10px] uppercase text-primary/40">
                     {label}
                   </div>
-                  <div className="text-xs font-tech text-accent">{value}</div>
+                  <div className="font-tech text-xs text-accent">{value}</div>
                 </div>
               ))}
             </div>

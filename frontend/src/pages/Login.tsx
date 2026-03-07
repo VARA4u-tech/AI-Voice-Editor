@@ -61,24 +61,24 @@ const Login = () => {
   if (user) {
     return (
       <Layout title="Neural_Link" subtitle="Auth_Terminal" icon={ShieldCheck}>
-        <div className="max-w-md mx-auto text-center space-y-6">
-          <div className="p-8 border border-accent/20 bg-accent/5 rounded-sm">
-            <h3 className="font-tech text-xs text-accent uppercase tracking-widest mb-2">
+        <div className="mx-auto max-w-md space-y-6 text-center">
+          <div className="rounded-sm border border-accent/20 bg-accent/5 p-8">
+            <h3 className="font-tech mb-2 text-xs uppercase tracking-widest text-accent">
               Neural_Link_Active
             </h3>
-            <p className="font-mono text-[10px] text-primary/60 mb-6">
+            <p className="mb-6 font-mono text-[10px] text-primary/60">
               You are already connected as {user.email}
             </p>
             <div className="flex flex-col gap-4">
               <button
                 onClick={() => navigate("/")}
-                className="w-full py-3 bg-primary/10 border border-primary/20 text-primary font-tech text-[10px] tracking-widest uppercase hover:bg-primary/20 transition-all"
+                className="font-tech w-full border border-primary/20 bg-primary/10 py-3 text-[10px] uppercase tracking-widest text-primary transition-all hover:bg-primary/20"
               >
                 Return_to_Core
               </button>
               <button
                 onClick={() => signOut()}
-                className="w-full py-3 border border-red-500/20 text-red-500/60 font-tech text-[10px] tracking-widest uppercase hover:bg-red-500/10 transition-all"
+                className="font-tech w-full border border-red-500/20 py-3 text-[10px] uppercase tracking-widest text-red-500/60 transition-all hover:bg-red-500/10"
               >
                 Sever_Neural_Link
               </button>
@@ -91,8 +91,8 @@ const Login = () => {
 
   return (
     <Layout title="Neural_Link" subtitle="Auth_Terminal" icon={ShieldCheck}>
-      <div className="max-w-md mx-auto space-y-8">
-        <div className="text-center space-y-2">
+      <div className="mx-auto max-w-md space-y-8">
+        <div className="space-y-2 text-center">
           <p className="font-body text-sm italic text-foreground/60">
             Establish a secure connection to your archives.
           </p>
@@ -101,25 +101,25 @@ const Login = () => {
         <form onSubmit={handleLogin} className="space-y-6">
           <div className="space-y-4">
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/40" />
+              <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary/40" />
               <input
                 type="email"
                 placeholder="Email_Hash"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full bg-primary/5 border border-primary/20 rounded-sm py-3 pl-10 pr-4 text-xs font-mono text-primary placeholder:text-primary/20 focus:outline-none focus:border-accent/40 transition-colors"
+                className="w-full rounded-sm border border-primary/20 bg-primary/5 py-3 pl-10 pr-4 font-mono text-xs text-primary transition-colors placeholder:text-primary/20 focus:border-accent/40 focus:outline-none"
               />
             </div>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/40" />
+              <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary/40" />
               <input
                 type="password"
                 placeholder="Access_Key"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full bg-primary/5 border border-primary/20 rounded-sm py-3 pl-10 pr-4 text-xs font-mono text-primary placeholder:text-primary/20 focus:outline-none focus:border-accent/40 transition-colors"
+                className="w-full rounded-sm border border-primary/20 bg-primary/5 py-3 pl-10 pr-4 font-mono text-xs text-primary transition-colors placeholder:text-primary/20 focus:border-accent/40 focus:outline-none"
               />
             </div>
           </div>
@@ -127,13 +127,13 @@ const Login = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full flex items-center justify-center gap-2 py-4 bg-accent/20 border border-accent/40 text-accent font-tech text-[11px] tracking-widest uppercase hover:bg-accent/30 transition-all group disabled:opacity-50"
+            className="font-tech group flex w-full items-center justify-center gap-2 border border-accent/40 bg-accent/20 py-4 text-[11px] uppercase tracking-widest text-accent transition-all hover:bg-accent/30 disabled:opacity-50"
           >
             {loading ? (
-              <div className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-accent border-t-transparent" />
             ) : (
               <>
-                Establish_Connection <LogIn className="w-4 h-4" />
+                Establish_Connection <LogIn className="h-4 w-4" />
               </>
             )}
           </button>
@@ -142,7 +142,7 @@ const Login = () => {
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t border-accent/10" />
             </div>
-            <div className="relative flex justify-center text-[8px] uppercase tracking-widest font-tech">
+            <div className="font-tech relative flex justify-center text-[8px] uppercase tracking-widest">
               <span className="bg-background px-4 text-primary/40">
                 Alternative_Auth_Protocols
               </span>
@@ -152,9 +152,9 @@ const Login = () => {
           <button
             type="button"
             onClick={handleGoogleAuth}
-            className="w-full flex items-center justify-center gap-3 py-3 bg-white/5 border border-white/10 text-white/80 font-tech text-[10px] tracking-widest uppercase hover:bg-white/10 transition-all group"
+            className="font-tech group flex w-full items-center justify-center gap-3 border border-white/10 bg-white/5 py-3 text-[10px] uppercase tracking-widest text-white/80 transition-all hover:bg-white/10"
           >
-            <svg className="w-4 h-4" viewBox="0 0 24 24">
+            <svg className="h-4 w-4" viewBox="0 0 24 24">
               <path
                 fill="currentColor"
                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -179,7 +179,7 @@ const Login = () => {
         <div className="pt-4 text-center">
           <Link
             to="/signup"
-            className="text-[10px] font-mono text-primary/40 hover:text-primary uppercase tracking-widest transition-colors"
+            className="font-mono text-[10px] uppercase tracking-widest text-primary/40 transition-colors hover:text-primary"
           >
             // Switch to Sign_Up_Protocol
           </Link>

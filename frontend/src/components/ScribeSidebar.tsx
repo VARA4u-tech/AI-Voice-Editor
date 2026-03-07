@@ -60,63 +60,63 @@ const ScribeSidebar = ({
     <>
       {/* Backdrop Overlay */}
       <div
-        className={`fixed inset-0 bg-black/40 backdrop-blur-sm z-[55] transition-opacity duration-500 ${
+        className={`fixed inset-0 z-[55] bg-black/40 backdrop-blur-sm transition-opacity duration-500 ${
           isOpen
-            ? "opacity-100 pointer-events-auto"
-            : "opacity-0 pointer-events-none"
+            ? "pointer-events-auto opacity-100"
+            : "pointer-events-none opacity-0"
         }`}
         onClick={onClose}
       />
 
       {/* Modern High-Tech Panel */}
       <div
-        className={`fixed top-0 right-0 h-full w-full sm:w-[420px] bg-slate-950/90 backdrop-blur-2xl border-l border-primary/20 z-[60] transform transition-transform duration-700 cubic-bezier(0.4, 0, 0.2, 1) flex overflow-hidden shadow-[-40px_0_80px_rgba(0,0,0,0.8)] ${
+        className={`cubic-bezier(0.4, 0, 0.2, 1) fixed right-0 top-0 z-[60] flex h-full w-full transform overflow-hidden border-l border-primary/20 bg-slate-950/90 shadow-[-40px_0_80px_rgba(0,0,0,0.8)] backdrop-blur-2xl transition-transform duration-700 sm:w-[420px] ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
         {/* Decorative Left Edge Bar */}
-        <div className="w-1.5 h-full bg-gradient-to-b from-transparent via-accent/40 to-transparent absolute left-0 top-0 opacity-50" />
+        <div className="absolute left-0 top-0 h-full w-1.5 bg-gradient-to-b from-transparent via-accent/40 to-transparent opacity-50" />
 
         {/* Vertical Icon Rail */}
-        <div className="w-16 h-full border-r border-primary/10 flex flex-col items-center py-8 gap-8 bg-black/40 flex-shrink-0">
+        <div className="flex h-full w-16 flex-shrink-0 flex-col items-center gap-8 border-r border-primary/10 bg-black/40 py-8">
           <Link to="/">
-            <div className="w-10 h-10 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center mb-4 group cursor-pointer hover:bg-accent/20 transition-all">
-              <BrainCircuit className="w-5 h-5 text-accent animate-pulse" />
+            <div className="group mb-4 flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl border border-accent/20 bg-accent/10 transition-all hover:bg-accent/20">
+              <BrainCircuit className="h-5 w-5 animate-pulse text-accent" />
             </div>
           </Link>
           <div className="flex flex-col gap-6 text-primary/40">
             <Link to="/analytics" title="Analytics">
-              <BarChart3 className="w-5 h-5 hover:text-primary transition-colors cursor-pointer" />
+              <BarChart3 className="h-5 w-5 cursor-pointer transition-colors hover:text-primary" />
             </Link>
             <Link to="/history" title="History">
-              <History className="w-5 h-5 hover:text-primary transition-colors cursor-pointer" />
+              <History className="h-5 w-5 cursor-pointer transition-colors hover:text-primary" />
             </Link>
             <Link to="/security" title="Security">
-              <Shield className="w-5 h-5 hover:text-primary transition-colors cursor-pointer" />
+              <Shield className="h-5 w-5 cursor-pointer transition-colors hover:text-primary" />
             </Link>
-            <div className="mt-auto mb-4 flex flex-col gap-6">
+            <div className="mb-4 mt-auto flex flex-col gap-6">
               <Link to="/settings" title="Settings">
-                <Settings className="w-5 h-5 hover:text-primary transition-colors cursor-pointer" />
+                <Settings className="h-5 w-5 cursor-pointer transition-colors hover:text-primary" />
               </Link>
               <Link to="/info" title="System Info">
-                <Info className="w-5 h-5 hover:text-primary transition-colors cursor-pointer" />
+                <Info className="h-5 w-5 cursor-pointer transition-colors hover:text-primary" />
               </Link>
               <Link to="/login" title="Authentication">
-                <User className="w-5 h-5 hover:text-primary transition-colors cursor-pointer text-accent" />
+                <User className="h-5 w-5 cursor-pointer text-accent transition-colors hover:text-primary" />
               </Link>
             </div>
           </div>
         </div>
 
         {/* Main Content Area */}
-        <div className="flex-1 flex flex-col h-full relative">
+        <div className="relative flex h-full flex-1 flex-col">
           {/* Header */}
-          <div className="p-8 pb-4 flex items-center justify-between">
+          <div className="flex items-center justify-between p-8 pb-4">
             <div>
-              <h2 className="font-heading text-xl tracking-[0.2em] text-primary uppercase font-bold gold-text-glow">
+              <h2 className="gold-text-glow font-heading text-xl font-bold uppercase tracking-[0.2em] text-primary">
                 Neural Center
               </h2>
-              <p className="text-[9px] font-mono text-accent/60 uppercase tracking-widest mt-1">
+              <p className="mt-1 font-mono text-[9px] uppercase tracking-widest text-accent/60">
                 {user
                   ? `// Identity: ${user.email?.split("@")[0]}`
                   : "// System_Active: Protocol_4.2"}
@@ -126,33 +126,33 @@ const ScribeSidebar = ({
               {user && (
                 <button
                   onClick={() => signOut()}
-                  className="p-2 hover:bg-red-500/10 rounded-full transition-colors text-red-500/40 hover:text-red-500 border border-transparent hover:border-red-500/20"
+                  className="rounded-full border border-transparent p-2 text-red-500/40 transition-colors hover:border-red-500/20 hover:bg-red-500/10 hover:text-red-500"
                   title="Sever Neural Link"
                 >
-                  <LogOut className="w-4 h-4" />
+                  <LogOut className="h-4 w-4" />
                 </button>
               )}
               <button
                 onClick={onClose}
-                className="group p-2 hover:bg-white/5 rounded-full transition-all border border-transparent hover:border-primary/10"
+                className="group rounded-full border border-transparent p-2 transition-all hover:border-primary/10 hover:bg-white/5"
               >
-                <X className="w-5 h-5 text-primary/40 group-hover:text-primary group-hover:rotate-90 transition-all duration-300" />
+                <X className="h-5 w-5 text-primary/40 transition-all duration-300 group-hover:rotate-90 group-hover:text-primary" />
               </button>
             </div>
           </div>
 
           {/* Scrolling Content */}
-          <div className="flex-1 overflow-y-auto px-8 py-6 space-y-8 custom-scrollbar">
+          <div className="custom-scrollbar flex-1 space-y-8 overflow-y-auto px-8 py-6">
             {/* Quick Stats Grid */}
             <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 bg-primary/5 border border-primary/10 rounded-lg relative overflow-hidden group">
-                <div className="absolute top-0 right-0 p-1.5 opacity-10 group-hover:opacity-30 transition-opacity">
-                  <Activity className="w-4 h-4 text-primary" />
+              <div className="group relative overflow-hidden rounded-lg border border-primary/10 bg-primary/5 p-4">
+                <div className="absolute right-0 top-0 p-1.5 opacity-10 transition-opacity group-hover:opacity-30">
+                  <Activity className="h-4 w-4 text-primary" />
                 </div>
-                <span className="block text-[8px] font-mono text-primary/40 uppercase tracking-tighter mb-1">
+                <span className="mb-1 block font-mono text-[8px] uppercase tracking-tighter text-primary/40">
                   Complexity
                 </span>
-                <span className="text-lg font-bold text-primary gold-text-glow">
+                <span className="gold-text-glow text-lg font-bold text-primary">
                   {avgWordLength > 6
                     ? "High"
                     : avgWordLength > 5
@@ -160,16 +160,16 @@ const ScribeSidebar = ({
                       : "Low"}
                 </span>
               </div>
-              <div className="p-4 bg-primary/5 border border-primary/10 rounded-lg relative overflow-hidden group">
-                <div className="absolute top-0 right-0 p-1.5 opacity-10 group-hover:opacity-30 transition-opacity">
-                  <Sparkles className="w-4 h-4 text-primary" />
+              <div className="group relative overflow-hidden rounded-lg border border-primary/10 bg-primary/5 p-4">
+                <div className="absolute right-0 top-0 p-1.5 opacity-10 transition-opacity group-hover:opacity-30">
+                  <Sparkles className="h-4 w-4 text-primary" />
                 </div>
-                <span className="block text-[8px] font-mono text-primary/40 uppercase tracking-tighter mb-1">
+                <span className="mb-1 block font-mono text-[8px] uppercase tracking-tighter text-primary/40">
                   Volume
                 </span>
-                <span className="text-lg font-bold text-primary gold-text-glow">
+                <span className="gold-text-glow text-lg font-bold text-primary">
                   {wordCount}{" "}
-                  <span className="text-[10px] opacity-40 font-normal italic">
+                  <span className="text-[10px] font-normal italic opacity-40">
                     words
                   </span>
                 </span>
@@ -177,35 +177,35 @@ const ScribeSidebar = ({
             </div>
 
             {/* Progress Gauges */}
-            <div className="space-y-6 py-4 border-y border-primary/10">
+            <div className="space-y-6 border-y border-primary/10 py-4">
               <div className="space-y-3">
-                <div className="flex justify-between items-end">
-                  <span className="text-[10px] font-tech tracking-[0.2em] text-primary/60 uppercase">
+                <div className="flex items-end justify-between">
+                  <span className="font-tech text-[10px] uppercase tracking-[0.2em] text-primary/60">
                     Lexical_Density
                   </span>
-                  <span className="text-[10px] font-mono text-accent">
+                  <span className="font-mono text-[10px] text-accent">
                     {Math.round(scholarlyWeight)}%
                   </span>
                 </div>
-                <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+                <div className="h-1 overflow-hidden rounded-full bg-white/5">
                   <div
-                    className="h-full bg-gradient-to-r from-primary/40 via-primary to-accent transition-all duration-1000 ease-out shadow-[0_0_8px_hsl(var(--gold)/0.5)]"
+                    className="h-full bg-gradient-to-r from-primary/40 via-primary to-accent shadow-[0_0_8px_hsl(var(--gold)/0.5)] transition-all duration-1000 ease-out"
                     style={{ width: `${scholarlyWeight}%` }}
                   />
                 </div>
               </div>
               <div className="space-y-3">
-                <div className="flex justify-between items-end">
-                  <span className="text-[10px] font-tech tracking-[0.2em] text-primary/60 uppercase">
+                <div className="flex items-end justify-between">
+                  <span className="font-tech text-[10px] uppercase tracking-[0.2em] text-primary/60">
                     Stream_Saturation
                   </span>
-                  <span className="text-[10px] font-mono text-accent">
+                  <span className="font-mono text-[10px] text-accent">
                     {Math.round(focusIntensity)}%
                   </span>
                 </div>
-                <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+                <div className="h-1 overflow-hidden rounded-full bg-white/5">
                   <div
-                    className="h-full bg-gradient-to-r from-primary/40 via-primary to-accent transition-all duration-1000 ease-out shadow-[0_0_8px_hsl(var(--gold)/0.5)]"
+                    className="h-full bg-gradient-to-r from-primary/40 via-primary to-accent shadow-[0_0_8px_hsl(var(--gold)/0.5)] transition-all duration-1000 ease-out"
                     style={{ width: `${focusIntensity}%` }}
                   />
                 </div>
@@ -214,12 +214,12 @@ const ScribeSidebar = ({
 
             {/* Activity Feed */}
             <div className="space-y-4">
-              <h3 className="text-[10px] font-tech tracking-[0.3em] text-primary/40 uppercase mb-4">
+              <h3 className="font-tech mb-4 text-[10px] uppercase tracking-[0.3em] text-primary/40">
                 Transmission_Log
               </h3>
               {scribeLog.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-12 text-center space-y-4 opacity-20">
-                  <Bot className="w-10 h-10 text-primary" />
+                <div className="flex flex-col items-center justify-center space-y-4 py-12 text-center opacity-20">
+                  <Bot className="h-10 w-10 text-primary" />
                   <p className="font-body text-xs italic">
                     AI buffer empty. Awaiting document processing signals...
                   </p>
@@ -228,26 +228,26 @@ const ScribeSidebar = ({
                 scribeLog.map((log, i) => (
                   <div
                     key={i}
-                    className="group p-4 bg-white/2 border border-white/5 hover:border-primary/20 transition-all relative rounded-sm"
+                    className="bg-white/2 group relative rounded-sm border border-white/5 p-4 transition-all hover:border-primary/20"
                   >
-                    <div className="absolute top-0 left-0 w-[2px] h-full bg-primary/20 group-hover:bg-accent transition-colors" />
-                    <div className="flex items-center gap-2 mb-2">
+                    <div className="absolute left-0 top-0 h-full w-[2px] bg-primary/20 transition-colors group-hover:bg-accent" />
+                    <div className="mb-2 flex items-center gap-2">
                       {log.type === "summary" ? (
-                        <MessageSquare className="w-3.5 h-3.5 text-accent" />
+                        <MessageSquare className="h-3.5 w-3.5 text-accent" />
                       ) : (
-                        <BarChart3 className="w-3.5 h-3.5 text-primary" />
+                        <BarChart3 className="h-3.5 w-3.5 text-primary" />
                       )}
-                      <span className="text-[10px] font-tech tracking-[0.1em] text-primary/80 uppercase">
+                      <span className="font-tech text-[10px] uppercase tracking-[0.1em] text-primary/80">
                         {log.title || "Core_Report"}
                       </span>
-                      <span className="ml-auto text-[8px] font-mono opacity-30">
+                      <span className="ml-auto font-mono text-[8px] opacity-30">
                         {log.timestamp.toLocaleTimeString([], {
                           hour: "2-digit",
                           minute: "2-digit",
                         })}
                       </span>
                     </div>
-                    <p className="text-[12px] font-body text-foreground/70 leading-relaxed italic">
+                    <p className="font-body text-[12px] italic leading-relaxed text-foreground/70">
                       {log.content}
                     </p>
                   </div>
@@ -257,9 +257,9 @@ const ScribeSidebar = ({
           </div>
 
           {/* Footer Decoration */}
-          <div className="p-8 pt-4 opacity-20 pointer-events-none">
-            <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary/40 to-transparent mb-4" />
-            <div className="text-[8px] font-mono text-center tracking-[0.5em] uppercase">
+          <div className="pointer-events-none p-8 pt-4 opacity-20">
+            <div className="mb-4 h-[1px] w-full bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
+            <div className="text-center font-mono text-[8px] uppercase tracking-[0.5em]">
               // End_Of_Line //
             </div>
           </div>

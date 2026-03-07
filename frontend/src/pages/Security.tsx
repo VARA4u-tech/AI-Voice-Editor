@@ -23,56 +23,56 @@ const Security = () => {
   return (
     <Layout title="Security" subtitle="Armor_Protocols" icon={Shield}>
       <div className="space-y-10">
-        <div className="flex flex-col items-center justify-center p-8 border border-accent/20 bg-accent/5 rounded-sm relative overflow-hidden">
-          <div className="absolute top-2 right-2 animate-spin-slow opacity-20">
-            <Shield className="w-24 h-24 text-accent" />
+        <div className="relative flex flex-col items-center justify-center overflow-hidden rounded-sm border border-accent/20 bg-accent/5 p-8">
+          <div className="animate-spin-slow absolute right-2 top-2 opacity-20">
+            <Shield className="h-24 w-24 text-accent" />
           </div>
-          <div className="w-16 h-16 rounded-full border-2 border-accent flex items-center justify-center mb-6 shadow-[0_0_20px_hsl(var(--accent)/0.3)]">
-            <Lock className="w-8 h-8 text-accent" />
+          <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full border-2 border-accent shadow-[0_0_20px_hsl(var(--accent)/0.3)]">
+            <Lock className="h-8 w-8 text-accent" />
           </div>
-          <h3 className="font-heading text-lg text-primary tracking-[0.2em] uppercase mb-2">
+          <h3 className="mb-2 font-heading text-lg uppercase tracking-[0.2em] text-primary">
             Core Integrity: Level 1
           </h3>
-          <p className="font-mono text-[10px] text-accent tracking-widest uppercase">
+          <p className="font-mono text-[10px] uppercase tracking-widest text-accent">
             Encryption_Status: UNBREAKABLE
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           {protocols.map((protocol, i) => (
             <div
               key={i}
-              className="p-6 border border-primary/10 bg-primary/5 rounded-sm group hover:border-accent/40 transition-all duration-300"
+              className="group rounded-sm border border-primary/10 bg-primary/5 p-6 transition-all duration-300 hover:border-accent/40"
             >
-              <div className="flex justify-between items-center mb-4">
-                <h4 className="font-tech text-[11px] text-primary tracking-widest uppercase">
+              <div className="mb-4 flex items-center justify-between">
+                <h4 className="font-tech text-[11px] uppercase tracking-widest text-primary">
                   {protocol.title}
                 </h4>
-                <span className="flex items-center gap-1.5 text-[9px] font-mono text-accent">
-                  <CheckCircle className="w-3 h-3" /> {protocol.status}
+                <span className="flex items-center gap-1.5 font-mono text-[9px] text-accent">
+                  <CheckCircle className="h-3 w-3" /> {protocol.status}
                 </span>
               </div>
-              <p className="font-body text-sm text-foreground/70 leading-relaxed font-medium">
+              <p className="font-body text-sm font-medium leading-relaxed text-foreground/70">
                 {protocol.desc}
               </p>
             </div>
           ))}
 
-          <div className="p-6 border border-dashed border-primary/20 bg-transparent rounded-sm flex flex-col items-center justify-center text-center group cursor-pointer hover:border-accent/40 transition-all">
-            <RefreshCcw className="w-6 h-6 text-primary/40 group-hover:text-accent group-hover:rotate-180 transition-all duration-700 mb-3" />
-            <span className="font-tech text-[10px] text-primary/60 tracking-widest uppercase">
+          <div className="group flex cursor-pointer flex-col items-center justify-center rounded-sm border border-dashed border-primary/20 bg-transparent p-6 text-center transition-all hover:border-accent/40">
+            <RefreshCcw className="mb-3 h-6 w-6 text-primary/40 transition-all duration-700 group-hover:rotate-180 group-hover:text-accent" />
+            <span className="font-tech text-[10px] uppercase tracking-widest text-primary/60">
               Rotate_Encryption_Keys
             </span>
           </div>
         </div>
 
-        <div className="pt-4 p-4 border border-destructive/20 bg-destructive/5 rounded-sm flex items-start gap-4">
-          <Eye className="w-5 h-5 text-destructive shrink-0 mt-0.5" />
+        <div className="flex items-start gap-4 rounded-sm border border-destructive/20 bg-destructive/5 p-4 pt-4">
+          <Eye className="mt-0.5 h-5 w-5 shrink-0 text-destructive" />
           <div>
-            <h5 className="font-tech text-[10px] text-destructive tracking-widest uppercase mb-1">
+            <h5 className="font-tech mb-1 text-[10px] uppercase tracking-widest text-destructive">
               Privacy_Notice
             </h5>
-            <p className="font-body text-xs text-destructive/80 italic font-medium">
+            <p className="font-body text-xs font-medium italic text-destructive/80">
               Your document content is processed entirely within your browser's
               secure context. No sensitive data is transmitted to central neural
               nodes.

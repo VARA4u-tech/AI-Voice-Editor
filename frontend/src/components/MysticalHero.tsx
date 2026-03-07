@@ -7,7 +7,7 @@ interface MysticalHeroProps {
 const MysticalHero = ({ isListening }: MysticalHeroProps) => {
   return (
     <div
-      className={`relative flex flex-col items-center justify-center py-12 transition-all duration-700 w-full max-w-xl mx-auto ${
+      className={`relative mx-auto flex w-full max-w-xl flex-col items-center justify-center py-12 transition-all duration-700 ${
         isListening ? "scale-105 opacity-100" : "scale-100 opacity-95"
       }`}
     >
@@ -209,7 +209,7 @@ const MysticalHero = ({ isListening }: MysticalHeroProps) => {
 
       {/* ALL I SEE Text — wide tracked gold foil stamp — Significantly Boosted Visibility */}
       <h1
-        className="mt-8 mystical-gold-text select-none z-10 transition-all duration-700 hover:scale-110 drop-shadow-[0_0_15px_rgba(255,215,0,0.2)]"
+        className="mystical-gold-text z-10 mt-8 select-none drop-shadow-[0_0_15px_rgba(255,215,0,0.2)] transition-all duration-700 hover:scale-110"
         style={{
           fontSize: "clamp(2.5rem, 10vw, 4.5rem)",
           letterSpacing: "0.5em",

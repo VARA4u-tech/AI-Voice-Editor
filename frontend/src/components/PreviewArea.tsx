@@ -125,7 +125,7 @@ const PreviewArea = ({
   return (
     <div
       ref={scrollRef}
-      className="w-full max-w-4xl border border-primary/30 bg-background/90 backdrop-blur-2xl min-h-[400px] max-h-[600px] 2xl:max-h-[800px] overflow-y-auto p-4 sm:p-8 md:p-10 transition-all duration-500 relative shadow-[0_0_50px_rgba(0,0,0,0.8)] custom-scrollbar"
+      className="custom-scrollbar relative max-h-[600px] min-h-[400px] w-full max-w-4xl overflow-y-auto border border-primary/30 bg-background/90 p-4 shadow-[0_0_50px_rgba(0,0,0,0.8)] backdrop-blur-2xl transition-all duration-500 sm:p-8 md:p-10 2xl:max-h-[800px]"
     >
       <div className="tech-bracket-tl" />
       <div className="tech-bracket-tr" />
@@ -133,15 +133,15 @@ const PreviewArea = ({
       <div className="tech-bracket-br" />
 
       {/* Tailwind SAFELIST for dynamic AI rendered content */}
-      <div className="hidden bg-red-500/20 text-red-500 px-1 rounded" />
+      <div className="hidden rounded bg-red-500/20 px-1 text-red-500" />
 
       {/* Command feedback toast */}
       {commandFeedback && (
         <div
-          className={`mb-6 px-4 py-3 text-xs font-mono border animate-fade-in relative overflow-hidden ${
+          className={`relative mb-6 animate-fade-in overflow-hidden border px-4 py-3 font-mono text-xs ${
             commandSuccess
-              ? "border-accent/40 text-accent bg-accent/5"
-              : "border-destructive/40 text-destructive/80 bg-destructive/5"
+              ? "border-accent/40 bg-accent/5 text-accent"
+              : "border-destructive/40 bg-destructive/5 text-destructive/80"
           }`}
         >
           <div className="flex items-center gap-2">
@@ -151,85 +151,85 @@ const PreviewArea = ({
             {commandFeedback}
           </div>
           <div
-            className="absolute bottom-0 left-0 h-[1px] bg-accent/50 animate-[shimmer_2s_infinite]"
+            className="absolute bottom-0 left-0 h-[1px] animate-[shimmer_2s_infinite] bg-accent/50"
             style={{ width: "100%" }}
           />
         </div>
       )}
 
       {isLoading ? (
-        <div className="flex flex-col items-center justify-center h-full min-h-[300px] gap-6">
+        <div className="flex h-full min-h-[300px] flex-col items-center justify-center gap-6">
           <div className="relative">
-            <Loader2 className="w-12 h-12 text-accent animate-spin" />
-            <div className="absolute inset-0 bg-accent/20 blur-xl animate-pulse" />
+            <Loader2 className="h-12 w-12 animate-spin text-accent" />
+            <div className="absolute inset-0 animate-pulse bg-accent/20 blur-xl" />
           </div>
-          <p className="font-tech text-xs tracking-[0.4em] uppercase text-accent animate-pulse">
+          <p className="font-tech animate-pulse text-xs uppercase tracking-[0.4em] text-accent">
             Analyzing Data Stream...
           </p>
         </div>
       ) : paragraphs.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-full min-h-[500px] gap-8 p-6 sm:p-12 relative animate-fade-in">
-          <div className="relative z-10 flex flex-col items-center text-center w-full max-w-2xl">
-            <div className="w-24 h-24 rounded-sm bg-primary/5 flex items-center justify-center mb-8 border border-primary/20 relative group overflow-hidden shadow-[0_0_30px_rgba(255,215,0,0.05)]">
-              <div className="absolute inset-0 bg-accent/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-              <FileText className="w-12 h-12 text-primary group-hover:text-accent transition-all duration-500 group-hover:scale-110" />
-              <div className="tech-bracket-tl w-3 h-3" />
-              <div className="tech-bracket-br w-3 h-3" />
+        <div className="relative flex h-full min-h-[500px] animate-fade-in flex-col items-center justify-center gap-8 p-6 sm:p-12">
+          <div className="relative z-10 flex w-full max-w-2xl flex-col items-center text-center">
+            <div className="group relative mb-8 flex h-24 w-24 items-center justify-center overflow-hidden rounded-sm border border-primary/20 bg-primary/5 shadow-[0_0_30px_rgba(255,215,0,0.05)]">
+              <div className="absolute inset-0 bg-accent/10 opacity-0 transition-opacity group-hover:opacity-100" />
+              <FileText className="h-12 w-12 text-primary transition-all duration-500 group-hover:scale-110 group-hover:text-accent" />
+              <div className="tech-bracket-tl h-3 w-3" />
+              <div className="tech-bracket-br h-3 w-3" />
             </div>
-            <h3 className="font-tech text-2xl sm:text-4xl text-primary tracking-[0.4em] mb-6 uppercase gold-text-glow leading-tight">
+            <h3 className="font-tech gold-text-glow mb-6 text-2xl uppercase leading-tight tracking-[0.4em] text-primary sm:text-4xl">
               Interface Standby
             </h3>
-            <p className="font-body text-lg sm:text-xl text-foreground mb-12 leading-relaxed px-6 opacity-90">
+            <p className="mb-12 px-6 font-body text-lg leading-relaxed text-foreground opacity-90 sm:text-xl">
               Awaiting document injection. Once initialized, your vocal commands
               will modulate the content in real-time with sub-millisecond
               latencies.
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full px-4">
-              <div className="flex items-start gap-4 p-5 border border-primary/10 bg-primary/5 hover:border-accent/40 hover:bg-accent/5 transition-all text-left group relative rounded-sm">
-                <div className="tech-bracket-tl w-2 h-2" />
-                <Mic className="w-6 h-6 text-primary mt-1 shrink-0 group-hover:text-accent group-hover:scale-110 transition-all" />
+            <div className="grid w-full grid-cols-1 gap-6 px-4 sm:grid-cols-2">
+              <div className="group relative flex items-start gap-4 rounded-sm border border-primary/10 bg-primary/5 p-5 text-left transition-all hover:border-accent/40 hover:bg-accent/5">
+                <div className="tech-bracket-tl h-2 w-2" />
+                <Mic className="mt-1 h-6 w-6 shrink-0 text-primary transition-all group-hover:scale-110 group-hover:text-accent" />
                 <div>
-                  <h4 className="font-tech text-xs text-primary/80 tracking-widest uppercase mb-2 font-bold">
+                  <h4 className="font-tech mb-2 text-xs font-bold uppercase tracking-widest text-primary/80">
                     Vocal Synthesis
                   </h4>
-                  <p className="font-mono text-xs text-foreground/70 leading-snug">
+                  <p className="font-mono text-xs leading-snug text-foreground/70">
                     "Delete segment 4"
                   </p>
                 </div>
               </div>
-              <div className="flex items-start gap-4 p-5 border border-primary/10 bg-primary/5 hover:border-accent/40 hover:bg-accent/5 transition-all text-left group relative rounded-sm">
-                <div className="tech-bracket-tl w-2 h-2" />
-                <Wand2 className="w-6 h-6 text-primary mt-1 shrink-0 group-hover:text-accent group-hover:-rotate-12 transition-all" />
+              <div className="group relative flex items-start gap-4 rounded-sm border border-primary/10 bg-primary/5 p-5 text-left transition-all hover:border-accent/40 hover:bg-accent/5">
+                <div className="tech-bracket-tl h-2 w-2" />
+                <Wand2 className="mt-1 h-6 w-6 shrink-0 text-primary transition-all group-hover:-rotate-12 group-hover:text-accent" />
                 <div>
-                  <h4 className="font-tech text-xs text-primary/80 tracking-widest uppercase mb-2 font-bold">
+                  <h4 className="font-tech mb-2 text-xs font-bold uppercase tracking-widest text-primary/80">
                     Neural Rewrite
                   </h4>
-                  <p className="font-mono text-xs text-foreground/70 leading-snug">
+                  <p className="font-mono text-xs leading-snug text-foreground/70">
                     "Elevate tone for segment 1"
                   </p>
                 </div>
               </div>
-              <div className="flex items-start gap-4 p-5 border border-primary/10 bg-primary/5 hover:border-accent/40 hover:bg-accent/5 transition-all text-left group relative rounded-sm">
-                <div className="tech-bracket-tl w-2 h-2" />
-                <Languages className="w-6 h-6 text-primary mt-1 shrink-0 group-hover:text-accent transition-all" />
+              <div className="group relative flex items-start gap-4 rounded-sm border border-primary/10 bg-primary/5 p-5 text-left transition-all hover:border-accent/40 hover:bg-accent/5">
+                <div className="tech-bracket-tl h-2 w-2" />
+                <Languages className="mt-1 h-6 w-6 shrink-0 text-primary transition-all group-hover:text-accent" />
                 <div>
-                  <h4 className="font-tech text-xs text-primary/80 tracking-widest uppercase mb-2 font-bold">
+                  <h4 className="font-tech mb-2 text-xs font-bold uppercase tracking-widest text-primary/80">
                     Cipher Lingua
                   </h4>
-                  <p className="font-mono text-xs text-foreground/70 leading-snug">
+                  <p className="font-mono text-xs leading-snug text-foreground/70">
                     "Translate segment 3 to Hindi"
                   </p>
                 </div>
               </div>
-              <div className="flex items-start gap-4 p-5 border border-primary/10 bg-primary/5 hover:border-accent/40 hover:bg-accent/5 transition-all text-left group relative rounded-sm">
-                <div className="tech-bracket-tl w-2 h-2" />
-                <Eye className="w-6 h-6 text-primary mt-1 shrink-0 group-hover:text-accent transition-all" />
+              <div className="group relative flex items-start gap-4 rounded-sm border border-primary/10 bg-primary/5 p-5 text-left transition-all hover:border-accent/40 hover:bg-accent/5">
+                <div className="tech-bracket-tl h-2 w-2" />
+                <Eye className="mt-1 h-6 w-6 shrink-0 text-primary transition-all group-hover:text-accent" />
                 <div>
-                  <h4 className="font-tech text-xs text-primary/80 tracking-widest uppercase mb-2 font-bold">
+                  <h4 className="font-tech mb-2 text-xs font-bold uppercase tracking-widest text-primary/80">
                     Sensory Focus
                   </h4>
-                  <p className="font-mono text-xs text-foreground/70 leading-snug">
+                  <p className="font-mono text-xs leading-snug text-foreground/70">
                     "Activate Focus Mode"
                   </p>
                 </div>
@@ -238,32 +238,32 @@ const PreviewArea = ({
           </div>
         </div>
       ) : (
-        <div className="space-y-1 relative z-10">
-          <div className="flex flex-col border-b border-primary/20 pb-4 mb-6 gap-3">
+        <div className="relative z-10 space-y-1">
+          <div className="mb-6 flex flex-col gap-3 border-b border-primary/20 pb-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="flex flex-col">
-                  <span className="font-tech text-[8px] text-primary/40 tracking-[0.2em] mb-1">
+                  <span className="font-tech mb-1 text-[8px] tracking-[0.2em] text-primary/40">
                     DOCUMENT_ID
                   </span>
-                  <span className="font-mono text-[11px] text-primary tracking-tight">
+                  <span className="font-mono text-[11px] tracking-tight text-primary">
                     VCORE_
                     {Math.random().toString(36).substring(7).toUpperCase()}
                   </span>
                 </div>
-                <div className="w-[1px] h-8 bg-primary/10" />
+                <div className="h-8 w-[1px] bg-primary/10" />
                 <div className="flex flex-col">
-                  <span className="font-tech text-[8px] text-primary/40 tracking-[0.2em] mb-1">
+                  <span className="font-tech mb-1 text-[8px] tracking-[0.2em] text-primary/40">
                     SEGMENTS
                   </span>
-                  <span className="font-mono text-[11px] text-primary tracking-tight">
+                  <span className="font-mono text-[11px] tracking-tight text-primary">
                     {paragraphs.length}
                   </span>
                 </div>
               </div>
               {pageCount && (
-                <div className="px-3 py-1 border border-accent/20 bg-accent/5 rounded-sm">
-                  <span className="font-tech text-[9px] text-accent tracking-[0.2em]">
+                <div className="rounded-sm border border-accent/20 bg-accent/5 px-3 py-1">
+                  <span className="font-tech text-[9px] tracking-[0.2em] text-accent">
                     {pageCount} PG_UNITS
                   </span>
                 </div>
@@ -272,30 +272,30 @@ const PreviewArea = ({
 
             {/* Live Stats Bar */}
             <div className="flex flex-wrap gap-3 pt-2">
-              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/5 border border-primary/10 rounded-sm">
-                <Type className="w-3 h-3 text-accent/60" />
+              <div className="flex items-center gap-1.5 rounded-sm border border-primary/10 bg-primary/5 px-3 py-1.5">
+                <Type className="h-3 w-3 text-accent/60" />
                 <span className="font-mono text-[10px] text-primary/70">
                   {stats.wordCount.toLocaleString()}
                 </span>
-                <span className="font-tech text-[8px] text-primary/30 uppercase tracking-widest">
+                <span className="font-tech text-[8px] uppercase tracking-widest text-primary/30">
                   Words
                 </span>
               </div>
-              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/5 border border-primary/10 rounded-sm">
-                <AlignLeft className="w-3 h-3 text-accent/60" />
+              <div className="flex items-center gap-1.5 rounded-sm border border-primary/10 bg-primary/5 px-3 py-1.5">
+                <AlignLeft className="h-3 w-3 text-accent/60" />
                 <span className="font-mono text-[10px] text-primary/70">
                   {stats.sentenceCount}
                 </span>
-                <span className="font-tech text-[8px] text-primary/30 uppercase tracking-widest">
+                <span className="font-tech text-[8px] uppercase tracking-widest text-primary/30">
                   Sentences
                 </span>
               </div>
-              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/5 border border-primary/10 rounded-sm">
-                <Clock className="w-3 h-3 text-accent/60" />
+              <div className="flex items-center gap-1.5 rounded-sm border border-primary/10 bg-primary/5 px-3 py-1.5">
+                <Clock className="h-3 w-3 text-accent/60" />
                 <span className="font-mono text-[10px] text-primary/70">
                   ~{stats.readingMins} min
                 </span>
-                <span className="font-tech text-[8px] text-primary/30 uppercase tracking-widest">
+                <span className="font-tech text-[8px] uppercase tracking-widest text-primary/30">
                   Read
                 </span>
               </div>
@@ -303,8 +303,8 @@ const PreviewArea = ({
           </div>
 
           {/* Search Bar */}
-          <div className="relative flex items-center mb-4">
-            <Search className="absolute left-3 w-3.5 h-3.5 text-primary/30" />
+          <div className="relative mb-4 flex items-center">
+            <Search className="absolute left-3 h-3.5 w-3.5 text-primary/30" />
             <input
               type="text"
               value={searchQuery}
@@ -314,7 +314,7 @@ const PreviewArea = ({
               }}
               onKeyDown={handleSearchKey}
               placeholder="Search_Archive... (Enter = next match)"
-              className="w-full bg-primary/5 border border-primary/10 focus:border-accent/30 rounded-sm pl-9 pr-20 py-2 text-[11px] font-mono text-primary placeholder:text-primary/20 focus:outline-none transition-colors"
+              className="w-full rounded-sm border border-primary/10 bg-primary/5 py-2 pl-9 pr-20 font-mono text-[11px] text-primary transition-colors placeholder:text-primary/20 focus:border-accent/30 focus:outline-none"
             />
             {searchQuery && (
               <div className="absolute right-3 flex items-center gap-2">
@@ -329,7 +329,7 @@ const PreviewArea = ({
                     setMatchIndex(0);
                   }}
                 >
-                  <X className="w-3 h-3 text-primary/30 hover:text-primary transition-colors" />
+                  <X className="h-3 w-3 text-primary/30 transition-colors hover:text-primary" />
                 </button>
               </div>
             )}
@@ -347,34 +347,34 @@ const PreviewArea = ({
                 <div
                   key={i}
                   ref={(el) => (paraRefs.current[i] = el)}
-                  className={`group relative flex gap-4 py-3 px-2 border-l-2 border-transparent transition-all duration-300 ${
+                  className={`group relative flex gap-4 border-l-2 border-transparent px-2 py-3 transition-all duration-300 ${
                     isEditing
-                      ? "border-l-accent/80 bg-accent/5 rounded-r-lg"
+                      ? "rounded-r-lg border-l-accent/80 bg-accent/5"
                       : isSelectedForVoice
-                        ? "bg-accent/15 border-l-accent rounded-r-lg shadow-[0_0_20px_rgba(255,215,0,0.1)]"
+                        ? "rounded-r-lg border-l-accent bg-accent/15 shadow-[0_0_20px_rgba(255,215,0,0.1)]"
                         : isActive
-                          ? "bg-accent/10 border-l-accent rounded-r-lg"
+                          ? "rounded-r-lg border-l-accent bg-accent/10"
                           : isMatch
-                            ? "bg-accent/5 border-l-accent/30 rounded-r-lg"
+                            ? "rounded-r-lg border-l-accent/30 bg-accent/5"
                             : lastEditedIndices.includes(i)
-                              ? "bg-accent/5 border-l-accent/50 rounded-r-lg"
+                              ? "rounded-r-lg border-l-accent/50 bg-accent/5"
                               : "hover:border-primary/20"
                   }`}
                 >
                   {/* Paragraph number + Target indicator */}
-                  <div className="flex flex-col items-center gap-1 shrink-0 w-8">
+                  <div className="flex w-8 shrink-0 flex-col items-center gap-1">
                     <span
-                      className={`font-mono text-[10px] tabular-nums ${isSelectedForVoice ? "text-accent font-bold" : "text-primary/30"}`}
+                      className={`font-mono text-[10px] tabular-nums ${isSelectedForVoice ? "font-bold text-accent" : "text-primary/30"}`}
                     >
                       [{String(i + 1).padStart(2, "00")}]
                     </span>
                     {isSelectedForVoice && (
-                      <Target className="w-3 h-3 text-accent animate-pulse" />
+                      <Target className="h-3 w-3 animate-pulse text-accent" />
                     )}
                   </div>
 
                   {/* Content — view or edit */}
-                  <div className="flex-1 min-w-0">
+                  <div className="min-w-0 flex-1">
                     {isEditing ? (
                       <>
                         <textarea
@@ -389,21 +389,21 @@ const PreviewArea = ({
                           }}
                           onKeyDown={handleEditKeyDown}
                           rows={3}
-                          className="w-full bg-transparent border border-accent/20 focus:border-accent/50 rounded-sm px-3 py-2 font-body text-base text-foreground/90 leading-relaxed resize-none focus:outline-none transition-colors"
+                          className="w-full resize-none rounded-sm border border-accent/20 bg-transparent px-3 py-2 font-body text-base leading-relaxed text-foreground/90 transition-colors focus:border-accent/50 focus:outline-none"
                           style={{ minHeight: "4rem" }}
                         />
-                        <div className="flex items-center gap-2 mt-2">
+                        <div className="mt-2 flex items-center gap-2">
                           <button
                             onClick={commitEdit}
-                            className="flex items-center gap-1.5 px-3 py-1 text-[9px] font-tech uppercase tracking-widest text-accent border border-accent/30 bg-accent/10 hover:bg-accent/20 transition-all rounded-sm"
+                            className="font-tech flex items-center gap-1.5 rounded-sm border border-accent/30 bg-accent/10 px-3 py-1 text-[9px] uppercase tracking-widest text-accent transition-all hover:bg-accent/20"
                           >
-                            <Check className="w-3 h-3" /> Save · Ctrl+↵
+                            <Check className="h-3 w-3" /> Save · Ctrl+↵
                           </button>
                           <button
                             onClick={cancelEdit}
-                            className="flex items-center gap-1.5 px-3 py-1 text-[9px] font-tech uppercase tracking-widest text-primary/40 border border-primary/10 hover:text-primary hover:border-primary/30 transition-all rounded-sm"
+                            className="font-tech flex items-center gap-1.5 rounded-sm border border-primary/10 px-3 py-1 text-[9px] uppercase tracking-widest text-primary/40 transition-all hover:border-primary/30 hover:text-primary"
                           >
-                            <X className="w-3 h-3" /> Cancel · Esc
+                            <X className="h-3 w-3" /> Cancel · Esc
                           </button>
                           <span className="ml-auto font-mono text-[9px] text-primary/20">
                             {
@@ -421,15 +421,15 @@ const PreviewArea = ({
                         title={onParagraphEdit ? "Click to edit" : undefined}
                       >
                         <p
-                          className={`font-body text-base leading-relaxed transition-colors duration-200 pr-12 ${
+                          className={`pr-12 font-body text-base leading-relaxed transition-colors duration-200 ${
                             isSelectedForVoice
-                              ? "text-accent font-medium"
+                              ? "font-medium text-accent"
                               : "text-foreground/90 group-hover:text-foreground"
                           }`}
                           dangerouslySetInnerHTML={{ __html: para }}
                         />
 
-                        <div className="absolute top-0 right-0 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="absolute right-0 top-0 flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
                           {onSelectParagraph && (
                             <button
                               onClick={(e) => {
@@ -438,10 +438,10 @@ const PreviewArea = ({
                                   isSelectedForVoice ? null : i,
                                 );
                               }}
-                              className={`p-1.5 transition-all rounded-full ${
+                              className={`rounded-full p-1.5 transition-all ${
                                 isSelectedForVoice
-                                  ? "text-accent bg-accent/10 ring-1 ring-accent/30"
-                                  : "text-primary/30 hover:text-accent hover:bg-accent/10"
+                                  ? "bg-accent/10 text-accent ring-1 ring-accent/30"
+                                  : "text-primary/30 hover:bg-accent/10 hover:text-accent"
                               }`}
                               title={
                                 isSelectedForVoice
@@ -450,7 +450,7 @@ const PreviewArea = ({
                               }
                             >
                               <Target
-                                className={`w-3.5 h-3.5 ${isSelectedForVoice ? "animate-spin-slow" : ""}`}
+                                className={`h-3.5 w-3.5 ${isSelectedForVoice ? "animate-spin-slow" : ""}`}
                               />
                             </button>
                           )}
@@ -461,10 +461,10 @@ const PreviewArea = ({
                                 e.stopPropagation();
                                 startEdit(i, para);
                               }}
-                              className="p-1.5 text-primary/30 hover:text-accent hover:bg-accent/10 transition-all rounded-full"
+                              className="rounded-full p-1.5 text-primary/30 transition-all hover:bg-accent/10 hover:text-accent"
                               title="Manual edit"
                             >
-                              <Pencil className="w-3.5 h-3.5" />
+                              <Pencil className="h-3.5 w-3.5" />
                             </button>
                           )}
                         </div>

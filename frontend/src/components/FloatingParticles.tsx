@@ -31,11 +31,11 @@ const FloatingParticles = () => {
   }, []);
 
   return (
-    <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
       {particles.map((p) => (
         <div
           key={p.id}
-          className="absolute float-particle"
+          className="float-particle absolute"
           style={{
             left: p.left,
             top: p.top,

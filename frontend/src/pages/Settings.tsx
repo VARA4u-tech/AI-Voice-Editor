@@ -69,13 +69,13 @@ const SystemSettings = () => {
     <Layout title="Settings" subtitle="Control_Panel" icon={Settings}>
       <div className="space-y-10">
         <section className="space-y-6">
-          <h3 className="flex items-center gap-2 font-tech text-xs text-primary tracking-widest uppercase pb-2 border-b border-primary/10">
-            <Volume2 className="w-4 h-4 text-accent" />
+          <h3 className="font-tech flex items-center gap-2 border-b border-primary/10 pb-2 text-xs uppercase tracking-widest text-primary">
+            <Volume2 className="h-4 w-4 text-accent" />
             Audio_Configuration
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
             <div className="space-y-4">
-              <label className="block text-[10px] font-mono text-primary/40 uppercase">
+              <label className="block font-mono text-[10px] uppercase text-primary/40">
                 System Volume ({volume}%)
               </label>
               <input
@@ -84,11 +84,11 @@ const SystemSettings = () => {
                 max="100"
                 value={volume}
                 onChange={(e) => setVolume(parseInt(e.target.value))}
-                className="w-full transition-all accent-accent bg-primary/10"
+                className="w-full bg-primary/10 accent-accent transition-all"
               />
             </div>
             <div className="space-y-4">
-              <label className="block text-[10px] font-mono text-primary/40 uppercase">
+              <label className="block font-mono text-[10px] uppercase text-primary/40">
                 Ambience Saturation ({ambience}%)
               </label>
               <input
@@ -97,19 +97,19 @@ const SystemSettings = () => {
                 max="100"
                 value={ambience}
                 onChange={(e) => setAmbience(parseInt(e.target.value))}
-                className="w-full accent-primary bg-primary/10"
+                className="w-full bg-primary/10 accent-primary"
               />
             </div>
           </div>
         </section>
 
         <section className="space-y-6">
-          <h3 className="flex items-center gap-2 font-tech text-xs text-primary tracking-widest uppercase pb-2 border-b border-primary/10">
-            <Globe className="w-4 h-4 text-accent" />
+          <h3 className="font-tech flex items-center gap-2 border-b border-primary/10 pb-2 text-xs uppercase tracking-widest text-primary">
+            <Globe className="h-4 w-4 text-accent" />
             Language_Configuration
           </h3>
-          <div className="space-y-4 max-w-md">
-            <label className="block text-[10px] font-mono text-primary/40 uppercase">
+          <div className="max-w-md space-y-4">
+            <label className="block font-mono text-[10px] uppercase text-primary/40">
               Transcription Language
             </label>
             <select
@@ -118,7 +118,7 @@ const SystemSettings = () => {
                 playClick();
                 setLanguage(e.target.value);
               }}
-              className="w-full bg-primary/5 border border-primary/20 p-3 text-sm text-foreground focus:outline-none focus:border-accent font-tech tracking-wider rounded-sm"
+              className="font-tech w-full rounded-sm border border-primary/20 bg-primary/5 p-3 text-sm tracking-wider text-foreground focus:border-accent focus:outline-none"
             >
               <option className="bg-slate-900 text-foreground" value="en-US">
                 English (US)
@@ -146,30 +146,30 @@ const SystemSettings = () => {
         </section>
 
         <section className="space-y-6">
-          <h3 className="flex items-center gap-2 font-tech text-xs text-primary tracking-widest uppercase pb-2 border-b border-primary/10">
-            <Mic className="w-4 h-4 text-accent" />
+          <h3 className="font-tech flex items-center gap-2 border-b border-primary/10 pb-2 text-xs uppercase tracking-widest text-primary">
+            <Mic className="h-4 w-4 text-accent" />
             Voice_Engine_Options
           </h3>
           <div className="space-y-4">
             {options.map((option) => (
               <div
                 key={option.id}
-                className="flex justify-between items-start gap-8 p-4 border border-primary/5 bg-primary/5 rounded-sm"
+                className="flex items-start justify-between gap-8 rounded-sm border border-primary/5 bg-primary/5 p-4"
               >
                 <div>
-                  <h4 className="font-tech text-[10px] text-primary tracking-widest uppercase mb-1">
+                  <h4 className="font-tech mb-1 text-[10px] uppercase tracking-widest text-primary">
                     {option.label}
                   </h4>
-                  <p className="font-body text-[13px] text-foreground/60 italic">
+                  <p className="font-body text-[13px] italic text-foreground/60">
                     {option.desc}
                   </p>
                 </div>
                 <button
                   onClick={() => toggleOption(option.id)}
-                  className={`shrink-0 w-10 h-5 rounded-full relative transition-colors ${option.value ? "bg-accent/40" : "bg-primary/5 border border-primary/20"}`}
+                  className={`relative h-5 w-10 shrink-0 rounded-full transition-colors ${option.value ? "bg-accent/40" : "border border-primary/20 bg-primary/5"}`}
                 >
                   <div
-                    className={`absolute top-1 w-3 h-3 rounded-full transition-all ${option.value ? "right-1 bg-accent" : "left-1 bg-primary/40"}`}
+                    className={`absolute top-1 h-3 w-3 rounded-full transition-all ${option.value ? "right-1 bg-accent" : "left-1 bg-primary/40"}`}
                   />
                 </button>
               </div>
@@ -178,32 +178,32 @@ const SystemSettings = () => {
         </section>
 
         <section className="space-y-6">
-          <h3 className="flex items-center gap-2 font-tech text-xs text-primary tracking-widest uppercase pb-2 border-b border-primary/10">
-            <Palette className="w-4 h-4 text-accent" />
+          <h3 className="font-tech flex items-center gap-2 border-b border-primary/10 pb-2 text-xs uppercase tracking-widest text-primary">
+            <Palette className="h-4 w-4 text-accent" />
             Aesthetic_Manifestation
           </h3>
           <div className="flex gap-4">
             <div
-              className="w-10 h-10 rounded-sm border-2 border-accent bg-background cursor-pointer"
+              className="h-10 w-10 cursor-pointer rounded-sm border-2 border-accent bg-background"
               title="Emerald Protocol"
             />
             <div
-              className="w-10 h-10 rounded-sm border border-primary/20 bg-slate-900 cursor-pointer"
+              className="h-10 w-10 cursor-pointer rounded-sm border border-primary/20 bg-slate-900"
               title="Obsidian Core"
             />
             <div
-              className="w-10 h-10 rounded-sm border border-primary/20 bg-blue-950 cursor-pointer"
+              className="h-10 w-10 cursor-pointer rounded-sm border border-primary/20 bg-blue-950"
               title="Deep Azure"
             />
           </div>
         </section>
 
-        <div className="pt-8 flex justify-end">
+        <div className="flex justify-end pt-8">
           <button
             onClick={handleSave}
-            className="flex items-center gap-2 px-8 py-3 bg-accent/20 border border-accent/40 text-accent font-tech text-[11px] tracking-widest uppercase hover:bg-accent/30 transition-all group"
+            className="font-tech group flex items-center gap-2 border border-accent/40 bg-accent/20 px-8 py-3 text-[11px] uppercase tracking-widest text-accent transition-all hover:bg-accent/30"
           >
-            <Save className="w-4 h-4" />
+            <Save className="h-4 w-4" />
             Commit_Changes
           </button>
         </div>

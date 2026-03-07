@@ -77,57 +77,57 @@ const ChatWidget = ({ paragraphs, onChat }: ChatWidgetProps) => {
   };
 
   return (
-    <div className="fixed bottom-6 left-6 z-50 flex flex-col items-start animate-fade-in">
+    <div className="fixed bottom-6 left-6 z-50 flex animate-fade-in flex-col items-start">
       {/* Chat Window */}
       {isOpen && (
-        <div className="mb-4 w-[320px] sm:w-[380px] h-[450px] bg-slate-950/80 backdrop-blur-2xl border border-primary/20 rounded-lg shadow-2xl flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="mb-4 flex h-[450px] w-[320px] flex-col overflow-hidden rounded-lg border border-primary/20 bg-slate-950/80 shadow-2xl backdrop-blur-2xl duration-500 animate-in fade-in slide-in-from-bottom-4 sm:w-[380px]">
           {/* Header */}
-          <div className="p-4 border-b border-primary/10 bg-primary/5 flex items-center justify-between">
+          <div className="flex items-center justify-between border-b border-primary/10 bg-primary/5 p-4">
             <div className="flex items-center gap-3">
               <div className="relative">
-                <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center border border-accent/40">
-                  <Bot className="w-4 h-4 text-accent" />
+                <div className="flex h-8 w-8 items-center justify-center rounded-full border border-accent/40 bg-accent/20">
+                  <Bot className="h-4 w-4 text-accent" />
                 </div>
-                <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-slate-950 animate-pulse" />
+                <div className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 animate-pulse rounded-full border-2 border-slate-950 bg-emerald-500" />
               </div>
               <div>
-                <h3 className="text-[11px] font-tech tracking-[0.2em] text-primary uppercase">
+                <h3 className="font-tech text-[11px] uppercase tracking-[0.2em] text-primary">
                   Scribe_AI
                 </h3>
-                <p className="text-[9px] font-mono text-accent/60 uppercase">
+                <p className="font-mono text-[9px] uppercase text-accent/60">
                   Status: Core_Online
                 </p>
               </div>
             </div>
             <button
               onClick={() => setIsOpen(false)}
-              className="p-1 hover:bg-white/5 rounded-full transition-colors text-primary/40 hover:text-primary"
+              className="rounded-full p-1 text-primary/40 transition-colors hover:bg-white/5 hover:text-primary"
             >
-              <X className="w-4 h-4" />
+              <X className="h-4 w-4" />
             </button>
           </div>
 
           {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-hide">
+          <div className="scrollbar-hide flex-1 space-y-4 overflow-y-auto p-4">
             {messages.map((msg) => (
               <div
                 key={msg.id}
                 className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`max-w-[85%] p-3 rounded-sm text-[13px] font-body leading-relaxed ${
+                  className={`max-w-[85%] rounded-sm p-3 font-body text-[13px] leading-relaxed ${
                     msg.sender === "user"
-                      ? "bg-accent/10 border border-accent/20 text-foreground/90 ml-4"
-                      : "bg-white/5 border border-white/10 text-primary/90 mr-4"
-                  } relative group`}
+                      ? "ml-4 border border-accent/20 bg-accent/10 text-foreground/90"
+                      : "mr-4 border border-white/10 bg-white/5 text-primary/90"
+                  } group relative`}
                 >
                   {/* Decorative corner brackets for bot */}
                   {msg.sender === "bot" && (
-                    <div className="absolute -top-1 -left-1 w-2 h-2 border-t border-l border-primary/40" />
+                    <div className="absolute -left-1 -top-1 h-2 w-2 border-l border-t border-primary/40" />
                   )}
                   {msg.text}
                   <div
-                    className={`mt-1 text-[8px] font-mono opacity-30 ${msg.sender === "user" ? "text-right" : "text-left"}`}
+                    className={`mt-1 font-mono text-[8px] opacity-30 ${msg.sender === "user" ? "text-right" : "text-left"}`}
                   >
                     {msg.timestamp.toLocaleTimeString([], {
                       hour: "2-digit",
@@ -139,10 +139,10 @@ const ChatWidget = ({ paragraphs, onChat }: ChatWidgetProps) => {
             ))}
             {isTyping && (
               <div className="flex justify-start">
-                <div className="bg-white/5 border border-white/10 p-3 rounded-sm flex gap-1">
-                  <div className="w-1 h-1 bg-primary/40 rounded-full animate-bounce" />
-                  <div className="w-1 h-1 bg-primary/40 rounded-full animate-bounce [animation-delay:0.2s]" />
-                  <div className="w-1 h-1 bg-primary/40 rounded-full animate-bounce [animation-delay:0.4s]" />
+                <div className="flex gap-1 rounded-sm border border-white/10 bg-white/5 p-3">
+                  <div className="h-1 w-1 animate-bounce rounded-full bg-primary/40" />
+                  <div className="h-1 w-1 animate-bounce rounded-full bg-primary/40 [animation-delay:0.2s]" />
+                  <div className="h-1 w-1 animate-bounce rounded-full bg-primary/40 [animation-delay:0.4s]" />
                 </div>
               </div>
             )}
@@ -150,7 +150,7 @@ const ChatWidget = ({ paragraphs, onChat }: ChatWidgetProps) => {
           </div>
 
           {/* Input Area */}
-          <div className="p-3 bg-primary/5 border-t border-primary/10">
+          <div className="border-t border-primary/10 bg-primary/5 p-3">
             <div className="relative flex items-center">
               <input
                 type="text"
@@ -158,14 +158,14 @@ const ChatWidget = ({ paragraphs, onChat }: ChatWidgetProps) => {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSend()}
                 placeholder="Transmitting signal..."
-                className="w-full bg-slate-900/50 border border-primary/20 rounded-md py-2 pl-3 pr-10 text-[12px] font-mono text-primary placeholder:text-primary/20 focus:outline-none focus:border-accent/40 transition-colors"
+                className="w-full rounded-md border border-primary/20 bg-slate-900/50 py-2 pl-3 pr-10 font-mono text-[12px] text-primary transition-colors placeholder:text-primary/20 focus:border-accent/40 focus:outline-none"
               />
               <button
                 onClick={handleSend}
-                className="absolute right-2 p-1.5 text-accent hover:text-primary transition-colors"
+                className="absolute right-2 p-1.5 text-accent transition-colors hover:text-primary"
                 title="Send Transmission"
               >
-                <Send className="w-3.5 h-3.5" />
+                <Send className="h-3.5 w-3.5" />
               </button>
             </div>
           </div>
@@ -178,25 +178,25 @@ const ChatWidget = ({ paragraphs, onChat }: ChatWidgetProps) => {
           setIsOpen(!isOpen);
           if (!isOpen) playStart();
         }}
-        className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500 shadow-2xl relative group ${
+        className={`group relative flex h-14 w-14 items-center justify-center rounded-full shadow-2xl transition-all duration-500 ${
           isOpen
-            ? "bg-accent/20 border border-accent/40 rotate-90"
-            : "bg-slate-950 border border-primary/30 hover:border-accent hover:scale-110 active:scale-95"
+            ? "rotate-90 border border-accent/40 bg-accent/20"
+            : "border border-primary/30 bg-slate-950 hover:scale-110 hover:border-accent active:scale-95"
         }`}
       >
-        <div className="absolute inset-0 rounded-full bg-accent/5 animate-ping opacity-20 pointer-events-none" />
+        <div className="pointer-events-none absolute inset-0 animate-ping rounded-full bg-accent/5 opacity-20" />
         {isOpen ? (
-          <X className="w-6 h-6 text-primary" />
+          <X className="h-6 w-6 text-primary" />
         ) : (
           <div className="relative">
-            <MessageSquare className="w-6 h-6 text-primary group-hover:text-accent transition-colors" />
-            <Sparkles className="absolute -top-1 -right-1 w-3 h-3 text-accent animate-pulse" />
+            <MessageSquare className="h-6 w-6 text-primary transition-colors group-hover:text-accent" />
+            <Sparkles className="absolute -right-1 -top-1 h-3 w-3 animate-pulse text-accent" />
           </div>
         )}
 
         {/* HUD Elements around button */}
         {!isOpen && (
-          <div className="absolute inset-[-4px] border border-primary/10 rounded-full border-dashed animate-[spin_10s_linear_infinite]" />
+          <div className="absolute inset-[-4px] animate-[spin_10s_linear_infinite] rounded-full border border-dashed border-primary/10" />
         )}
       </button>
     </div>

@@ -91,18 +91,18 @@ const SessionHistory = () => {
   return (
     <Layout title="History" subtitle="Ritual_Logs" icon={History}>
       <div className="space-y-8">
-        <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
+        <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
           {/* View Toggle */}
-          <div className="flex bg-primary/5 p-1 rounded-sm border border-primary/20">
+          <div className="flex rounded-sm border border-primary/20 bg-primary/5 p-1">
             <button
               onClick={() => setView("documents")}
-              className={`px-4 py-2 text-[10px] font-tech uppercase tracking-widest transition-all ${view === "documents" ? "bg-accent/20 text-accent" : "text-primary/40 hover:text-primary"}`}
+              className={`font-tech px-4 py-2 text-[10px] uppercase tracking-widest transition-all ${view === "documents" ? "bg-accent/20 text-accent" : "text-primary/40 hover:text-primary"}`}
             >
               Active_Scrolls
             </button>
             <button
               onClick={() => setView("activity")}
-              className={`px-4 py-2 text-[10px] font-tech uppercase tracking-widest transition-all ${view === "activity" ? "bg-accent/20 text-accent" : "text-primary/40 hover:text-primary"}`}
+              className={`font-tech px-4 py-2 text-[10px] uppercase tracking-widest transition-all ${view === "activity" ? "bg-accent/20 text-accent" : "text-primary/40 hover:text-primary"}`}
             >
               Neural_Logs
             </button>
@@ -110,13 +110,13 @@ const SessionHistory = () => {
 
           {/* Search Header */}
           <div className="relative w-full md:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/40" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary/40" />
             <input
               type="text"
               placeholder="Search_Archives..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-primary/5 border border-primary/20 rounded-sm py-2 pl-10 pr-4 text-[11px] font-mono text-primary placeholder:text-primary/20 focus:outline-none focus:border-accent/40 transition-colors"
+              className="w-full rounded-sm border border-primary/20 bg-primary/5 py-2 pl-10 pr-4 font-mono text-[11px] text-primary transition-colors placeholder:text-primary/20 focus:border-accent/40 focus:outline-none"
             />
           </div>
         </div>
@@ -125,7 +125,7 @@ const SessionHistory = () => {
         <div className="space-y-4">
           {loading ? (
             <div className="flex justify-center py-20">
-              <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+              <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
             </div>
           ) : view === "documents" ? (
             documents.length > 0 ? (
@@ -145,17 +145,17 @@ const SessionHistory = () => {
                   return (
                     <div
                       key={doc.id}
-                      className="group p-5 border border-primary/10 bg-primary/5 rounded-sm hover:border-accent/40 transition-all duration-300 relative overflow-hidden"
+                      className="group relative overflow-hidden rounded-sm border border-primary/10 bg-primary/5 p-5 transition-all duration-300 hover:border-accent/40"
                     >
-                      <div className="absolute top-0 left-0 w-1 h-full bg-primary/20 group-hover:bg-accent transition-colors" />
-                      <div className="flex justify-between items-center gap-4">
-                        <div className="flex items-center gap-4 min-w-0">
-                          <FileText className="w-5 h-5 text-primary/60 shrink-0" />
+                      <div className="absolute left-0 top-0 h-full w-1 bg-primary/20 transition-colors group-hover:bg-accent" />
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="flex min-w-0 items-center gap-4">
+                          <FileText className="h-5 w-5 shrink-0 text-primary/60" />
                           <div className="min-w-0">
-                            <h4 className="font-heading text-sm text-primary uppercase truncate">
+                            <h4 className="truncate font-heading text-sm uppercase text-primary">
                               {displayName}
                             </h4>
-                            <div className="flex flex-wrap gap-3 text-[10px] font-mono text-primary/40 mt-0.5">
+                            <div className="mt-0.5 flex flex-wrap gap-3 font-mono text-[10px] text-primary/40">
                               <span>
                                 {new Date(doc.updated_at).toLocaleString()}
                               </span>
@@ -176,25 +176,25 @@ const SessionHistory = () => {
                         </div>
                         <button
                           onClick={() => handleRestore(doc)}
-                          className="shrink-0 p-2 bg-accent/10 border border-accent/20 text-accent hover:bg-accent/20 transition-all rounded-sm flex items-center gap-2 text-[10px] font-tech uppercase tracking-widest"
+                          className="font-tech flex shrink-0 items-center gap-2 rounded-sm border border-accent/20 bg-accent/10 p-2 text-[10px] uppercase tracking-widest text-accent transition-all hover:bg-accent/20"
                         >
-                          <RotateCcw className="w-3 h-3" /> Restore
+                          <RotateCcw className="h-3 w-3" /> Restore
                         </button>
                       </div>
                     </div>
                   );
                 })
             ) : (
-              <div className="text-center py-20 border border-dashed border-primary/10 rounded-sm space-y-3">
-                <p className="font-mono text-[10px] text-primary/40 uppercase tracking-widest">
+              <div className="space-y-3 rounded-sm border border-dashed border-primary/10 py-20 text-center">
+                <p className="font-mono text-[10px] uppercase tracking-widest text-primary/40">
                   // No scrolls indexed //
                 </p>
                 {!user ? (
-                  <p className="font-body text-xs text-primary/30 italic">
+                  <p className="font-body text-xs italic text-primary/30">
                     Sign in to auto-save uploaded documents to your history.
                   </p>
                 ) : (
-                  <p className="font-body text-xs text-primary/30 italic">
+                  <p className="font-body text-xs italic text-primary/30">
                     Upload a PDF or TXT — it will appear here automatically.
                   </p>
                 )}
@@ -204,18 +204,18 @@ const SessionHistory = () => {
             logs.map((log) => (
               <div
                 key={log.id}
-                className="group p-4 border border-primary/10 bg-primary/5 rounded-sm relative overflow-hidden"
+                className="group relative overflow-hidden rounded-sm border border-primary/10 bg-primary/5 p-4"
               >
                 <div className="flex items-start gap-4">
-                  <Mic className="w-4 h-4 text-accent/60 mt-1" />
+                  <Mic className="mt-1 h-4 w-4 text-accent/60" />
                   <div>
-                    <h4 className="text-[11px] font-tech text-primary uppercase tracking-widest">
+                    <h4 className="font-tech text-[11px] uppercase tracking-widest text-primary">
                       {log.command_type}
                     </h4>
-                    <p className="text-xs font-body text-foreground/70 italic my-1">
+                    <p className="my-1 font-body text-xs italic text-foreground/70">
                       "{log.transcript}"
                     </p>
-                    <span className="text-[9px] font-mono text-primary/30">
+                    <span className="font-mono text-[9px] text-primary/30">
                       {new Date(log.created_at).toLocaleString()}
                     </span>
                   </div>
@@ -223,8 +223,8 @@ const SessionHistory = () => {
               </div>
             ))
           ) : (
-            <div className="text-center py-20 border border-dashed border-primary/10 rounded-sm">
-              <p className="font-mono text-[10px] text-primary/40 uppercase tracking-widest">
+            <div className="rounded-sm border border-dashed border-primary/10 py-20 text-center">
+              <p className="font-mono text-[10px] uppercase tracking-widest text-primary/40">
                 // Neural logs empty //
               </p>
             </div>

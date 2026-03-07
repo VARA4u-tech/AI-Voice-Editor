@@ -2,26 +2,26 @@ import React from "react";
 
 const MysticalBackground = () => {
   return (
-    <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
       {/* Ambient glowing deep-sea/emerald orbs */}
-      <div className="absolute top-[-10%] left-[-10%] w-[60vw] h-[60vw] bg-accent/5 rounded-full blur-[120px] mix-blend-screen animate-[pulse_8s_ease-in-out_infinite_alternate]" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] bg-primary/5 rounded-full blur-[140px] mix-blend-screen animate-[pulse_12s_ease-in-out_infinite_alternate-reverse]" />
+      <div className="absolute left-[-10%] top-[-10%] h-[60vw] w-[60vw] animate-[pulse_8s_ease-in-out_infinite_alternate] rounded-full bg-accent/5 mix-blend-screen blur-[120px]" />
+      <div className="absolute bottom-[-10%] right-[-10%] h-[50vw] w-[50vw] animate-[pulse_12s_ease-in-out_infinite_alternate-reverse] rounded-full bg-primary/5 mix-blend-screen blur-[140px]" />
 
       {/* Modern Tech Elements */}
-      <div className="absolute inset-0 digital-grid opacity-5" />
+      <div className="digital-grid absolute inset-0 opacity-5" />
       <div className="scanline" />
 
       {/* Modern Tech Nodes Background */}
-      <div className="absolute inset-0 opacity-10 digital-nodes-bg mix-blend-screen" />
+      <div className="digital-nodes-bg absolute inset-0 opacity-10 mix-blend-screen" />
 
       {/* Sweeping ethereal glow */}
-      <div className="absolute inset-x-0 top-1/4 h-1/2 bg-primary/2 blur-[120px] rounded-[100%] animate-[pulse_15s_ease-in-out_infinite_alternate] mix-blend-screen opacity-20" />
+      <div className="bg-primary/2 absolute inset-x-0 top-1/4 h-1/2 animate-[pulse_15s_ease-in-out_infinite_alternate] rounded-[100%] opacity-20 mix-blend-screen blur-[120px]" />
 
       {/* Central Neural Audio Core / Voice Matrix */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150vw] sm:w-[100vw] max-w-[900px] aspect-square opacity-[0.08] animate-[spin_300s_linear_infinite]">
+      <div className="absolute left-1/2 top-1/2 aspect-square w-[150vw] max-w-[900px] -translate-x-1/2 -translate-y-1/2 animate-[spin_300s_linear_infinite] opacity-[0.08] sm:w-[100vw]">
         <svg
           viewBox="0 0 500 500"
-          className="w-full h-full text-primary stroke-current fill-none"
+          className="h-full w-full fill-none stroke-current text-primary"
         >
           {/* Outer tech boundaries */}
           <circle
@@ -100,16 +100,16 @@ const MysticalBackground = () => {
             cy="250"
             r="10"
             fill="currentColor"
-            className="text-accent animate-pulse"
+            className="animate-pulse text-accent"
           />
         </svg>
       </div>
 
       {/* Secondary Counter-rotating HUD Ring */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120vw] sm:w-[80vw] max-w-[700px] aspect-square opacity-[0.05] animate-[spin_180s_reverse_linear_infinite]">
+      <div className="absolute left-1/2 top-1/2 aspect-square w-[120vw] max-w-[700px] -translate-x-1/2 -translate-y-1/2 animate-[spin_180s_reverse_linear_infinite] opacity-[0.05] sm:w-[80vw]">
         <svg
           viewBox="0 0 500 500"
-          className="w-full h-full text-accent stroke-current fill-none"
+          className="h-full w-full fill-none stroke-current text-accent"
         >
           <circle
             cx="250"

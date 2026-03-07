@@ -100,8 +100,8 @@ const Signup = () => {
 
   return (
     <Layout title="Initiation" subtitle="Auth_Terminal" icon={ShieldCheck}>
-      <div className="max-w-md mx-auto space-y-8">
-        <div className="text-center space-y-2">
+      <div className="mx-auto max-w-md space-y-8">
+        <div className="space-y-2 text-center">
           <p className="font-body text-sm italic text-foreground/60">
             Register your biometric signals with the Gilded Scribe.
           </p>
@@ -110,30 +110,30 @@ const Signup = () => {
         <form onSubmit={handleSignup} className="space-y-6">
           <div className="space-y-4">
             <div className="relative">
-              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/40" />
+              <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary/40" />
               <input
                 type="text"
                 placeholder="Identity_Name"
                 value={fullName}
                 onChange={handleFullNameChange}
                 required
-                className="w-full bg-primary/5 border border-primary/20 rounded-sm py-3 pl-10 pr-4 text-xs font-mono text-primary placeholder:text-primary/20 focus:outline-none focus:border-accent/40 transition-colors"
+                className="w-full rounded-sm border border-primary/20 bg-primary/5 py-3 pl-10 pr-4 font-mono text-xs text-primary transition-colors placeholder:text-primary/20 focus:border-accent/40 focus:outline-none"
               />
             </div>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/40" />
+              <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary/40" />
               <input
                 type="email"
                 placeholder="Email_Hash"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full bg-primary/5 border border-primary/20 rounded-sm py-3 pl-10 pr-4 text-xs font-mono text-primary placeholder:text-primary/20 focus:outline-none focus:border-accent/40 transition-colors"
+                className="w-full rounded-sm border border-primary/20 bg-primary/5 py-3 pl-10 pr-4 font-mono text-xs text-primary transition-colors placeholder:text-primary/20 focus:border-accent/40 focus:outline-none"
               />
             </div>
-            <div className="relative group/pass">
+            <div className="group/pass relative">
               <Lock
-                className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${strength === 100 ? "text-emerald-400" : strength > 0 ? "text-accent" : "text-primary/40"}`}
+                className={`absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors ${strength === 100 ? "text-emerald-400" : strength > 0 ? "text-accent" : "text-primary/40"}`}
               />
               <input
                 type="password"
@@ -141,18 +141,18 @@ const Signup = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className={`w-full bg-primary/5 border rounded-sm py-3 pl-10 pr-4 text-xs font-mono text-primary placeholder:text-primary/20 focus:outline-none transition-all ${strength === 100 ? "border-emerald-500/40 focus:border-emerald-500/60" : strength > 0 ? "border-accent/40 focus:border-accent/60" : "border-primary/20 focus:border-accent/40"}`}
+                className={`w-full rounded-sm border bg-primary/5 py-3 pl-10 pr-4 font-mono text-xs text-primary transition-all placeholder:text-primary/20 focus:outline-none ${strength === 100 ? "border-emerald-500/40 focus:border-emerald-500/60" : strength > 0 ? "border-accent/40 focus:border-accent/60" : "border-primary/20 focus:border-accent/40"}`}
               />
               {/* Strength Meter Bar */}
               <div
-                className="absolute bottom-0 left-0 h-[2px] bg-emerald-500 transition-all duration-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"
+                className="absolute bottom-0 left-0 h-[2px] bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] transition-all duration-500"
                 style={{ width: `${strength}%` }}
               />
             </div>
 
-            <div className="relative group/confirm">
+            <div className="group/confirm relative">
               <Lock
-                className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 transition-colors ${passwordsMatch ? "text-emerald-400" : showMismatch ? "text-red-400 animate-pulse" : "text-primary/40"}`}
+                className={`absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors ${passwordsMatch ? "text-emerald-400" : showMismatch ? "animate-pulse text-red-400" : "text-primary/40"}`}
               />
               <input
                 type="password"
@@ -160,11 +160,11 @@ const Signup = () => {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
-                className={`w-full bg-primary/5 border rounded-sm py-3 pl-10 pr-4 text-xs font-mono text-primary placeholder:text-primary/20 focus:outline-none transition-all ${passwordsMatch ? "border-emerald-500/40 focus:border-emerald-500/60 shadow-[0_0_15px_rgba(16,185,129,0.1)]" : showMismatch ? "border-red-500/40 focus:border-red-500/60 animate-shake" : "border-primary/20 focus:border-accent/40"}`}
+                className={`w-full rounded-sm border bg-primary/5 py-3 pl-10 pr-4 font-mono text-xs text-primary transition-all placeholder:text-primary/20 focus:outline-none ${passwordsMatch ? "border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.1)] focus:border-emerald-500/60" : showMismatch ? "animate-shake border-red-500/40 focus:border-red-500/60" : "border-primary/20 focus:border-accent/40"}`}
               />
               {showMismatch && (
                 <div className="absolute -bottom-5 left-0 w-full text-center">
-                  <span className="text-[8px] font-tech text-red-500 uppercase tracking-widest animate-pulse">
+                  <span className="font-tech animate-pulse text-[8px] uppercase tracking-widest text-red-500">
                     Neural_Signal_Mismatch
                   </span>
                 </div>
@@ -175,13 +175,13 @@ const Signup = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full flex items-center justify-center gap-2 py-4 bg-accent/20 border border-accent/40 text-accent font-tech text-[11px] tracking-widest uppercase hover:bg-accent/30 transition-all group disabled:opacity-50"
+            className="font-tech group flex w-full items-center justify-center gap-2 border border-accent/40 bg-accent/20 py-4 text-[11px] uppercase tracking-widest text-accent transition-all hover:bg-accent/30 disabled:opacity-50"
           >
             {loading ? (
-              <div className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-accent border-t-transparent" />
             ) : (
               <>
-                Sign_Up_Scribe <UserPlus className="w-4 h-4" />
+                Sign_Up_Scribe <UserPlus className="h-4 w-4" />
               </>
             )}
           </button>
@@ -190,7 +190,7 @@ const Signup = () => {
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t border-accent/10" />
             </div>
-            <div className="relative flex justify-center text-[8px] uppercase tracking-widest font-tech">
+            <div className="font-tech relative flex justify-center text-[8px] uppercase tracking-widest">
               <span className="bg-background px-4 text-primary/40">
                 Alternative_Auth_Protocols
               </span>
@@ -200,9 +200,9 @@ const Signup = () => {
           <button
             type="button"
             onClick={handleGoogleAuth}
-            className="w-full flex items-center justify-center gap-3 py-3 bg-white/5 border border-white/10 text-white/80 font-tech text-[10px] tracking-widest uppercase hover:bg-white/10 transition-all group"
+            className="font-tech group flex w-full items-center justify-center gap-3 border border-white/10 bg-white/5 py-3 text-[10px] uppercase tracking-widest text-white/80 transition-all hover:bg-white/10"
           >
-            <svg className="w-4 h-4" viewBox="0 0 24 24">
+            <svg className="h-4 w-4" viewBox="0 0 24 24">
               <path
                 fill="currentColor"
                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -227,7 +227,7 @@ const Signup = () => {
         <div className="pt-4 text-center">
           <Link
             to="/login"
-            className="text-[10px] font-mono text-primary/40 hover:text-primary uppercase tracking-widest transition-colors"
+            className="font-mono text-[10px] uppercase tracking-widest text-primary/40 transition-colors hover:text-primary"
           >
             // Switch to Login_Link
           </Link>

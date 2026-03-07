@@ -100,13 +100,13 @@ const SmartSuggestions = ({
 
   return (
     <div className="w-full max-w-4xl animate-fade-in">
-      <div className="flex items-center gap-2 mb-3">
-        <Sparkles className="w-3 h-3 text-accent/60" />
-        <span className="font-tech text-[9px] text-primary/40 tracking-[0.25em] uppercase">
+      <div className="mb-3 flex items-center gap-2">
+        <Sparkles className="h-3 w-3 text-accent/60" />
+        <span className="font-tech text-[9px] uppercase tracking-[0.25em] text-primary/40">
           Neural_Suggestions
         </span>
         {loading && (
-          <Loader2 className="w-3 h-3 text-accent/40 animate-spin ml-1" />
+          <Loader2 className="ml-1 h-3 w-3 animate-spin text-accent/40" />
         )}
       </div>
 
@@ -116,7 +116,7 @@ const SmartSuggestions = ({
             [0, 1, 2].map((i) => (
               <div
                 key={i}
-                className="h-8 w-36 bg-primary/5 border border-primary/10 rounded-sm animate-pulse"
+                className="h-8 w-36 animate-pulse rounded-sm border border-primary/10 bg-primary/5"
                 style={{ animationDelay: `${i * 100}ms` }}
               />
             ))
@@ -125,13 +125,10 @@ const SmartSuggestions = ({
                 <button
                   key={i}
                   onClick={() => onSuggestionClick(s)}
-                  className="flex items-center gap-1.5 px-4 py-2 text-[10px] font-mono
-                border border-primary/15 bg-primary/5 text-primary/70
-                hover:border-accent/40 hover:bg-accent/10 hover:text-accent
-                transition-all duration-300 rounded-sm group"
+                  className="group flex items-center gap-1.5 rounded-sm border border-primary/15 bg-primary/5 px-4 py-2 font-mono text-[10px] text-primary/70 transition-all duration-300 hover:border-accent/40 hover:bg-accent/10 hover:text-accent"
                   style={{ animationDelay: `${i * 80}ms` }}
                 >
-                  <ChevronRight className="w-3 h-3 opacity-40 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+                  <ChevronRight className="h-3 w-3 opacity-40 transition-all group-hover:translate-x-0.5 group-hover:opacity-100" />
                   {s}
                 </button>
               ))

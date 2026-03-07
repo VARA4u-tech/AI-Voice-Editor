@@ -18,10 +18,10 @@ const MoonPhaseAnimation = () => {
   }, []);
 
   return (
-    <div className="flex items-center justify-center gap-2 mt-2">
+    <div className="mt-2 flex items-center justify-center gap-2">
       {/* Left stars */}
       <span
-        className="text-xs select-none"
+        className="select-none text-xs"
         style={{
           color: "#bf953f",
           opacity: 0.5,
@@ -36,7 +36,7 @@ const MoonPhaseAnimation = () => {
         ✦
       </span>
       <span
-        className="text-[9px] -mt-3 select-none"
+        className="-mt-3 select-none text-[9px]"
         style={{
           color: "#bf953f",
           opacity: 0.35,
@@ -52,7 +52,7 @@ const MoonPhaseAnimation = () => {
 
       {/* Moon glyph */}
       <span
-        className="text-4xl leading-none select-none transition-all duration-500"
+        className="select-none text-4xl leading-none transition-all duration-500"
         style={{
           opacity,
           filter: `
@@ -68,7 +68,7 @@ const MoonPhaseAnimation = () => {
 
       {/* Right stars */}
       <span
-        className="text-[9px] -mt-3 select-none"
+        className="-mt-3 select-none text-[9px]"
         style={{
           color: "#bf953f",
           opacity: 0.35,
@@ -82,7 +82,7 @@ const MoonPhaseAnimation = () => {
         ✧
       </span>
       <span
-        className="text-xs select-none"
+        className="select-none text-xs"
         style={{
           color: "#bf953f",
           opacity: 0.5,

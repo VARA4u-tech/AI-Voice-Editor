@@ -15,13 +15,13 @@ const Terms = () => {
       subtitle="Standard_Usage_Protocol"
       icon={Scale}
     >
-      <div className="space-y-12 animate-fade-in px-2 max-w-4xl mx-auto">
+      <div className="mx-auto max-w-4xl animate-fade-in space-y-12 px-2">
         {/* Intro */}
-        <section className="text-center space-y-4">
-          <h3 className="font-tech text-xl text-primary tracking-[0.3em] uppercase gold-text-glow font-bold">
+        <section className="space-y-4 text-center">
+          <h3 className="font-tech gold-text-glow text-xl font-bold uppercase tracking-[0.3em] text-primary">
             The Scribe Service Accord
           </h3>
-          <p className="font-body text-base text-foreground/80 leading-relaxed italic">
+          <p className="font-body text-base italic leading-relaxed text-foreground/80">
             By syncing your student profile with the Scribe neural network, you
             agree to maintain the integrity of the academic collective. Our
             tools are for assistance, not automation.
@@ -29,43 +29,43 @@ const Terms = () => {
         </section>
 
         {/* Core items */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
           <section className="space-y-6">
-            <h4 className="flex items-center gap-3 font-tech text-xs text-primary tracking-widest uppercase mb-4 font-bold border-b border-primary/10 pb-2">
-              <CheckCircle2 className="w-4 h-4 text-accent" />{" "}
+            <h4 className="font-tech mb-4 flex items-center gap-3 border-b border-primary/10 pb-2 text-xs font-bold uppercase tracking-widest text-primary">
+              <CheckCircle2 className="h-4 w-4 text-accent" />{" "}
               Permitted_Operations
             </h4>
-            <div className="font-mono text-[11px] text-primary/70 space-y-6">
-              <div className="p-3 border-l-2 border-accent/20 bg-accent/5">
+            <div className="space-y-6 font-mono text-[11px] text-primary/70">
+              <div className="border-l-2 border-accent/20 bg-accent/5 p-3">
                 <p>• Editing and refining original student coursework.</p>
               </div>
-              <div className="p-3 border-l-2 border-accent/20 bg-accent/5">
+              <div className="border-l-2 border-accent/20 bg-accent/5 p-3">
                 <p>• Formatting research papers for academic submission.</p>
               </div>
-              <div className="p-3 border-l-2 border-accent/20 bg-accent/5">
+              <div className="border-l-2 border-accent/20 bg-accent/5 p-3">
                 <p>• Summarizing personal lecture notes and study guides.</p>
               </div>
-              <div className="p-3 border-l-2 border-accent/20 bg-accent/5">
+              <div className="border-l-2 border-accent/20 bg-accent/5 p-3">
                 <p>• Utilizing voice commands for hands-free study sessions.</p>
               </div>
             </div>
           </section>
 
           <section className="space-y-6">
-            <h4 className="flex items-center gap-3 font-tech text-xs text-primary tracking-widest uppercase mb-4 font-bold border-b border-primary/10 pb-2">
-              <AlertOctagon className="w-4 h-4 text-accent" /> Restricted_Logic
+            <h4 className="font-tech mb-4 flex items-center gap-3 border-b border-primary/10 pb-2 text-xs font-bold uppercase tracking-widest text-primary">
+              <AlertOctagon className="h-4 w-4 text-accent" /> Restricted_Logic
             </h4>
-            <div className="font-mono text-[11px] text-primary/70 space-y-6">
-              <div className="p-3 border-l-2 border-primary/20 bg-primary/5">
+            <div className="space-y-6 font-mono text-[11px] text-primary/70">
+              <div className="border-l-2 border-primary/20 bg-primary/5 p-3">
                 <p>• Reverse engineering the Scribe neural protocols.</p>
               </div>
-              <div className="p-3 border-l-2 border-primary/20 bg-primary/5">
+              <div className="border-l-2 border-primary/20 bg-primary/5 p-3">
                 <p>• Automating high-volume academic dishonesty.</p>
               </div>
-              <div className="p-3 border-l-2 border-primary/20 bg-primary/5">
+              <div className="border-l-2 border-primary/20 bg-primary/5 p-3">
                 <p>• Unauthorized extraction of other users' metadata.</p>
               </div>
-              <div className="p-3 border-l-2 border-primary/20 bg-primary/5">
+              <div className="border-l-2 border-primary/20 bg-primary/5 p-3">
                 <p>• Injecting malicious payloads into the document engine.</p>
               </div>
             </div>
@@ -73,17 +73,17 @@ const Terms = () => {
         </div>
 
         {/* Global Compliance */}
-        <section className="p-6 border border-primary/10 bg-primary/5 rounded-sm flex flex-col items-center gap-6">
-          <div className="flex items-center gap-12 sm:gap-24 opacity-40">
-            <Globe className="w-8 h-8 text-primary" />
-            <Terminal className="w-8 h-8 text-accent" />
-            <FileText className="w-8 h-8 text-primary" />
+        <section className="flex flex-col items-center gap-6 rounded-sm border border-primary/10 bg-primary/5 p-6">
+          <div className="flex items-center gap-12 opacity-40 sm:gap-24">
+            <Globe className="h-8 w-8 text-primary" />
+            <Terminal className="h-8 w-8 text-accent" />
+            <FileText className="h-8 w-8 text-primary" />
           </div>
-          <div className="text-center space-y-3">
-            <h4 className="font-tech text-xs text-primary/80 tracking-[0.4em] uppercase font-bold">
+          <div className="space-y-3 text-center">
+            <h4 className="font-tech text-xs font-bold uppercase tracking-[0.4em] text-primary/80">
               Global_Sync_Protocol
             </h4>
-            <p className="font-body text-[11px] text-foreground/50 leading-relaxed italic max-w-2xl mx-auto">
+            <p className="mx-auto max-w-2xl font-body text-[11px] italic leading-relaxed text-foreground/50">
               Scribe operates under the laws of MDXXVI. Any misuse for harmful
               academic fraud will result in an immediate and irreversible neural
               link termination. Always prioritize original scholarship.
@@ -92,10 +92,10 @@ const Terms = () => {
         </section>
 
         {/* Footer info */}
-        <section className="text-center py-6 border-t border-primary/10">
-          <p className="font-mono text-[10px] text-primary/40 uppercase tracking-widest">
+        <section className="border-t border-primary/10 py-6 text-center">
+          <p className="font-mono text-[10px] uppercase tracking-widest text-primary/40">
             Last Updated //{" "}
-            <span className="text-accent underline cursor-pointer">
+            <span className="cursor-pointer text-accent underline">
               MDXXVI_MAR_03
             </span>
           </p>

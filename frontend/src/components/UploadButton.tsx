@@ -14,22 +14,15 @@ const UploadButton = ({ onUpload, hasFile, fileName }: UploadButtonProps) => {
     <button
       onClick={onUpload}
       onMouseEnter={() => playHover()}
-      className="
-        group flex items-center justify-center gap-3 px-6 sm:px-8 py-2.5 sm:py-3
-        border border-primary/30 bg-primary/5
-        text-primary font-tech text-[10px] sm:text-[11px] tracking-[0.25em] uppercase
-        transition-all duration-300 w-full sm:w-auto
-        hover:border-accent hover:bg-accent/5 hover:text-accent
-        relative cursor-pointer
-      "
+      className="font-tech group relative flex w-full cursor-pointer items-center justify-center gap-3 border border-primary/30 bg-primary/5 px-6 py-2.5 text-[10px] uppercase tracking-[0.25em] text-primary transition-all duration-300 hover:border-accent hover:bg-accent/5 hover:text-accent sm:w-auto sm:px-8 sm:py-3 sm:text-[11px]"
     >
-      <div className="tech-bracket-tl w-1 h-1" />
-      <div className="tech-bracket-br w-1 h-1" />
+      <div className="tech-bracket-tl h-1 w-1" />
+      <div className="tech-bracket-br h-1 w-1" />
 
-      <Upload className="w-4 h-4 transition-transform duration-300 group-hover:-translate-y-0.5" />
+      <Upload className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5" />
       {hasFile ? (
         <span
-          className="truncate max-w-[150px] sm:max-w-[180px] font-bold"
+          className="max-w-[150px] truncate font-bold sm:max-w-[180px]"
           title={fileName}
         >
           {fileName}
@@ -37,7 +30,7 @@ const UploadButton = ({ onUpload, hasFile, fileName }: UploadButtonProps) => {
       ) : (
         <span className="whitespace-nowrap font-bold tracking-[0.25em]">
           Inject{" "}
-          <span className="opacity-60 text-[9px] ml-1">
+          <span className="ml-1 text-[9px] opacity-60">
             DATA_STREAM [PDF·TXT]
           </span>
         </span>

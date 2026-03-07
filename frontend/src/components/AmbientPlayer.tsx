@@ -56,12 +56,12 @@ const AmbientPlayer = () => {
     <div className="fixed bottom-6 left-6 z-40 flex flex-col items-start gap-2">
       {/* Soundscape picker */}
       {showPicker && (
-        <div className="mb-1 flex flex-col gap-1 animate-fade-in">
+        <div className="mb-1 flex animate-fade-in flex-col gap-1">
           {SOUNDSCAPES.map((s, i) => (
             <button
               key={s.label}
               onClick={() => selectScape(i)}
-              className={`px-3 py-1.5 text-left font-heading text-[10px] tracking-widest uppercase border transition-all duration-200 ${
+              className={`border px-3 py-1.5 text-left font-heading text-[10px] uppercase tracking-widest transition-all duration-200 ${
                 i === scapeIdx
                   ? "border-primary/60 bg-primary/10 text-primary"
                   : "border-primary/20 bg-background/40 text-primary/50 hover:border-primary/40 hover:text-primary/80"
@@ -77,7 +77,7 @@ const AmbientPlayer = () => {
         {/* Main toggle button */}
         <button
           onClick={togglePlay}
-          className={`p-3 rounded-full border border-primary/20 bg-background/40 backdrop-blur-md text-primary transition-all duration-300 shadow-xl group ${
+          className={`group rounded-full border border-primary/20 bg-background/40 p-3 text-primary shadow-xl backdrop-blur-md transition-all duration-300 ${
             isPlaying
               ? "border-primary/50 shadow-[0_0_15px_hsl(var(--gold)/0.15)]"
               : "hover:bg-primary/10"
@@ -89,28 +89,28 @@ const AmbientPlayer = () => {
           }
         >
           {isPlaying ? (
-            <Volume2 className="w-5 h-5 group-hover:scale-110 transition-transform" />
+            <Volume2 className="h-5 w-5 transition-transform group-hover:scale-110" />
           ) : (
-            <VolumeX className="w-5 h-5 group-hover:scale-110 transition-transform" />
+            <VolumeX className="h-5 w-5 transition-transform group-hover:scale-110" />
           )}
         </button>
 
         {/* Picker toggle */}
         <button
           onClick={() => setShowPicker((p) => !p)}
-          className="p-2 rounded-full border border-primary/15 bg-background/30 backdrop-blur-md text-primary/50 hover:text-primary/80 hover:border-primary/30 transition-all duration-200"
+          className="rounded-full border border-primary/15 bg-background/30 p-2 text-primary/50 backdrop-blur-md transition-all duration-200 hover:border-primary/30 hover:text-primary/80"
           title="Choose soundscape"
         >
           {showPicker ? (
-            <ChevronDown className="w-3.5 h-3.5" />
+            <ChevronDown className="h-3.5 w-3.5" />
           ) : (
-            <ChevronUp className="w-3.5 h-3.5" />
+            <ChevronUp className="h-3.5 w-3.5" />
           )}
         </button>
 
         {/* Label */}
         {isPlaying && (
-          <span className="font-body text-xs italic text-primary/50 animate-fade-in whitespace-nowrap">
+          <span className="animate-fade-in whitespace-nowrap font-body text-xs italic text-primary/50">
             {currentScape.label} · Focus Active
           </span>
         )}

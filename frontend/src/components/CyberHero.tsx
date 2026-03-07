@@ -11,12 +11,12 @@ const CyberHero = ({ fileName, paragraphsCount }: CyberHeroProps) => {
   const { playHover } = useSoundEffects();
 
   return (
-    <div className="w-full max-w-5xl flex flex-col items-center mb-10 animate-fade-in relative pt-6 sm:pt-10">
+    <div className="relative mb-10 flex w-full max-w-5xl animate-fade-in flex-col items-center pt-6 sm:pt-10">
       {/* Decorative Outer Hexagon HUD — contained to logo area */}
-      <div className="absolute top-6 left-1/2 -translate-x-1/2 w-80 h-80 pointer-events-none opacity-20">
+      <div className="pointer-events-none absolute left-1/2 top-6 h-80 w-80 -translate-x-1/2 opacity-20">
         <svg
           viewBox="0 0 100 100"
-          className="w-full h-full text-accent stroke-current fill-none"
+          className="h-full w-full fill-none stroke-current text-accent"
         >
           <path
             d="M50 5 L90 25 L90 75 L50 95 L10 75 L10 25 Z"
@@ -28,36 +28,36 @@ const CyberHero = ({ fileName, paragraphsCount }: CyberHeroProps) => {
       </div>
 
       {/* Main Logo Area */}
-      <div className="relative mb-8 group">
-        <div className="absolute -inset-16 bg-accent/20 blur-[100px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+      <div className="group relative mb-8">
+        <div className="absolute -inset-16 rounded-full bg-accent/20 opacity-0 blur-[100px] transition-opacity duration-1000 group-hover:opacity-100" />
         <img
           src="/LOGO.png"
           alt="AI Voice Editor Logo"
-          className="w-56 sm:w-[320px] md:w-[400px] h-auto drop-shadow-[0_0_60px_hsl(var(--gold)/0.6)] relative z-10 transition-transform duration-700 group-hover:scale-105"
+          className="relative z-10 h-auto w-56 drop-shadow-[0_0_60px_hsl(var(--gold)/0.6)] transition-transform duration-700 group-hover:scale-105 sm:w-[320px] md:w-[400px]"
         />
-        <div className="tech-bracket-tl -top-4 -left-4 w-10 h-10 border-accent/40" />
-        <div className="tech-bracket-br -bottom-4 -right-4 w-10 h-10 border-accent/40" />
-        <div className="tech-bracket-tr -top-4 -right-4 w-4 h-4 border-accent/20" />
-        <div className="tech-bracket-bl -bottom-4 -left-4 w-4 h-4 border-accent/20" />
+        <div className="tech-bracket-tl -left-4 -top-4 h-10 w-10 border-accent/40" />
+        <div className="tech-bracket-br -bottom-4 -right-4 h-10 w-10 border-accent/40" />
+        <div className="tech-bracket-tr -right-4 -top-4 h-4 w-4 border-accent/20" />
+        <div className="tech-bracket-bl -bottom-4 -left-4 h-4 w-4 border-accent/20" />
       </div>
 
       {/* Primary Titles */}
-      <div className="text-center space-y-4 mb-12 px-6 relative">
-        <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl lg:text-7xl tracking-[0.35em] text-primary gold-text-glow uppercase leading-tight">
+      <div className="relative mb-12 space-y-4 px-6 text-center">
+        <h1 className="gold-text-glow font-heading text-3xl uppercase leading-tight tracking-[0.35em] text-primary sm:text-4xl md:text-5xl lg:text-7xl">
           AI Voice Editor
         </h1>
         <div className="flex items-center justify-center gap-6">
           <div className="h-[1px] w-12 bg-gradient-to-r from-transparent to-accent/60" />
-          <p className="font-tech text-xs sm:text-sm md:text-base text-accent tracking-[0.5em] uppercase font-bold text-glow">
+          <p className="font-tech text-glow text-xs font-bold uppercase tracking-[0.5em] text-accent sm:text-sm md:text-base">
             [ Protocol_V4.Scribe_Elite ]
           </p>
           <div className="h-[1px] w-12 bg-gradient-to-l from-transparent to-accent/60" />
         </div>
 
         {fileName && paragraphsCount && (
-          <div className="flex flex-col items-center mt-5 scale-100">
-            <div className="px-4 py-2 bg-accent/10 border border-accent/30 rounded-sm shadow-[0_0_15px_rgba(255,215,0,0.1)]">
-              <span className="font-mono text-xs text-accent uppercase tracking-tight font-medium">
+          <div className="mt-5 flex scale-100 flex-col items-center">
+            <div className="rounded-sm border border-accent/30 bg-accent/10 px-4 py-2 shadow-[0_0_15px_rgba(255,215,0,0.1)]">
+              <span className="font-mono text-xs font-medium uppercase tracking-tight text-accent">
                 Restored: {fileName} // {paragraphsCount} Blocks Found
               </span>
             </div>
@@ -66,93 +66,93 @@ const CyberHero = ({ fileName, paragraphsCount }: CyberHeroProps) => {
       </div>
 
       {/* Content Columns: Value Proposition */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-4xl px-6">
+      <div className="grid w-full max-w-4xl grid-cols-1 gap-8 px-6 md:grid-cols-3">
         <div
           onMouseEnter={() => playHover()}
-          className="p-6 border border-primary/20 bg-slate-950/60 backdrop-blur-2xl relative group hover:border-accent/50 transition-all duration-500 overflow-hidden rounded-sm"
+          className="group relative overflow-hidden rounded-sm border border-primary/20 bg-slate-950/60 p-6 backdrop-blur-2xl transition-all duration-500 hover:border-accent/50"
         >
-          <div className="tech-bracket-tl w-3 h-3" />
-          <div className="absolute top-0 right-0 p-3 opacity-30 group-hover:opacity-100 group-hover:text-accent group-hover:scale-110 transition-all">
-            <Zap className="w-5 h-5" />
+          <div className="tech-bracket-tl h-3 w-3" />
+          <div className="absolute right-0 top-0 p-3 opacity-30 transition-all group-hover:scale-110 group-hover:text-accent group-hover:opacity-100">
+            <Zap className="h-5 w-5" />
           </div>
-          <h3 className="font-tech text-xs text-primary tracking-widest uppercase mb-3 font-semibold">
+          <h3 className="font-tech mb-3 text-xs font-semibold uppercase tracking-widest text-primary">
             Neural_Synthesis
           </h3>
-          <p className="font-body text-base text-foreground leading-relaxed font-medium">
+          <p className="font-body text-base font-medium leading-relaxed text-foreground">
             Advanced voice recognition algorithms translate natural speech into
             precise document manipulations with sub-millisecond precision.
           </p>
-          <div className="mt-4 font-mono text-[10px] text-accent/80 uppercase tracking-tighter">
+          <div className="mt-4 font-mono text-[10px] uppercase tracking-tighter text-accent/80">
             Latency: 0.12ms // ACTIVE
           </div>
         </div>
 
         <div
           onMouseEnter={() => playHover()}
-          className="p-6 border border-primary/20 bg-slate-950/60 backdrop-blur-2xl relative group hover:border-accent/50 transition-all duration-500 overflow-hidden rounded-sm"
+          className="group relative overflow-hidden rounded-sm border border-primary/20 bg-slate-950/60 p-6 backdrop-blur-2xl transition-all duration-500 hover:border-accent/50"
         >
-          <div className="tech-bracket-tl w-3 h-3" />
-          <div className="absolute top-0 right-0 p-3 opacity-30 group-hover:opacity-100 group-hover:text-accent group-hover:scale-110 transition-all">
-            <Shield className="w-5 h-5" />
+          <div className="tech-bracket-tl h-3 w-3" />
+          <div className="absolute right-0 top-0 p-3 opacity-30 transition-all group-hover:scale-110 group-hover:text-accent group-hover:opacity-100">
+            <Shield className="h-5 w-5" />
           </div>
-          <h3 className="font-tech text-xs text-primary tracking-widest uppercase mb-3 font-semibold">
+          <h3 className="font-tech mb-3 text-xs font-semibold uppercase tracking-widest text-primary">
             Secure_Encryption
           </h3>
-          <p className="font-body text-base text-foreground leading-relaxed font-medium">
+          <p className="font-body text-base font-medium leading-relaxed text-foreground">
             Local-first processing ensures your document data never leaves the
             secure boundaries of your local terminal environment.
           </p>
-          <div className="mt-4 font-mono text-[10px] text-accent/80 uppercase tracking-tighter">
+          <div className="mt-4 font-mono text-[10px] uppercase tracking-tighter text-accent/80">
             Status: Protected // RSA-4096
           </div>
         </div>
 
         <div
           onMouseEnter={() => playHover()}
-          className="p-6 border border-primary/20 bg-slate-950/60 backdrop-blur-2xl relative group hover:border-accent/50 transition-all duration-500 overflow-hidden rounded-sm"
+          className="group relative overflow-hidden rounded-sm border border-primary/20 bg-slate-950/60 p-6 backdrop-blur-2xl transition-all duration-500 hover:border-accent/50"
         >
-          <div className="tech-bracket-tl w-3 h-3" />
-          <div className="absolute top-0 right-0 p-3 opacity-30 group-hover:opacity-100 group-hover:text-accent group-hover:scale-110 transition-all">
-            <Cpu className="w-5 h-5" />
+          <div className="tech-bracket-tl h-3 w-3" />
+          <div className="absolute right-0 top-0 p-3 opacity-30 transition-all group-hover:scale-110 group-hover:text-accent group-hover:opacity-100">
+            <Cpu className="h-5 w-5" />
           </div>
-          <h3 className="font-tech text-xs text-primary tracking-widest uppercase mb-3 font-semibold">
+          <h3 className="font-tech mb-3 text-xs font-semibold uppercase tracking-widest text-primary">
             Logic_Alchemy
           </h3>
-          <p className="font-body text-base text-foreground leading-relaxed font-medium">
+          <p className="font-body text-base font-medium leading-relaxed text-foreground">
             Context-aware AI understands intent, allowing for complex multi-step
             edits with simple natural language voice phrases.
           </p>
-          <div className="mt-4 font-mono text-[10px] text-accent/80 uppercase tracking-tighter">
+          <div className="mt-4 font-mono text-[10px] uppercase tracking-tighter text-accent/80">
             Core: AGI_MIMIC // V4.2L
           </div>
         </div>
       </div>
 
       {/* Decorative Bottom Bar */}
-      <div className="mt-10 flex items-center justify-between w-full max-w-md px-6 bg-primary/5 py-4 border-x border-primary/10">
+      <div className="mt-10 flex w-full max-w-md items-center justify-between border-x border-primary/10 bg-primary/5 px-6 py-4">
         <div className="flex flex-col items-center">
-          <span className="font-mono text-[10px] text-primary/40 uppercase tracking-widest">
+          <span className="font-mono text-[10px] uppercase tracking-widest text-primary/40">
             Uptime
           </span>
-          <span className="font-mono text-sm text-accent font-bold">
+          <span className="font-mono text-sm font-bold text-accent">
             99.98%
           </span>
         </div>
         <div className="h-10 w-[1px] bg-primary/20" />
         <div className="flex flex-col items-center">
-          <span className="font-mono text-[10px] text-primary/40 uppercase tracking-widest">
+          <span className="font-mono text-[10px] uppercase tracking-widest text-primary/40">
             Version
           </span>
-          <span className="font-mono text-sm text-accent font-bold">
+          <span className="font-mono text-sm font-bold text-accent">
             SCRIBE_4.2
           </span>
         </div>
         <div className="h-10 w-[1px] bg-primary/20" />
         <div className="flex flex-col items-center">
-          <span className="font-mono text-[10px] text-primary/40 uppercase tracking-widest">
+          <span className="font-mono text-[10px] uppercase tracking-widest text-primary/40">
             Integrity
           </span>
-          <span className="font-mono text-sm text-accent font-bold">
+          <span className="font-mono text-sm font-bold text-accent">
             VERIFIED
           </span>
         </div>
