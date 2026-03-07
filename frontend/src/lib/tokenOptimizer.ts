@@ -110,8 +110,8 @@ export function buildSmartDocumentContext(
     targetIdx >= 0 ? Math.max(0, targetIdx - Math.floor(maxParagraphs / 2)) : 0;
   const context = sample
     .map((p, i) => {
-      // Truncate very long paragraphs to 300 chars
-      const truncated = p.length > 300 ? p.slice(0, 300) + "…" : p;
+      // Truncate very long paragraphs to 2000 chars (was 300) to ensure context for edits
+      const truncated = p.length > 2000 ? p.slice(0, 2000) + "…" : p;
       return `[${startIdx + i}] ${truncated}`;
     })
     .join("\n");

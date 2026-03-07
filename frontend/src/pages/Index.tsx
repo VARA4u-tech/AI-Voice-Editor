@@ -95,6 +95,7 @@ const Index = () => {
   >([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isFocusMode, setIsFocusMode] = useState(false);
+  const [isCooldown, setIsCooldown] = useState(false); // Cooldown guard
   const [selectedParagraphIndex, setSelectedParagraphIndex] = useState<
     number | null
   >(null);
@@ -202,6 +203,13 @@ const Index = () => {
 
   const handleCommand = useCallback(
     async (command: string) => {
+      // 0. Cooldown Guard
+      if (isCooldown) {
+        setCommandFeedback("System Rebooting | Please wait 3s...");
+        setCommandSuccess(false);
+        return;
+      }
+
       if (!paragraphs.length) {
         setCommandFeedback(
           "Upload a document first before using voice commands.",
@@ -286,9 +294,15 @@ const Index = () => {
         }
       }
 
-      setCommandFeedback(result.message);
+      setCommandFeedback(
+        result.success
+          ? `${result.message} | Cooldown Active (3s)`
+          : result.message,
+      );
       setCommandSuccess(result.success);
       setIsProcessing(false);
+      setIsCooldown(true);
+      setTimeout(() => setIsCooldown(false), 3000);
 
       if (result.success) {
         playSuccess();
@@ -355,6 +369,7 @@ const Index = () => {
       paragraphs,
       history,
       future,
+      isCooldown,
       clearFeedback,
       playSuccess,
       playError,
@@ -1096,6 +1111,7 @@ const Index = () => {
             status={
               isListening ? "listening" : isProcessing ? "processing" : "idle"
             }
+            isCooldown={isCooldown}
           />
 
           {selectedParagraphIndex !== null && (

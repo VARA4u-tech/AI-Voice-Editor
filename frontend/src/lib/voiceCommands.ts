@@ -155,6 +155,161 @@ const commands: CommandPattern[] = [
   },
   {
     pattern:
+      /^(?:delete|remove)\s+(?:word\s+)?["']?(.+?)["']?\s+from\s+(?:the\s+)?(?:selected\s+)?(?:line|paragraph)(?:\s+(\d+))?$/i,
+    description: "Delete a word from source",
+    example: "delete hello from selected line",
+    handler: (paragraphs, match, selectedParagraphIndex) => {
+      const word = match[1].trim();
+      const pNum = match[2];
+      const idx = pNum ? parseInt(pNum, 10) - 1 : selectedParagraphIndex;
+
+      if (
+        idx === null ||
+        idx === undefined ||
+        idx < 0 ||
+        idx >= paragraphs.length
+      ) {
+        return {
+          success: false,
+          message: pNum
+            ? `Paragraph ${pNum} does not exist.`
+            : "Please select a specific line/paragraph first.",
+          updatedParagraphs: paragraphs,
+        };
+      }
+
+      const original = paragraphs[idx];
+      // Try with word boundaries first for accuracy
+      const regex = new RegExp(`\\b${escapeRegex(word)}\\b`, "gi");
+      let updatedText = original.replace(regex, "");
+
+      // If nothing changed (maybe it's not a full word or contains non-alphanumeric), try without \b
+      if (updatedText === original) {
+        const fallbackRegex = new RegExp(escapeRegex(word), "gi");
+        updatedText = original.replace(fallbackRegex, "");
+      }
+
+      if (updatedText === original) {
+        return {
+          success: false,
+          message: `Could not find "${word}" in the target line.`,
+          updatedParagraphs: paragraphs,
+        };
+      }
+
+      // Cleanup extra whitespace
+      updatedText = updatedText.replace(/\s+/g, " ").trim();
+      const updated = [...paragraphs];
+      updated[idx] = updatedText;
+
+      return {
+        success: true,
+        message: `Excised "${word}" from the scrolls.`,
+        updatedParagraphs: updated,
+        affectedIndices: [idx],
+        structuredData: {
+          action: "delete",
+          target: word,
+        },
+      };
+    },
+  },
+  {
+    pattern:
+      /^add\s+["']?(.+?)["']?\s+(?:to|at|in|on)\s+(?:the\s+)?(?:end\s+of\s+)?(?:the\s+)?(?:selected\s+)?(?:line|paragraph)(?:\s+(\d+))?$/i,
+    description: "Append text to source",
+    example: "add 'the end' to selected line",
+    handler: (paragraphs, match, selectedParagraphIndex) => {
+      const text = match[1].trim();
+      const pNum = match[2];
+      const idx = pNum ? parseInt(pNum, 10) - 1 : selectedParagraphIndex;
+
+      if (
+        idx === null ||
+        idx === undefined ||
+        idx < 0 ||
+        idx >= paragraphs.length
+      ) {
+        return {
+          success: false,
+          message: pNum
+            ? `Paragraph ${pNum} does not exist.`
+            : "Please select a specific line/paragraph first.",
+          updatedParagraphs: paragraphs,
+        };
+      }
+
+      const updated = [...paragraphs];
+      const current = updated[idx];
+      // Append text with appropriate spacing
+      updated[idx] =
+        current.length > 0
+          ? current.endsWith(" ")
+            ? current + text
+            : current + " " + text
+          : text;
+
+      return {
+        success: true,
+        message: `Appended text to ${pNum ? "paragraph " + pNum : "the selected line"}.`,
+        updatedParagraphs: updated,
+        affectedIndices: [idx],
+        structuredData: {
+          action: "add",
+          target: text,
+        },
+      };
+    },
+  },
+  {
+    pattern:
+      /^add\s+["']?(.+?)["']?\s+(?:at|to|in|on)\s+(?:the\s+)?(?:start|beginning|starting)\s+of\s+(?:the\s+)?(?:selected\s+)?(?:line|paragraph)(?:\s+(\d+))?$/i,
+    description: "Prepend text to source",
+    example: "add 'Attention' at the start of selected line",
+    handler: (paragraphs, match, selectedParagraphIndex) => {
+      const text = match[1].trim();
+      const pNum = match[2];
+      const idx = pNum ? parseInt(pNum, 10) - 1 : selectedParagraphIndex;
+
+      if (
+        idx === null ||
+        idx === undefined ||
+        idx < 0 ||
+        idx >= paragraphs.length
+      ) {
+        return {
+          success: false,
+          message: pNum
+            ? `Paragraph ${pNum} does not exist.`
+            : "Please select a specific line/paragraph first.",
+          updatedParagraphs: paragraphs,
+        };
+      }
+
+      const updated = [...paragraphs];
+      const current = updated[idx];
+      // Prepend text with appropriate spacing
+      updated[idx] =
+        current.length > 0
+          ? text.endsWith(" ")
+            ? text + current
+            : text + " " + current
+          : text;
+
+      return {
+        success: true,
+        message: `Prepended text to ${pNum ? "paragraph " + pNum : "the selected line"}.`,
+        updatedParagraphs: updated,
+        affectedIndices: [idx],
+        structuredData: {
+          action: "add_start",
+          target: text,
+        },
+      };
+    },
+  },
+  {
+    pattern:
       /^(?:move|swap)\s+paragraph\s+(\d+)\s+(?:to|with)\s+(?:paragraph\s+)?(\d+)$/i,
     description: "Swap two paragraphs by number",
     example: "swap paragraph 1 with 3",
