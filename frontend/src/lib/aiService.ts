@@ -1,4 +1,5 @@
 import { CommandResult } from "./voiceCommands";
+import { supabase } from "./supabase";
 import {
   commandCache,
   dedupe,
@@ -45,39 +46,35 @@ export async function processChatOnly(
   message: string,
   paragraphs: string[],
 ): Promise<string> {
-  const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
-  const siteUrl = import.meta.env.VITE_SITE_URL || "http://localhost:8080";
-  const siteName = import.meta.env.VITE_SITE_NAME || "AI Voice Editor";
+  const backendUrl =
+    import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token;
 
-  if (!apiKey) return "Connection key missing.";
+  if (!token) return "Authentication required to connect to the Oracle.";
 
   const documentContext = buildSmartDocumentContext(paragraphs, message, 5);
 
   try {
-    const response = await fetch(
-      "https://openrouter.ai/api/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "HTTP-Referer": siteUrl,
-          "X-Title": siteName,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "stepfun/step-3.5-flash:free",
-          max_tokens: 512,
-          temperature: 0.7,
-          messages: [
-            { role: "system", content: CHAT_SYSTEM_PROMPT },
-            {
-              role: "user",
-              content: `Document Context (for reference):\n${documentContext}\n\nUser Message: "${message}"`,
-            },
-          ],
-        }),
+    const response = await fetch(`${backendUrl}/edit/chat`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       },
-    );
+      body: JSON.stringify({
+        model: "stepfun/step-3.5-flash:free",
+        max_tokens: 512,
+        temperature: 0.7,
+        messages: [
+          { role: "system", content: CHAT_SYSTEM_PROMPT },
+          {
+            role: "user",
+            content: `Document Context (for reference):\n${documentContext}\n\nUser Message: "${message}"`,
+          },
+        ],
+      }),
+    });
 
     if (!response.ok) throw new Error("Signal interference.");
 
@@ -96,15 +93,15 @@ export async function processCommandWithAI(
   paragraphs: string[],
   retries = 2,
 ): Promise<CommandResult> {
-  const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
-  const siteUrl = import.meta.env.VITE_SITE_URL || "http://localhost:8080";
-  const siteName = import.meta.env.VITE_SITE_NAME || "AI Voice Editor";
+  const backendUrl =
+    import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token;
 
-  if (!apiKey) {
+  if (!token) {
     return {
       success: false,
-      message:
-        "The Oracle's connection key is missing. Configure VITE_OPENROUTER_API_KEY.",
+      message: "Authentication required to connect to the Oracle.",
       updatedParagraphs: paragraphs,
     };
   }
@@ -137,30 +134,25 @@ export async function processCommandWithAI(
         command,
       );
 
-      const response = await fetch(
-        "https://openrouter.ai/api/v1/chat/completions",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${apiKey}`,
-            "HTTP-Referer": siteUrl,
-            "X-Title": siteName,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            model: "stepfun/step-3.5-flash:free",
-            max_tokens: 1024, // hard cap — free tier protection
-            temperature: 0.2, // lower = more deterministic, fewer wasted tokens
-            messages: [
-              { role: "system", content: SYSTEM_PROMPT },
-              {
-                role: "user",
-                content: `Command: "${command}"\n\nDocument:\n${documentContext}`,
-              },
-            ],
-          }),
+      const response = await fetch(`${backendUrl}/edit/chat`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          model: "stepfun/step-3.5-flash:free",
+          max_tokens: 1024, // hard cap — free tier protection
+          temperature: 0.2, // lower = more deterministic, fewer wasted tokens
+          messages: [
+            { role: "system", content: SYSTEM_PROMPT },
+            {
+              role: "user",
+              content: `Command: "${command}"\n\nDocument:\n${documentContext}`,
+            },
+          ],
+        }),
+      });
 
       // 429 = rate limited
       if (response.status === 429) {

@@ -5,6 +5,7 @@ import {
   docFingerprint,
   minifyPrompt,
 } from "@/lib/tokenOptimizer";
+import { supabase } from "@/lib/supabase";
 
 interface SmartSuggestionsProps {
   paragraphs: string[];
@@ -25,9 +26,12 @@ const SmartSuggestions = ({
   const fetchSuggestions = useCallback(async () => {
     if (!paragraphs.length || !lastCommand) return;
 
-    const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
-    const siteUrl = import.meta.env.VITE_SITE_URL || "http://localhost:8080";
-    const siteName = import.meta.env.VITE_SITE_NAME || "AI Voice Editor";
+    const backendUrl =
+      import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+    const { data: authData } = await supabase.auth.getSession();
+    const token = authData.session?.access_token;
+
+    if (!token) return;
 
     // ── Cache lookup ─────────────────────────────────────────────────────
     const fp = docFingerprint(paragraphs);
@@ -48,30 +52,25 @@ const SmartSuggestions = ({
     );
 
     try {
-      const response = await fetch(
-        "https://openrouter.ai/api/v1/chat/completions",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${apiKey}`,
-            "HTTP-Referer": siteUrl,
-            "X-Title": siteName,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            model: "stepfun/step-3.5-flash:free",
-            max_tokens: 150, // suggestions are short — hard cap
-            temperature: 0.4,
-            messages: [
-              { role: "system", content: systemMsg },
-              {
-                role: "user",
-                content: `Last command: "${lastCommand}"\nDoc excerpt: ${sample}`,
-              },
-            ],
-          }),
+      const response = await fetch(`${backendUrl}/edit/chat`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          model: "stepfun/step-3.5-flash:free",
+          max_tokens: 150, // suggestions are short — hard cap
+          temperature: 0.4,
+          messages: [
+            { role: "system", content: systemMsg },
+            {
+              role: "user",
+              content: `Last command: "${lastCommand}"\nDoc excerpt: ${sample}`,
+            },
+          ],
+        }),
+      });
 
       if (response.ok) {
         const data = await response.json();
