@@ -213,7 +213,7 @@ gilded-voice-scribe/
     │   │   └── useAuth.ts               # Auth state
     │   ├── lib/                 # Core utilities
     │   │   ├── voiceCommands.ts    # Voice command engine (15+ commands)
-    │   │   ├── aiService.ts        # OpenRouter AI integration
+    │   │   ├── aiService.ts        # OpenAI integration
     │   │   ├── tokenOptimizer.ts   # Caching, dedup & token savings
     │   │   ├── documentParser.ts   # PDF text extraction
     │   │   ├── pdfExport.ts        # PDF generation
