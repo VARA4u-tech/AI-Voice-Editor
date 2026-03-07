@@ -465,10 +465,21 @@ const Index = () => {
       playStop();
       setIsProcessing(true); // Signal we're waiting for settling transcript
       setTimeout(async () => {
-        const cmd = transcript || "";
-        if (cmd.trim()) {
+        let cmd = (transcript || "").trim();
+        if (cmd) {
+          // Robust text deduplication: "replace replace word word" -> "replace word"
+          // Also catches "replace word replace word"
+          const words = cmd.split(/\s+/);
+          const uniqueWords: string[] = [];
+          for (let i = 0; i < words.length; i++) {
+            if (words[i].toLowerCase() !== words[i + 1]?.toLowerCase()) {
+              uniqueWords.push(words[i]);
+            }
+          }
+          cmd = uniqueWords.join(" ");
+
           console.info("Neural_Link: Transmitting Voice Directive...", cmd);
-          await handleCommand(cmd.trim());
+          await handleCommand(cmd);
         }
         setIsProcessing(false);
       }, 700);
