@@ -41,6 +41,7 @@ import OnboardingTutorial from "@/components/OnboardingTutorial";
 import SmartSuggestions from "@/components/SmartSuggestions";
 import Footer from "@/components/Footer";
 import { titleCache, docFingerprint, minifyPrompt } from "@/lib/tokenOptimizer";
+import UserProfileIcon from "@/components/UserProfileIcon";
 
 const STORAGE_KEY = "gilded-scribe-session";
 
@@ -865,25 +866,31 @@ const Index = () => {
         )}
       </button>
 
-      {/* Auth Navigation — top left */}
-      {!user && !isFocusMode && (
-        <div className="fixed top-6 left-6 z-40 flex items-center gap-4 animate-fade-in">
-          <Link
-            to="/login"
-            onMouseEnter={() => playHover()}
-            className="flex items-center gap-2 px-4 py-2 bg-slate-950/80 backdrop-blur-xl border border-primary/20 text-primary/80 hover:text-primary hover:border-primary/40 transition-all duration-300 rounded-sm font-tech text-[10px] uppercase tracking-widest group"
-          >
-            <LogIn className="w-3.5 h-3.5 text-primary/40 group-hover:text-accent transition-colors" />
-            Login_Connection
-          </Link>
-          <Link
-            to="/signup"
-            onMouseEnter={() => playHover()}
-            className="flex items-center gap-2 px-4 py-2 bg-accent/5 backdrop-blur-xl border border-accent/20 text-accent/80 hover:text-accent hover:border-accent/40 transition-all duration-300 rounded-sm font-tech text-[10px] uppercase tracking-widest group shadow-[0_0_15px_rgba(255,215,0,0.1)]"
-          >
-            <UserPlus className="w-3.5 h-3.5 text-accent/40 group-hover:text-accent transition-colors" />
-            Sign_Up_Protocol
-          </Link>
+      {/* User Status / Auth Navigation — top left */}
+      {!isFocusMode && (
+        <div className="fixed top-6 left-6 z-40">
+          {user ? (
+            <UserProfileIcon />
+          ) : (
+            <div className="flex items-center gap-4 animate-fade-in">
+              <Link
+                to="/login"
+                onMouseEnter={() => playHover()}
+                className="flex items-center gap-2 px-4 py-2 bg-slate-950/80 backdrop-blur-xl border border-primary/20 text-primary/80 hover:text-primary hover:border-primary/40 transition-all duration-300 rounded-sm font-tech text-[10px] uppercase tracking-widest group"
+              >
+                <LogIn className="w-3.5 h-3.5 text-primary/40 group-hover:text-accent transition-colors" />
+                Login_Connection
+              </Link>
+              <Link
+                to="/signup"
+                onMouseEnter={() => playHover()}
+                className="flex items-center gap-2 px-4 py-2 bg-accent/5 backdrop-blur-xl border border-accent/20 text-accent/80 hover:text-accent hover:border-accent/40 transition-all duration-300 rounded-sm font-tech text-[10px] uppercase tracking-widest group shadow-[0_0_15px_rgba(255,215,0,0.15)]"
+              >
+                <UserPlus className="w-3.5 h-3.5 text-accent/40 group-hover:text-accent transition-colors" />
+                Sign_Up_Protocol
+              </Link>
+            </div>
+          )}
         </div>
       )}
 
