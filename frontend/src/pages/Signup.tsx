@@ -1,7 +1,7 @@
 import Layout from "@/components/Layout";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { UserPlus, Mail, Lock, ShieldCheck } from "lucide-react";
+import { UserPlus, Mail, Lock, ShieldCheck, User } from "lucide-react";
 import { useSoundEffects } from "@/hooks/useSoundEffects";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
@@ -9,8 +9,10 @@ import { useAuth } from "@/hooks/useAuth";
 
 const Signup = () => {
   const { user } = useAuth();
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const { playClick, playSuccess, playError } = useSoundEffects();
   const navigate = useNavigate();
@@ -22,12 +24,42 @@ const Signup = () => {
     }
   }, [user, navigate]);
 
+  const handleFullNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    // Allow only alphabets and spaces
+    if (val === "" || /^[a-zA-Z\s]+$/.test(val)) {
+      setFullName(val);
+    }
+  };
+
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // ── Validation Protocols ──
+    if (password.length < 6) {
+      toast.error("Access_Key must be at least 6 characters.");
+      playError();
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      toast.error("Access_Key mismatch. Verify neural signals.");
+      playError();
+      return;
+    }
+
     setLoading(true);
     playClick();
 
-    const { error } = await supabase.auth.signUp({ email, password });
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: fullName,
+        },
+      },
+    });
 
     if (error) {
       toast.error(error.message);
@@ -51,6 +83,17 @@ const Signup = () => {
         <form onSubmit={handleSignup} className="space-y-6">
           <div className="space-y-4">
             <div className="relative">
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/40" />
+              <input
+                type="text"
+                placeholder="Identity_Name"
+                value={fullName}
+                onChange={handleFullNameChange}
+                required
+                className="w-full bg-primary/5 border border-primary/20 rounded-sm py-3 pl-10 pr-4 text-xs font-mono text-primary placeholder:text-primary/20 focus:outline-none focus:border-accent/40 transition-colors"
+              />
+            </div>
+            <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/40" />
               <input
                 type="email"
@@ -65,9 +108,20 @@ const Signup = () => {
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/40" />
               <input
                 type="password"
-                placeholder="Access_Key"
+                placeholder="Access_Key (Min 6 chars)"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required
+                className="w-full bg-primary/5 border border-primary/20 rounded-sm py-3 pl-10 pr-4 text-xs font-mono text-primary placeholder:text-primary/20 focus:outline-none focus:border-accent/40 transition-colors"
+              />
+            </div>
+            <div className="relative">
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/40" />
+              <input
+                type="password"
+                placeholder="Confirm_Access_Key"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 required
                 className="w-full bg-primary/5 border border-primary/20 rounded-sm py-3 pl-10 pr-4 text-xs font-mono text-primary placeholder:text-primary/20 focus:outline-none focus:border-accent/40 transition-colors"
               />
