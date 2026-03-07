@@ -351,6 +351,40 @@ const commands: CommandPattern[] = [
 
   {
     pattern:
+      /^(?:read|speak|narrate)(?:\s+the)?\s+(?:selected\s+)?(?:line|paragraph)(?:\s+(\d+))?$/i,
+    description: "Read text aloud",
+    example: "read paragraph 1",
+    handler: (paragraphs, match, selectedParagraphIndex) => {
+      const pNum = match[1];
+      const idx = pNum ? parseInt(pNum, 10) - 1 : selectedParagraphIndex;
+
+      if (
+        idx === null ||
+        idx === undefined ||
+        idx < 0 ||
+        idx >= paragraphs.length
+      ) {
+        return {
+          success: false,
+          message: pNum
+            ? `Paragraph ${pNum} does not exist.`
+            : "Please select a specific line/paragraph first.",
+          updatedParagraphs: paragraphs,
+        };
+      }
+      return {
+        success: true,
+        message: `Neural_Voice: Reading ${pNum ? "paragraph " + pNum : "selected line"} aloud...`,
+        updatedParagraphs: paragraphs,
+        structuredData: {
+          action: "read",
+          target: paragraphs[idx],
+        },
+      };
+    },
+  },
+  {
+    pattern:
       /^(?:translate|translation|transmute)\s+paragraph\s+(\d+)\s+(?:to|into)\s+(.+)$/i,
     description: "Mystical Translation",
     example: "translate paragraph 1 to Telugu",

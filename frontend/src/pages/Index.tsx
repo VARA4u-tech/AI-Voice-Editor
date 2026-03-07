@@ -347,12 +347,31 @@ const Index = () => {
             });
         }
 
-        if (result.scribeResponse) {
-          // Check for Focus Mode Toggle
-          if (result.structuredData?.action === "focus_toggle") {
-            setIsFocusMode((prev) => !prev);
-          }
+        // ── Handle Structural Actions (Immediate) ──
+        if (result.structuredData?.action === "focus_toggle") {
+          setIsFocusMode((prev) => !prev);
+        }
 
+        if (
+          result.structuredData?.action === "read" &&
+          result.structuredData?.target
+        ) {
+          const utterance = new SpeechSynthesisUtterance(
+            result.structuredData.target,
+          );
+          const voices = window.speechSynthesis.getVoices();
+          const preferredVoice =
+            voices.find(
+              (v) => v.name.includes("Google") && v.lang === "en-US",
+            ) || voices[0];
+          if (preferredVoice) utterance.voice = preferredVoice;
+          utterance.rate = 1.0;
+          utterance.pitch = 1.0;
+          window.speechSynthesis.cancel(); // Stop anything currently speaking
+          window.speechSynthesis.speak(utterance);
+        }
+
+        if (result.scribeResponse) {
           setScribeLog((prev) => [
             {
               ...result.scribeResponse!,
