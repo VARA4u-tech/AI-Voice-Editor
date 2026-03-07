@@ -101,7 +101,7 @@ const ScribeSidebar = ({
               <Link to="/info" title="System Info">
                 <Info className="w-5 h-5 hover:text-primary transition-colors cursor-pointer" />
               </Link>
-              <Link to="/auth" title="Authentication">
+              <Link to="/login" title="Authentication">
                 <User className="w-5 h-5 hover:text-primary transition-colors cursor-pointer text-accent" />
               </Link>
             </div>

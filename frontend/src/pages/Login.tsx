@@ -1,15 +1,14 @@
 import Layout from "@/components/Layout";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { LogIn, UserPlus, Mail, Lock, ShieldCheck } from "lucide-react";
+import { LogIn, Mail, Lock, ShieldCheck } from "lucide-react";
 import { useSoundEffects } from "@/hooks/useSoundEffects";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 
-const Auth = () => {
+const Login = () => {
   const { user, signOut } = useAuth();
-  const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -17,12 +16,11 @@ const Auth = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user && isLogin) {
-      // Small delay to show a welcome toast or similar
+    if (user) {
       const timer = setTimeout(() => navigate("/"), 2000);
       return () => clearTimeout(timer);
     }
-  }, [user, navigate, isLogin]);
+  }, [user, navigate]);
 
   const handleGoogleAuth = async () => {
     playClick();
@@ -39,26 +37,23 @@ const Auth = () => {
     }
   };
 
-  const handleAuth = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     playClick();
 
-    const { error } = isLogin
-      ? await supabase.auth.signInWithPassword({ email, password })
-      : await supabase.auth.signUp({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
     if (error) {
       toast.error(error.message);
       playError();
     } else {
-      toast.success(
-        isLogin
-          ? "Welcome back, Scribe."
-          : "Initiation complete. Check your email.",
-      );
+      toast.success("Welcome back, Scribe.");
       playSuccess();
-      if (isLogin) navigate("/");
+      navigate("/");
     }
     setLoading(false);
   };
@@ -95,21 +90,15 @@ const Auth = () => {
   }
 
   return (
-    <Layout
-      title={isLogin ? "Neural_Link" : "Initiation"}
-      subtitle="Auth_Terminal"
-      icon={ShieldCheck}
-    >
+    <Layout title="Neural_Link" subtitle="Auth_Terminal" icon={ShieldCheck}>
       <div className="max-w-md mx-auto space-y-8">
         <div className="text-center space-y-2">
           <p className="font-body text-sm italic text-foreground/60">
-            {isLogin
-              ? "Establish a secure connection to your archives."
-              : "Register your biometric signals with the Gilded Scribe."}
+            Establish a secure connection to your archives.
           </p>
         </div>
 
-        <form onSubmit={handleAuth} className="space-y-6">
+        <form onSubmit={handleLogin} className="space-y-6">
           <div className="space-y-4">
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/40" />
@@ -142,13 +131,9 @@ const Auth = () => {
           >
             {loading ? (
               <div className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin" />
-            ) : isLogin ? (
-              <>
-                Establish_Link <LogIn className="w-4 h-4" />
-              </>
             ) : (
               <>
-                Initialize_Scribe <UserPlus className="w-4 h-4" />
+                Establish_Connection <LogIn className="w-4 h-4" />
               </>
             )}
           </button>
@@ -159,7 +144,7 @@ const Auth = () => {
             </div>
             <div className="relative flex justify-center text-[8px] uppercase tracking-widest font-tech">
               <span className="bg-background px-4 text-primary/40">
-                Alternative_Link_Protocols
+                Alternative_Auth_Protocols
               </span>
             </div>
           </div>
@@ -187,23 +172,21 @@ const Auth = () => {
                 d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 12-4.53z"
               />
             </svg>
-            Sync_Google_ID
+            Sync_Google_Login
           </button>
         </form>
 
         <div className="pt-4 text-center">
-          <button
-            onClick={() => setIsLogin(!isLogin)}
+          <Link
+            to="/signup"
             className="text-[10px] font-mono text-primary/40 hover:text-primary uppercase tracking-widest transition-colors"
           >
-            {isLogin
-              ? "// Switch to Initiation_Protocol"
-              : "// Switch to Neural_Link"}
-          </button>
+            // Switch to Sign_Up_Protocol
+          </Link>
         </div>
       </div>
     </Layout>
   );
 };
 
-export default Auth;
+export default Login;
