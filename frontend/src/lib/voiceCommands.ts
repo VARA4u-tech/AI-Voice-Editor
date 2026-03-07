@@ -812,11 +812,13 @@ export function processVoiceCommand(
   if (lowerCmd.includes("replace"))
     suggestion = "Did you mean: 'replace X with Y'?";
   else if (lowerCmd.includes("add"))
-    suggestion = "Did you mean: 'add [text] after paragraph N'?";
+    suggestion =
+      "Did you mean: 'add [text] after paragraph N' or 'add [text] to the selected line'?";
   else if (lowerCmd.includes("swap") || lowerCmd.includes("move"))
     suggestion = "Did you mean: 'swap paragraph A with B'?";
   else if (lowerCmd.includes("delete") || lowerCmd.includes("remove"))
-    suggestion = "Did you mean: 'delete paragraph N'?";
+    suggestion =
+      "Did you mean: 'delete paragraph N' or 'delete [word] from selected line'?";
   else if (lowerCmd.includes("read") || lowerCmd.includes("speak"))
     suggestion = "Did you mean: 'read paragraph N'?";
   else if (lowerCmd.includes("rewrite") || lowerCmd.includes("tone"))
