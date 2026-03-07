@@ -75,6 +75,11 @@ const Index = () => {
   const [future, setFuture] = useState<string[][]>([]);
   const [showHistoryPanel, setShowHistoryPanel] = useState(false);
   const [pageCount, setPageCount] = useState(saved?.pageCount ?? 0);
+  // ── Session & Voice Refs ──
+  const isMicToggling = useRef(false);
+  const latestTranscriptRef = useRef("");
+  const wasListeningRef = useRef(false);
+  const lastProcessedTranscriptRef = useRef("");
   const [isParsing, setIsParsing] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -103,7 +108,6 @@ const Index = () => {
   >(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const hasAttemptedSync = useRef(false);
-  const isMicToggling = useRef(false);
   const {
     playClick,
     playSuccess,
@@ -439,13 +443,66 @@ const Index = () => {
     stopListening,
   } = useSpeechRecognition();
 
+  // Keep a ref of the latest transcript to avoid stale closures in handleMicToggle
+  useEffect(() => {
+    latestTranscriptRef.current = transcript;
+  }, [transcript]);
+
+  const triggerCommandProcessing = useCallback(async () => {
+    if (isProcessing) return;
+
+    // We wait a bit for mobile browsers to finalize their buffers
+    setIsProcessing(true);
+
+    setTimeout(async () => {
+      let cmd = (latestTranscriptRef.current || "").trim();
+
+      // If the command is empty or already processed, ignore
+      if (!cmd || cmd === lastProcessedTranscriptRef.current) {
+        if (!cmd) console.warn("Neural_Link: No vocal data captured.");
+        setIsProcessing(false);
+        return;
+      }
+
+      lastProcessedTranscriptRef.current = cmd;
+
+      // Deduplication for stutter
+      const cleanWords = cmd
+        .split(/\s+/)
+        .filter((w, i, a) => w.toLowerCase() !== a[i - 1]?.toLowerCase());
+      cmd = cleanWords.join(" ");
+
+      setScribeLog((prev) => [
+        ...prev,
+        {
+          title: "Vocal_Command Synchronized",
+          content: `Data: "${cmd}"`,
+          type: "info",
+          timestamp: new Date(),
+        },
+      ]);
+
+      await handleCommand(cmd);
+      setIsProcessing(false);
+    }, 800);
+  }, [handleCommand, isProcessing]);
+
+  // Effect to catch natural or manual "end" of recording
+  useEffect(() => {
+    if (wasListeningRef.current && !isListening) {
+      if (latestTranscriptRef.current.trim()) {
+        triggerCommandProcessing();
+      }
+    }
+    wasListeningRef.current = isListening;
+  }, [isListening, triggerCommandProcessing]);
+
   // ── Typewriter Sound: plays a soft tick as voice text streams in ──
   useEffect(() => {
     if (interimTranscript) playTypewriterTick();
   }, [interimTranscript, playTypewriterTick]);
 
   const handleMicToggle = useCallback(() => {
-    // 0. Anti-double-trigger guard (phantom mobile clicks)
     if (isMicToggling.current) return;
     isMicToggling.current = true;
     setTimeout(() => {
@@ -463,36 +520,23 @@ const Index = () => {
     if (isListening) {
       stopListening();
       playStop();
-      setIsProcessing(true); // Signal we're waiting for settling transcript
-      setTimeout(async () => {
-        let cmd = (transcript || "").trim();
-        if (cmd) {
-          // Robust text deduplication: "replace replace word word" -> "replace word"
-          // Also catches "replace word replace word"
-          const words = cmd.split(/\s+/);
-          const uniqueWords: string[] = [];
-          for (let i = 0; i < words.length; i++) {
-            if (words[i].toLowerCase() !== words[i + 1]?.toLowerCase()) {
-              uniqueWords.push(words[i]);
-            }
-          }
-          cmd = uniqueWords.join(" ");
-
-          console.info("Neural_Link: Transmitting Voice Directive...", cmd);
-          await handleCommand(cmd);
-        }
-        setIsProcessing(false);
-      }, 700);
     } else {
+      lastProcessedTranscriptRef.current = ""; // Reset for new recording
       playStart();
       startListening();
+      setScribeLog((prev) => [
+        ...prev,
+        {
+          content: "Neural_Link Established. Listening...",
+          type: "info",
+          timestamp: new Date(),
+        },
+      ]);
     }
   }, [
     isListening,
     stopListening,
     startListening,
-    transcript,
-    handleCommand,
     playStart,
     playStop,
     user,

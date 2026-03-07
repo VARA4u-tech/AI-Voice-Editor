@@ -72,7 +72,7 @@ const useSpeechRecognition = (): UseSpeechRecognitionResult => {
     const w = window as WindowWithSpeechRecognition;
     const SpeechRecognition = w.SpeechRecognition || w.webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
-    recognition.continuous = true;
+    recognition.continuous = false; // Non-continuous is much more stable on mobile
     recognition.interimResults = true;
 
     // Load preferred language from saved settings
@@ -88,25 +88,21 @@ const useSpeechRecognition = (): UseSpeechRecognitionResult => {
     recognition.lang = preferredLang;
 
     recognition.onresult = (event: SpeechRecognitionResultEvent) => {
-      const finalTranscripts: string[] = [];
+      let final = "";
       let interim = "";
 
-      // We maintain the order but filter out exact duplicates from the raw results
-      // mobile browsers often repeat phrases at different indices
       for (let i = 0; i < event.results.length; i++) {
         const result = event.results[i];
-        const phrase = result[0].transcript.trim();
         if (result.isFinal) {
-          // Only add if not strictly identical to the previous final result
-          if (finalTranscripts[finalTranscripts.length - 1] !== phrase) {
-            finalTranscripts.push(phrase);
-          }
+          final += result[0].transcript;
         } else {
-          interim += phrase;
+          interim += result[0].transcript;
         }
       }
 
-      setTranscript(finalTranscripts.join(" "));
+      if (final) {
+        setTranscript(final.trim());
+      }
       setInterimTranscript(interim);
     };
 
@@ -135,17 +131,23 @@ const useSpeechRecognition = (): UseSpeechRecognitionResult => {
     if (!recognitionRef.current) return;
 
     try {
+      // Abort any existing session to clear stale mobile buffers
+      recognitionRef.current.abort();
+
       setTranscript("");
       setInterimTranscript("");
-      recognitionRef.current.start();
-      setIsListening(true);
+
+      // Use a small timeout to let the browser process the abort
+      setTimeout(() => {
+        try {
+          recognitionRef.current?.start();
+          setIsListening(true);
+        } catch (e) {
+          console.error("Delayed start error:", e);
+        }
+      }, 50);
     } catch (e) {
-      // If already started, just sync the state
-      if (e instanceof Error && e.message.includes("already started")) {
-        setIsListening(true);
-      } else {
-        console.error("Failed to start recognition:", e);
-      }
+      console.error("Failed to reset/start recognition:", e);
     }
   }, []);
 
