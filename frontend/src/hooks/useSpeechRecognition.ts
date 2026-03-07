@@ -72,7 +72,7 @@ const useSpeechRecognition = (): UseSpeechRecognitionResult => {
     const w = window as WindowWithSpeechRecognition;
     const SpeechRecognition = w.SpeechRecognition || w.webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
-    recognition.continuous = false; // Non-continuous is much more stable on mobile
+    recognition.continuous = true; // Use continuous to allow longer commands without auto-cutoff
     recognition.interimResults = true;
 
     // Load preferred language from saved settings
