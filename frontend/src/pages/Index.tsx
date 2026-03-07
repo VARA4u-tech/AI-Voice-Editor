@@ -938,25 +938,25 @@ const Index = () => {
 
       {/* User Status / Auth Navigation — top left */}
       {!isFocusMode && (
-        <div className="fixed left-6 top-6 z-40">
+        <div className="fixed left-4 top-4 z-40 sm:left-6 sm:top-6">
           {user ? (
             <UserProfileIcon />
           ) : (
-            <div className="flex animate-fade-in items-center gap-4">
+            <div className="flex animate-fade-in flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-4">
               <Link
                 to="/login"
                 onMouseEnter={() => playHover()}
-                className="font-tech group flex items-center gap-2 rounded-sm border border-primary/20 bg-slate-950/80 px-4 py-2 text-[10px] uppercase tracking-widest text-primary/80 backdrop-blur-xl transition-all duration-300 hover:border-primary/40 hover:text-primary"
+                className="font-tech group flex items-center gap-2 rounded-sm border border-primary/20 bg-slate-950/80 px-3 py-1.5 text-[9px] uppercase tracking-widest text-primary/80 backdrop-blur-xl transition-all duration-300 hover:border-primary/40 hover:text-primary sm:px-4 sm:py-2 sm:text-[10px]"
               >
-                <LogIn className="h-3.5 w-3.5 text-primary/40 transition-colors group-hover:text-accent" />
+                <LogIn className="h-3 w-3 text-primary/40 transition-colors group-hover:text-accent sm:h-3.5 sm:w-3.5" />
                 Login_Connection
               </Link>
               <Link
                 to="/signup"
                 onMouseEnter={() => playHover()}
-                className="font-tech group flex items-center gap-2 rounded-sm border border-accent/20 bg-accent/5 px-4 py-2 text-[10px] uppercase tracking-widest text-accent/80 shadow-[0_0_15px_rgba(255,215,0,0.15)] backdrop-blur-xl transition-all duration-300 hover:border-accent/40 hover:text-accent"
+                className="font-tech group flex items-center gap-2 rounded-sm border border-accent/20 bg-accent/5 px-3 py-1.5 text-[9px] uppercase tracking-widest text-accent/80 shadow-[0_0_15px_rgba(255,215,0,0.15)] backdrop-blur-xl transition-all duration-300 hover:border-accent/40 hover:text-accent sm:px-4 sm:py-2 sm:text-[10px]"
               >
-                <UserPlus className="h-3.5 w-3.5 text-accent/40 transition-colors group-hover:text-accent" />
+                <UserPlus className="h-3 w-3 text-accent/40 transition-colors group-hover:text-accent sm:h-3.5 sm:w-3.5" />
                 Sign_Up_Protocol
               </Link>
             </div>

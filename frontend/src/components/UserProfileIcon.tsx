@@ -26,7 +26,7 @@ const UserProfileIcon = () => {
   };
 
   return (
-    <div className="group fixed left-6 top-6 z-[60] animate-fade-in">
+    <div className="group fixed left-4 top-4 z-[60] animate-fade-in sm:left-6 sm:top-6">
       {/* The main unique floating icon */}
       <button
         onClick={() => {

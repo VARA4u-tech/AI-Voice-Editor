@@ -43,7 +43,7 @@ const CyberHero = ({ fileName, paragraphsCount }: CyberHeroProps) => {
 
       {/* Primary Titles */}
       <div className="relative mb-12 space-y-4 px-6 text-center">
-        <h1 className="gold-text-glow font-heading text-3xl uppercase leading-tight tracking-[0.35em] text-primary sm:text-4xl md:text-5xl lg:text-7xl">
+        <h1 className="gold-text-glow font-heading text-2xl uppercase leading-tight tracking-[0.15em] text-primary sm:text-4xl sm:tracking-[0.35em] md:text-5xl lg:text-7xl">
           AI Voice Editor
         </h1>
         <div className="flex items-center justify-center gap-6">
