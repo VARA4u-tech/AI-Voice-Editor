@@ -46,6 +46,7 @@ const PreviewArea = ({
   const [matchIndex, setMatchIndex] = useState(0);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editValue, setEditValue] = useState("");
+  const [selectionIndex, setSelectionIndex] = useState<number | null>(null);
 
   const startEdit = useCallback((i: number, text: string) => {
     setEditingIndex(i);
@@ -416,9 +417,9 @@ const PreviewArea = ({
                       </>
                     ) : (
                       <div
-                        className="relative cursor-text"
-                        onClick={() => onParagraphEdit && startEdit(i, para)}
-                        title={onParagraphEdit ? "Click to edit" : undefined}
+                        className="relative cursor-pointer"
+                        onClick={() => setSelectionIndex(i)}
+                        title="Select editing mode"
                       >
                         <p
                           className={`pr-12 font-body text-base leading-relaxed transition-colors duration-200 ${
@@ -428,6 +429,45 @@ const PreviewArea = ({
                           }`}
                           dangerouslySetInnerHTML={{ __html: para }}
                         />
+
+                        {/* Mode Selection UI */}
+                        {selectionIndex === i && (
+                          <div className="absolute inset-0 z-20 flex animate-fade-in items-center justify-center rounded-sm bg-background/80 backdrop-blur-md">
+                            <div className="flex flex-wrap items-center justify-center gap-3">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onSelectParagraph?.(i);
+                                  setSelectionIndex(null);
+                                }}
+                                className="font-tech flex h-10 items-center justify-center gap-2 border border-accent/40 bg-accent/20 px-4 text-[10px] uppercase tracking-[0.2em] text-accent transition-all hover:bg-accent/30"
+                              >
+                                <Mic className="h-3 w-3" />
+                                Vocal_Command
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  startEdit(i, para);
+                                  setSelectionIndex(null);
+                                }}
+                                className="font-tech flex h-10 items-center justify-center gap-2 border border-primary/40 bg-primary/20 px-4 text-[10px] uppercase tracking-[0.2em] text-primary transition-all hover:bg-primary/30"
+                              >
+                                <Pencil className="h-3 w-3" />
+                                Manual_Edit
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectionIndex(null);
+                                }}
+                                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-white/40 transition-all hover:border-white/20 hover:text-white"
+                              >
+                                <X className="h-4 w-4" />
+                              </button>
+                            </div>
+                          </div>
+                        )}
 
                         <div className="absolute right-0 top-0 flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
                           {onSelectParagraph && (
@@ -459,10 +499,10 @@ const PreviewArea = ({
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                startEdit(i, para);
+                                setSelectionIndex(i);
                               }}
                               className="rounded-full p-1.5 text-primary/30 transition-all hover:bg-accent/10 hover:text-accent"
-                              title="Manual edit"
+                              title="Edit modes"
                             >
                               <Pencil className="h-3.5 w-3.5" />
                             </button>

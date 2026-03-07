@@ -103,6 +103,7 @@ const Index = () => {
   >(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const hasAttemptedSync = useRef(false);
+  const isMicToggling = useRef(false);
   const {
     playClick,
     playSuccess,
@@ -444,6 +445,13 @@ const Index = () => {
   }, [interimTranscript, playTypewriterTick]);
 
   const handleMicToggle = useCallback(() => {
+    // 0. Anti-double-trigger guard (phantom mobile clicks)
+    if (isMicToggling.current) return;
+    isMicToggling.current = true;
+    setTimeout(() => {
+      isMicToggling.current = false;
+    }, 1000);
+
     if (!user) {
       setCommandFeedback("Authentication Required. Please log in to connect.");
       setCommandSuccess(false);
@@ -455,13 +463,15 @@ const Index = () => {
     if (isListening) {
       stopListening();
       playStop();
+      setIsProcessing(true); // Signal we're waiting for settling transcript
       setTimeout(async () => {
         const cmd = transcript || "";
         if (cmd.trim()) {
+          console.info("Neural_Link: Transmitting Voice Directive...", cmd);
           await handleCommand(cmd.trim());
         }
         setIsProcessing(false);
-      }, 600);
+      }, 700);
     } else {
       playStart();
       startListening();
