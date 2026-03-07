@@ -1,8 +1,8 @@
 <div align="center">
 
 # 🎙️ Gilded Voice Scribe
-![FAVICON](https://github.com/user-attachments/assets/e7b5a78b-5f25-4d47-bd97-1d568d31b7d5)
 
+![FAVICON](https://github.com/user-attachments/assets/e7b5a78b-5f25-4d47-bd97-1d568d31b7d5)
 
 ### _AI-Powered Voice-Controlled PDF Editor_
 
@@ -73,13 +73,13 @@ Click any paragraph to edit it directly. Full manual control alongside voice com
 
 Translate any paragraph into dozens of languages with a single voice command — _"translate paragraph 1 to Telugu"_.
 
-### 🎨 Voice-Driven Formatting
+### 🔍 Precision Word-Level Editing
 
-Apply **bold**, _italic_, <u>underline</u>, or ==highlight== formatting by voice.
+Delete specific words or phrases and add text to the **start** or **end** of any selected line with high accuracy.
 
-### 🔍 Smart Search & Navigation
+### 📥 Universal PDF Export
 
-Find words, scroll to paragraphs, and navigate your document hands-free.
+Export your edited document as a high-fidelity PDF. Supports all Unicode scripts (Telugu, Hindi, etc.) via `html2canvas` rendering.
 
 ### 📊 Document Analytics
 
@@ -91,18 +91,20 @@ Get instant word counts, reading time estimates, paragraph stats, and AI-powered
 
 ### ✨ More Features
 
-| Feature                    | Description                                                |
-| -------------------------- | ---------------------------------------------------------- |
-| 🎵 **Ambient Soundscapes** | Focus mode with ambient audio for distraction-free editing |
-| 🧠 **Smart Suggestions**   | AI-powered contextual suggestions while you edit           |
-| 💬 **Chat Widget**         | Ask the Scribe questions about your document anytime       |
-| 📖 **Onboarding Tutorial** | Interactive walkthrough for first-time users               |
-| ⏱️ **Session Timer**       | Track your editing session duration                        |
-| 💾 **Auto-Save**           | Sessions persist in local storage automatically            |
-| 📥 **PDF Export**          | Export your edited document as a formatted PDF via `jsPDF` |
-| 🔐 **Authentication**      | Supabase-powered auth with secure user sessions            |
-| 📈 **Analytics Dashboard** | View usage statistics and editing history                  |
-| 🛡️ **Security Panel**      | Manage security settings and access controls               |
+| Feature                    | Description                                                 |
+| -------------------------- | ----------------------------------------------------------- |
+| 🎵 **Ambient Soundscapes** | Focus mode with ambient audio for distraction-free editing  |
+| 🧠 **Smart Suggestions**   | AI-powered contextual suggestions while you edit            |
+| 💬 **Chat Widget**         | Ask the Scribe questions about your document anytime        |
+| 📖 **Onboarding Tutorial** | Interactive walkthrough for first-time users                |
+| ⏱️ **Session Timer**       | Track your editing session duration                         |
+| 💾 **Auto-Save**           | Sessions persist in local storage automatically             |
+| 📥 **PDF Export**          | High-fidelity Unicode-ready export via `html2canvas`        |
+| 🔐 **Authentication**      | Supabase-powered auth with secure user sessions             |
+| 📈 **Analytics Dashboard** | View usage statistics and editing history                   |
+| 🛡️ **Security Panel**      | Manage security settings and access controls                |
+| ⏱️ **Cooldown Guard**      | 3s "Rebooting" period between commands for system stability |
+| 🧠 **Deep Context**        | Expanded 2000-character context window for AI edits         |
 
 ---
 
@@ -110,63 +112,33 @@ Get instant word counts, reading time estimates, paragraph stats, and AI-powered
 
 > Just press the **microphone button** and speak any of these commands:
 
-### ✏️ Editing Commands
+### ✏️ Core Editing Commands
 
-| Command              | Example                                    | Description                        |
-| -------------------- | ------------------------------------------ | ---------------------------------- |
-| **Delete paragraph** | _"delete paragraph 3"_                     | Remove a specific paragraph        |
-| **Replace word**     | _"replace hello with greetings"_           | Find & replace across the document |
-| **Add after**        | _"add Once upon a time after paragraph 2"_ | Insert text after a paragraph      |
-| **Add before**       | _"add In summary before paragraph 1"_      | Insert text before a paragraph     |
-| **Swap paragraphs**  | _"swap paragraph 1 with 3"_                | Reorder paragraphs                 |
-| **Undo**             | _"undo"_                                   | Revert the last change             |
-
-### 🎨 Formatting Commands
-
-| Command       | Example                   | Description                |
-| ------------- | ------------------------- | -------------------------- |
-| **Bold**      | _"bold paragraph 2"_      | Apply bold formatting      |
-| **Italic**    | _"italic paragraph 1"_    | Apply italic formatting    |
-| **Underline** | _"underline paragraph 3"_ | Apply underline formatting |
-| **Highlight** | _"highlight paragraph 4"_ | Highlight a paragraph      |
-
-### 🧠 AI-Powered Commands
-
-| Command            | Example                                    | Description                                     |
-| ------------------ | ------------------------------------------ | ----------------------------------------------- |
-| **Summarize**      | _"summarize the document"_                 | Get an AI-generated summary                     |
-| **Get stats**      | _"get stats for the document"_             | Word count, read time & more                    |
-| **Translate**      | _"translate paragraph 1 to Telugu"_        | Translate to any language                       |
-| **Rewrite tone**   | _"rewrite paragraph 2 to be professional"_ | Shift tone (professional/poetic/simple/shorter) |
-| **Ask the Scribe** | _"ask Scribe: What is the main point?"_    | Document Q&A                                    |
-
-### 🔍 Navigation Commands
-
-| Command        | Example               | Description                     |
-| -------------- | --------------------- | ------------------------------- |
-| **Find**       | _"find student"_      | Search for a word or phrase     |
-| **Go to**      | _"go to paragraph 5"_ | Scroll to a specific paragraph  |
-| **Read aloud** | _"read paragraph 1"_  | Text-to-speech for a paragraph  |
-| **Focus mode** | _"enter focus mode"_  | Toggle distraction-free editing |
+| Command          | Example                                      | Description                                     |
+| ---------------- | -------------------------------------------- | ----------------------------------------------- |
+| **Replace word** | _"replace hello with greetings"_             | Find & replace across the document              |
+| **Delete word**  | _"delete hello from selected line"_          | Remove a specific word from the selected line   |
+| **Add to end**   | _"add 'the end' to selected line"_           | Append text to the end of a line                |
+| **Add to start** | _"add 'Attention' at the start of the line"_ | Prepend text to the beginning of a line         |
+| **Rewrite tone** | _"rewrite paragraph 2 to be professional"_   | Shift tone (professional/poetic/simple/shorter) |
+| **Translate**    | _"translate paragraph 1 to Telugu"_          | Universal translation to any language           |
 
 ---
 
-## 🛠️ Tech Stack
+### 🛠️ Tech Stack
 
-<div align="center">
-
-| Layer           | Technology                                   |
-| --------------- | -------------------------------------------- |
-| **Frontend**    | React 18, TypeScript, Vite                   |
-| **Styling**     | Tailwind CSS, shadcn/ui, Radix UI Primitives |
-| **AI Engine**   | OpenRouter API (StepFun Step-3.5 Flash)      |
-| **Voice**       | Web Speech API (SpeechRecognition)           |
-| **PDF Parsing** | pdfjs-dist                                   |
-| **PDF Export**  | jsPDF                                        |
-| **Auth & DB**   | Supabase                                     |
-| **State**       | React Query, Local Storage                   |
-| **Testing**     | Vitest, Testing Library                      |
-| **Linting**     | ESLint, TypeScript ESLint                    |
+| Layer           | Technology                                     |
+| --------------- | ---------------------------------------------- |
+| **Frontend**    | React 18, TypeScript, Vite                     |
+| **Styling**     | Tailwind CSS, shadcn/ui, Radix UI Primitives   |
+| **AI Engine**   | OpenRouter API (StepFun Step-3.5 Flash)        |
+| **Voice**       | Web Speech API (SpeechRecognition)             |
+| **PDF Parsing** | pdfjs-dist                                     |
+| **PDF Export**  | html2canvas + jsPDF (Universal Script Support) |
+| **Auth & DB**   | Supabase                                       |
+| **State**       | React Query, Local Storage                     |
+| **Testing**     | Vitest, Testing Library                        |
+| **Linting**     | ESLint, TypeScript ESLint                      |
 
 </div>
 
@@ -261,7 +233,6 @@ gilded-voice-scribe/
     ├── tailwind.config.ts
     └── tsconfig.json
 ```
-
 
 > 💡 **Tip:** Get a free OpenRouter API key at [openrouter.ai](https://openrouter.ai) — the app uses the free `step-3.5-flash` model by default.
 
