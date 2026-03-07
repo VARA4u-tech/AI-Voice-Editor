@@ -88,19 +88,21 @@ const useSpeechRecognition = (): UseSpeechRecognitionResult => {
     recognition.lang = preferredLang;
 
     recognition.onresult = (event: SpeechRecognitionResultEvent) => {
-      let final = "";
+      let fullTranscript = "";
       let interim = "";
-      for (let i = event.resultIndex; i < event.results.length; i++) {
+
+      // Rebuild the entire transcript from the beginning of the results list
+      // this prevents the "duplicate word" issue common on mobile browsers
+      for (let i = 0; i < event.results.length; i++) {
         const result = event.results[i];
         if (result.isFinal) {
-          final += result[0].transcript;
+          fullTranscript += result[0].transcript;
         } else {
           interim += result[0].transcript;
         }
       }
-      if (final) {
-        setTranscript((prev) => (prev ? prev + " " + final : final));
-      }
+
+      setTranscript(fullTranscript.trim());
       setInterimTranscript(interim);
     };
 
