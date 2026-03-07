@@ -88,6 +88,64 @@ const SessionHistory = () => {
     setTimeout(() => navigate("/"), 1000);
   };
 
+  const handleDeleteDocument = async (id: string) => {
+    if (!confirm("Are you sure you want to purge this scroll?")) return;
+
+    const { error } = await supabase
+      .from("user_documents")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      toast.error("Failed to purge scroll.");
+    } else {
+      setDocuments(documents.filter((d) => d.id !== id));
+      toast.success("Scroll purged from archives.");
+    }
+  };
+
+  const handleDeleteLog = async (id: string) => {
+    if (!confirm("Are you sure you want to erase this memory?")) return;
+
+    const { error } = await supabase
+      .from("scribe_activity")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      toast.error("Failed to erase log.");
+    } else {
+      setLogs(logs.filter((l) => l.id !== id));
+      toast.success("Memory erased.");
+    }
+  };
+
+  const handleClearAll = async () => {
+    if (!user) return;
+    const table = view === "documents" ? "user_documents" : "scribe_activity";
+    const message =
+      view === "documents"
+        ? "Are you sure you want to purge ALL scrolls? This cannot be undone."
+        : "Are you sure you want to erase ALL neural logs? This cannot be undone.";
+
+    if (!confirm(message)) return;
+
+    const { error } = await supabase
+      .from(table)
+      .delete()
+      .eq("user_id", user.id);
+
+    if (error) {
+      toast.error(
+        `Failed to clear ${view === "documents" ? "archives" : "memory"}.`,
+      );
+    } else {
+      if (view === "documents") setDocuments([]);
+      else setLogs([]);
+      toast.success(`${view === "documents" ? "Archives" : "Memory"} cleared.`);
+    }
+  };
+
   return (
     <Layout title="History" subtitle="Ritual_Logs" icon={History}>
       <div className="space-y-8">
@@ -108,16 +166,33 @@ const SessionHistory = () => {
             </button>
           </div>
 
-          {/* Search Header */}
-          <div className="relative w-full md:w-64">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary/40" />
-            <input
-              type="text"
-              placeholder="Search_Archives..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full rounded-sm border border-primary/20 bg-primary/5 py-2 pl-10 pr-4 font-mono text-[11px] text-primary transition-colors placeholder:text-primary/20 focus:border-accent/40 focus:outline-none"
-            />
+          {/* Right side: Search + Clear All */}
+          <div className="flex w-full flex-col gap-4 md:w-auto md:flex-row md:items-center">
+            {/* Search Header */}
+            <div className="relative w-full md:w-64">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-primary/40" />
+              <input
+                type="text"
+                placeholder="Search_Archives..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full rounded-sm border border-primary/20 bg-primary/5 py-2 pl-10 pr-4 font-mono text-[11px] text-primary transition-colors placeholder:text-primary/20 focus:border-accent/40 focus:outline-none"
+              />
+            </div>
+
+            {(view === "documents"
+              ? documents.length > 0
+              : logs.length > 0) && (
+              <button
+                onClick={handleClearAll}
+                className="font-tech flex shrink-0 items-center justify-center gap-2 rounded-sm border border-red-500/20 bg-red-500/10 px-4 py-2 text-[10px] uppercase tracking-widest text-red-500 transition-all hover:bg-red-500/20"
+                title={
+                  view === "documents" ? "Purge All Scrolls" : "Erase All Logs"
+                }
+              >
+                <Trash2 className="h-3 w-3" /> Purge_All
+              </button>
+            )}
           </div>
         </div>
 
@@ -174,12 +249,21 @@ const SessionHistory = () => {
                             </div>
                           </div>
                         </div>
-                        <button
-                          onClick={() => handleRestore(doc)}
-                          className="font-tech flex shrink-0 items-center gap-2 rounded-sm border border-accent/20 bg-accent/10 p-2 text-[10px] uppercase tracking-widest text-accent transition-all hover:bg-accent/20"
-                        >
-                          <RotateCcw className="h-3 w-3" /> Restore
-                        </button>
+                        <div className="flex shrink-0 items-center gap-2">
+                          <button
+                            onClick={() => handleRestore(doc)}
+                            className="font-tech flex items-center gap-2 rounded-sm border border-accent/20 bg-accent/10 p-2 text-[10px] uppercase tracking-widest text-accent transition-all hover:bg-accent/20"
+                          >
+                            <RotateCcw className="h-3 w-3" /> Restore
+                          </button>
+                          <button
+                            onClick={() => handleDeleteDocument(doc.id)}
+                            className="flex items-center gap-2 rounded-sm border border-red-500/20 bg-red-500/10 p-2 text-red-400 transition-all hover:bg-red-500/20"
+                            title="Purge Scroll"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   );
@@ -208,7 +292,7 @@ const SessionHistory = () => {
               >
                 <div className="flex items-start gap-4">
                   <Mic className="mt-1 h-4 w-4 text-accent/60" />
-                  <div>
+                  <div className="flex-1">
                     <h4 className="font-tech text-[11px] uppercase tracking-widest text-primary">
                       {log.command_type}
                     </h4>
@@ -219,6 +303,13 @@ const SessionHistory = () => {
                       {new Date(log.created_at).toLocaleString()}
                     </span>
                   </div>
+                  <button
+                    onClick={() => handleDeleteLog(log.id)}
+                    className="flex shrink-0 items-center gap-2 rounded-sm border border-red-500/20 bg-red-500/10 p-2 text-red-400 opacity-0 transition-all transition-opacity hover:bg-red-500/20 group-hover:opacity-100"
+                    title="Erase Memory"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </button>
                 </div>
               </div>
             ))
