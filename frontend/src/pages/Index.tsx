@@ -97,10 +97,12 @@ const Index = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isFocusMode, setIsFocusMode] = useState(false);
   const [isCooldown, setIsCooldown] = useState(false); // Cooldown guard
+  const [isExporting, setIsExporting] = useState(false);
   const [selectedParagraphIndex, setSelectedParagraphIndex] = useState<
     number | null
   >(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const hasAttemptedSync = useRef(false);
   const {
     playClick,
     playSuccess,
@@ -114,7 +116,13 @@ const Index = () => {
 
   // ── Sync with Supabase on Login ──
   useEffect(() => {
-    if (user && paragraphs.length === 0) {
+    if (!user) {
+      hasAttemptedSync.current = false;
+      return;
+    }
+
+    if (paragraphs.length === 0 && !hasAttemptedSync.current) {
+      hasAttemptedSync.current = true;
       supabase
         .from("user_documents")
         .select("*")
@@ -610,7 +618,7 @@ const Index = () => {
     setParagraphs([]);
     setPageCount(0);
     setHistory([]);
-    setCommandFeedback("Scroll cleared. Ready for a new document.");
+    setCommandFeedback("Ritual Cleared: Archive connection suspended.");
     setCommandSuccess(true);
     playTransition();
     clearFeedback();
@@ -622,10 +630,24 @@ const Index = () => {
   };
 
   // Export as a properly formatted PDF using jsPDF
-  const handleExport = () => {
-    if (!paragraphs.length) return;
-    exportToPdf(fileName, paragraphs);
-    playSuccess();
+  const handleExport = async () => {
+    if (!paragraphs.length || isExporting) return;
+    setIsExporting(true);
+    setCommandFeedback("Generating high-fidelity PDF... please wait.");
+    try {
+      await exportToPdf(fileName, paragraphs);
+      setCommandFeedback("PDF sealed and exported successfully.");
+      setCommandSuccess(true);
+      playSuccess();
+      clearFeedback();
+    } catch (err) {
+      console.error("Export error:", err);
+      setCommandFeedback("Neural export failed. Please try again.");
+      setCommandSuccess(false);
+      playError();
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   // ── Save Version ──────────────────────────────────────────────────────────
@@ -1003,17 +1025,22 @@ const Index = () => {
                 <button
                   onClick={handleExport}
                   onMouseEnter={() => playHover()}
+                  disabled={isExporting}
                   className="group relative flex items-center justify-center gap-2 px-6 py-2.5 sm:py-3
                     border border-primary/20 bg-primary/5
                     text-primary font-tech text-[10px] sm:text-[11px] tracking-[0.2em] uppercase
                     transition-all duration-300 w-full sm:w-auto
                     hover:border-accent hover:bg-accent/5 hover:text-accent
-                    cursor-pointer animate-fade-in overflow-hidden"
+                    cursor-pointer animate-fade-in overflow-hidden disabled:opacity-50"
                 >
                   <div className="tech-bracket-tl w-1 h-1" />
                   <div className="tech-bracket-br w-1 h-1" />
-                  <Download className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-y-0.5" />
-                  Export_Out
+                  {isExporting ? (
+                    <div className="w-3.5 h-3.5 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <Download className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-y-0.5" />
+                  )}
+                  {isExporting ? "Sealing..." : "Export_Out"}
                 </button>
 
                 <button
