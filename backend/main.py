@@ -28,6 +28,8 @@ origins = [
     settings.frontend_origin,
     "http://localhost:5173", # Vite's default port
     "http://localhost:8080", # Vite's alternative port
+    "https://gilded-voice-scribe.vercel.app",  # Production Vercel App
+    "https://ai-voice-editor.vercel.app",      # Alternate Vercel App
 ]
 
 app.add_middleware(
