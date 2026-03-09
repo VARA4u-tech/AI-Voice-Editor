@@ -23,6 +23,7 @@
 
 ## 📖 Table of Contents
 
+- [📚 Detailed Documentation](PROJECT_DOCUMENTATION.md)
 - [🌟 Overview](#-overview)
 - [🎯 Key Features](#-key-features)
 - [🗣️ Voice Commands](#️-voice-commands)
