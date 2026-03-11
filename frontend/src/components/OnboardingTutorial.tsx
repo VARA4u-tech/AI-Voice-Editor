@@ -29,7 +29,7 @@ const STEPS: Step[] = [
   {
     icon: <Sparkles className="h-8 w-8" />,
     title: "Welcome to the Neural Scribe",
-    subtitle: "AI Voice Editor — Your voice-powered document ritual",
+    subtitle: "Voice Controlled PDF Editor — Your voice-powered document ritual",
     commands: [],
     tip: "This short guide will show you how to master the system. You can dismiss it anytime.",
     color: "from-amber-500/20 to-transparent",

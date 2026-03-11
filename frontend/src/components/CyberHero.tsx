@@ -32,7 +32,7 @@ const CyberHero = ({ fileName, paragraphsCount }: CyberHeroProps) => {
         <div className="absolute -inset-16 rounded-full bg-accent/20 opacity-0 blur-[100px] transition-opacity duration-1000 group-hover:opacity-100" />
         <img
           src="/LOGO.png"
-          alt="AI Voice Editor Logo"
+          alt="Voice Controlled PDF Editor Logo"
           className="relative z-10 h-auto w-56 drop-shadow-[0_0_60px_hsl(var(--gold)/0.6)] transition-transform duration-700 group-hover:scale-105 sm:w-[320px] md:w-[400px]"
         />
         <div className="tech-bracket-tl -left-4 -top-4 h-10 w-10 border-accent/40" />
@@ -44,7 +44,7 @@ const CyberHero = ({ fileName, paragraphsCount }: CyberHeroProps) => {
       {/* Primary Titles */}
       <div className="relative mb-12 space-y-4 px-6 text-center">
         <h1 className="gold-text-glow font-heading text-2xl uppercase leading-tight tracking-[0.15em] text-primary sm:text-4xl sm:tracking-[0.35em] md:text-5xl lg:text-7xl">
-          AI Voice Editor
+          Voice Controlled PDF Editor
         </h1>
         <div className="flex items-center justify-center gap-6">
           <div className="h-[1px] w-12 bg-gradient-to-r from-transparent to-accent/60" />

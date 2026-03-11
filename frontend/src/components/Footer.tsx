@@ -32,7 +32,7 @@ const Footer = () => {
             >
               <img
                 src="/LOGO.png"
-                alt="AI Voice Editor Logo"
+                alt="Voice Controlled PDF Editor Logo"
                 className="h-auto w-48 drop-shadow-[0_0_20px_hsl(var(--gold)/0.3)] transition-all duration-700 group-hover:scale-105 group-hover:drop-shadow-[0_0_30px_hsl(var(--gold)/0.5)]"
               />
               <div className="flex items-center gap-3">
@@ -164,7 +164,7 @@ const Footer = () => {
               Built and Engineered with Love by VARA
             </p>
             <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary/70">
-              © 2026 - 2027 AI VOICE EDITOR ARCHIVE
+              © 2026 - 2027 VOICE CONTROLLED PDF EDITOR ARCHIVE
             </p>
             <p className="font-mono text-[8px] uppercase tracking-[0.3em] text-primary/50">
               All Transmissions Decrypted // Locally Processed
