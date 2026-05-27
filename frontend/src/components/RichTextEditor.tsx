@@ -1,6 +1,6 @@
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { Bold, Italic, Strikethrough, Heading1, Heading2, List, ListOrdered, Quote, Undo, Redo } from 'lucide-react';
+import { Bold, Italic, Strikethrough, Heading1, Heading2, List, ListOrdered, Quote, Undo, Redo, Loader2 } from 'lucide-react';
 import { Image } from '@tiptap/extension-image';
 import { Table } from '@tiptap/extension-table';
 import { TableRow } from '@tiptap/extension-table-row';
@@ -179,14 +179,13 @@ export default function RichTextEditor({ content, onChange, isLoading }: RichTex
       <div className="tech-bracket-br" />
 
       {isLoading && (
-        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm">
-          <div className="relative mb-4">
-            <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-accent" />
-            <div className="absolute inset-0 animate-pulse bg-accent/20 blur-xl" />
+        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-background/50 backdrop-blur-sm">
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="h-8 w-8 animate-spin text-accent" />
+            <p className="font-tech text-[10px] tracking-widest text-primary/70 uppercase">
+              Extracting Data...
+            </p>
           </div>
-          <p className="font-tech animate-pulse text-xs uppercase tracking-[0.4em] text-accent">
-            Modulating Content...
-          </p>
         </div>
       )}
 
