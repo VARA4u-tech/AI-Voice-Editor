@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 const ALLOWED_ORIGINS = [
   "http://localhost:8080",
   "https://ai-voice-controlled-pdf-editor.vercel.app",
+  "https://ai-voicecontrolled-pdf-editor.onrender.com",
   process.env.FRONTEND_URL,
 ].filter(Boolean) as string[];
 
