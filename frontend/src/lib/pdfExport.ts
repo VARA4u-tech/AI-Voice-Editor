@@ -58,7 +58,7 @@ export async function exportToPdf(
   header.appendChild(dateSpan);
   container.appendChild(header);
 
-  // Build Paragraphs
+  // Build Paragraphs (Actually just injecting HTML now)
   paragraphs.forEach((para, idx) => {
     if (!para.trim()) return;
 
@@ -67,26 +67,28 @@ export async function exportToPdf(
     wrapper.style.marginBottom = "20px";
     wrapper.style.alignItems = "flex-start";
 
-    const num = document.createElement("div");
-    num.innerText = `[${String(idx + 1).padStart(2, "0")}]`;
-    num.style.fontFamily = "monospace";
-    num.style.color = "rgb(140, 170, 160)";
-    num.style.fontSize = "14px";
-    num.style.minWidth = "45px";
-    num.style.marginRight = "10px";
-    num.style.paddingTop = "2px";
-
     const text = document.createElement("div");
-    text.innerText = para;
+    // Use innerHTML so the extracted HTML formatting is preserved visually
+    text.innerHTML = para;
     text.style.fontSize = "16px";
     text.style.lineHeight = "1.6";
     text.style.color = "rgb(30, 30, 30)";
     text.style.flex = "1";
     text.style.wordWrap = "break-word";
-    // Important: preserve line breaks from the original text if needed
-    text.style.whiteSpace = "pre-wrap";
 
-    wrapper.appendChild(num);
+    // Add standard styling overrides for elements inside the HTML
+    const styleBlock = document.createElement("style");
+    styleBlock.innerHTML = `
+      h1, h2, h3, h4, h5, h6 { margin-top: 1.5em; margin-bottom: 0.5em; font-weight: bold; color: rgb(180, 140, 60); }
+      p { margin-bottom: 1em; }
+      table { width: 100%; border-collapse: collapse; margin-bottom: 1em; }
+      th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+      th { background-color: #f5f5f5; font-weight: bold; }
+      hr { border: 0; border-top: 1px solid #ccc; margin: 2em 0; }
+      a { color: rgb(180, 140, 60); text-decoration: none; }
+      img { max-width: 100%; height: auto; display: block; margin: 1em 0; }
+    `;
+    wrapper.appendChild(styleBlock);
     wrapper.appendChild(text);
     container.appendChild(wrapper);
   });
