@@ -208,31 +208,19 @@ const useSpeechRecognition = (): UseSpeechRecognitionResult => {
     // Mark intention BEFORE starting so onend can restart if needed
     shouldBeListeningRef.current = true;
     resetSilenceTimeout();
+    setTranscript("");
+    setInterimTranscript("");
 
     try {
-      // Abort any existing session to clear stale buffers
-      recognitionRef.current.abort();
-
-      setTranscript("");
-      setInterimTranscript("");
-
-      // Small timeout to let the browser process the abort before starting fresh
-      setTimeout(() => {
-        if (!shouldBeListeningRef.current) return; // Guard against race
-        try {
-          recognitionRef.current?.start();
-          setIsListening(true);
-        } catch (e) {
-          console.error("Delayed start error:", e);
-          shouldBeListeningRef.current = false;
-          setIsListening(false);
-        }
-      }, 80);
+      recognitionRef.current.start();
+      setIsListening(true);
     } catch (e) {
-      console.error("Failed to reset/start recognition:", e);
-      shouldBeListeningRef.current = false;
+      // If it throws because it's already started, that's fine.
+      // The intention is marked, so if it's currently stopping, onend will restart it.
+      setIsListening(true);
+      console.warn("Recognition already started", e);
     }
-  }, []);
+  }, [resetSilenceTimeout]);
 
   const stopListening = useCallback(() => {
     if (!recognitionRef.current) return;

@@ -47,6 +47,10 @@ export default function VoiceSelectionMenu({ editor }: { editor: Editor }) {
   const silenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isRecordingRef = useRef<boolean>(false);
 
+  const transcriptRef = useRef<string>("");
+  const selectionRangeRef = useRef<{ from: number; to: number } | null>(null);
+  const processRecordingRef = useRef<() => void>();
+
   // Sync ref with state so we can access it in the timeout callback reliably
   useEffect(() => {
     isRecordingRef.current = isRecording;
@@ -70,12 +74,10 @@ export default function VoiceSelectionMenu({ editor }: { editor: Editor }) {
     silenceTimerRef.current = setTimeout(() => {
       if (!isRecordingRef.current) return;
       
-      setIsRecording(false);
-      try {
-        recognitionRef.current?.stop();
-      } catch (err) {}
-      
-      toast.info("Microphone turned off due to inactivity");
+      // Auto-process the command instead of just turning off
+      if (processRecordingRef.current) {
+        processRecordingRef.current();
+      }
     }, 5000);
   }, [clearSilenceTimeout]);
 
@@ -97,6 +99,7 @@ export default function VoiceSelectionMenu({ editor }: { editor: Editor }) {
             currentTranscript += event.results[i][0].transcript;
           }
           setTranscript(currentTranscript);
+          transcriptRef.current = currentTranscript;
           
           // Reset silence timeout whenever we get speech results
           resetSilenceTimeout();
@@ -136,47 +139,16 @@ export default function VoiceSelectionMenu({ editor }: { editor: Editor }) {
     return div.innerHTML;
   };
 
-  const startRecording = (e: React.SyntheticEvent) => {
-    e.preventDefault(); // Keep editor focus and selection
-    if (!recognitionRef.current) {
-      toast.error("Speech recognition is not supported in this browser.");
-      return;
-    }
-
-    // Save selection range before we start doing things
-    setSelectionRange({
-      from: editor.state.selection.from,
-      to: editor.state.selection.to,
-    });
-
-    setTranscript("");
-    
-    // Abort any stale background sessions first
-    try {
-      recognitionRef.current.abort();
-    } catch (err) {}
-
-    // Small delay ensures the browser completely clears the audio pipeline
-    setTimeout(() => {
-      try {
-        recognitionRef.current?.start();
-        setIsRecording(true);
-        resetSilenceTimeout();
-      } catch (err) {
-        console.warn("Recognition start failed", err);
-      }
-    }, 80);
-  };
-
-  const stopRecording = async (e: React.SyntheticEvent) => {
-    e.preventDefault();
-    if (!isRecording) return;
+  processRecordingRef.current = async () => {
+    if (!isRecordingRef.current) return;
 
     clearSilenceTimeout();
-    recognitionRef.current?.stop();
+    try {
+      recognitionRef.current?.stop();
+    } catch (err) {}
     setIsRecording(false);
 
-    const finalTranscript = transcript.trim();
+    const finalTranscript = transcriptRef.current.trim();
     if (!finalTranscript) {
       toast.info("No voice command detected.");
       return;
@@ -186,8 +158,8 @@ export default function VoiceSelectionMenu({ editor }: { editor: Editor }) {
 
     try {
       // Re-apply the saved selection if we lost it
-      if (selectionRange) {
-        editor.commands.setTextSelection(selectionRange);
+      if (selectionRangeRef.current) {
+        editor.commands.setTextSelection(selectionRangeRef.current);
       }
 
       const selectedHtml = getSelectedHtml();
@@ -213,7 +185,51 @@ export default function VoiceSelectionMenu({ editor }: { editor: Editor }) {
     } finally {
       setIsProcessing(false);
       setTranscript("");
+      transcriptRef.current = "";
       setSelectionRange(null);
+      selectionRangeRef.current = null;
+    }
+  };
+
+  const startRecording = (e: React.SyntheticEvent) => {
+    e.preventDefault(); // Keep editor focus and selection
+    if (!recognitionRef.current) {
+      toast.error("Speech recognition is not supported in this browser.");
+      return;
+    }
+
+    // Save selection range before we start doing things
+    const currentSelection = {
+      from: editor.state.selection.from,
+      to: editor.state.selection.to,
+    };
+    setSelectionRange(currentSelection);
+    selectionRangeRef.current = currentSelection;
+
+    setTranscript("");
+    transcriptRef.current = "";
+    
+    // Abort any stale background sessions first
+    try {
+      recognitionRef.current.abort();
+    } catch (err) {}
+
+    // Small delay ensures the browser completely clears the audio pipeline
+    setTimeout(() => {
+      try {
+        recognitionRef.current?.start();
+        setIsRecording(true);
+        resetSilenceTimeout();
+      } catch (err) {
+        console.warn("Recognition start failed", err);
+      }
+    }, 80);
+  };
+
+  const stopRecording = (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    if (processRecordingRef.current) {
+      processRecordingRef.current();
     }
   };
 
