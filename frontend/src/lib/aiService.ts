@@ -269,3 +269,63 @@ export async function processCommandWithAI(
     updatedParagraphs: paragraphs,
   };
 }
+
+const SELECTION_SYSTEM_PROMPT = minifyPrompt(`
+You are the "Gilded Scribe", an elite AI voice editor assistant.
+The user has selected a specific portion of their document (provided as HTML) and issued a voice command to edit ONLY that selection.
+RULES:
+1. Return ONLY the modified HTML. Do NOT return markdown formatting (no \`\`\`html tags), do NOT explain your reasoning.
+2. Preserve all existing HTML formatting (bold, italics, headings, tables, etc.) unless the voice command explicitly asks to change it.
+3. Apply the user's voice command to the selected HTML.
+4. If the command asks to "simplify", "rewrite", or "translate", modify the text but keep the structural HTML tags intact if possible.
+5. If the command is unrelated or unclear, return the original HTML unmodified.
+`);
+
+export async function processSelectionEditWithAI(
+  selectedHtml: string,
+  voiceCommand: string,
+  retries = 1,
+): Promise<string> {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token;
+
+  if (!token) {
+    throw new Error("Authentication is required. Please log in.");
+  }
+
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      console.log(`Scribe Core: Processing selection edit (attempt ${attempt + 1})...`, voiceCommand);
+
+      const response = await fetchWithFallback(backendUrl, token, (model) => ({
+        model,
+        max_tokens: 1500,
+        temperature: 0.3, // Slightly higher for rewriting, but low enough to follow strict instructions
+        messages: [
+          { role: "system", content: SELECTION_SYSTEM_PROMPT },
+          {
+            role: "user",
+            content: `Voice Command: "${voiceCommand}"\n\nSelected HTML to edit:\n${selectedHtml}`,
+          },
+        ],
+      }));
+
+      const data = await response.json();
+      let aiContent = data.choices?.[0]?.message?.content || "";
+
+      // Clean up markdown blocks if the AI accidentally adds them
+      aiContent = aiContent.replace(/^```html\n?/, "").replace(/^```\n?/, "").replace(/\n?```$/, "").trim();
+      
+      return aiContent || selectedHtml;
+    } catch (error) {
+      if (attempt === retries) {
+        console.error("Selection Edit API Error:", error);
+        throw new Error("All AI providers are currently busy. Please try again.");
+      }
+      await delay((attempt + 1) * 2000);
+    }
+  }
+
+  return selectedHtml;
+}

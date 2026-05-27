@@ -7,6 +7,10 @@ import { TableRow } from '@tiptap/extension-table-row';
 import { TableHeader } from '@tiptap/extension-table-header';
 import { TableCell } from '@tiptap/extension-table-cell';
 import { TextAlign } from '@tiptap/extension-text-align';
+import VoiceSelectionMenu from './VoiceSelectionMenu';
+import { useState } from 'react';
+import { X, Sparkles } from 'lucide-react';
+
 interface RichTextEditorProps {
   content: string;
   onChange: (content: string) => void;
@@ -109,6 +113,8 @@ const MenuBar = ({ editor }: { editor: any }) => {
 };
 
 export default function RichTextEditor({ content, onChange, isLoading }: RichTextEditorProps) {
+  const [showTip, setShowTip] = useState(true);
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -178,6 +184,20 @@ export default function RichTextEditor({ content, onChange, isLoading }: RichTex
       <div className="tech-bracket-bl" />
       <div className="tech-bracket-br" />
 
+      {showTip && !isLoading && (
+        <div className="flex items-center justify-between bg-accent/10 px-4 py-2 text-xs text-accent backdrop-blur-md border-b border-accent/20">
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4" />
+            <span className="font-medium tracking-wide">
+              Tip: Select a line, paragraph, or word to edit manually or with Voice Commands.
+            </span>
+          </div>
+          <button onClick={() => setShowTip(false)} className="rounded-full p-1 hover:bg-accent/20 transition-colors">
+            <X className="h-3 w-3" />
+          </button>
+        </div>
+      )}
+
       {isLoading && (
         <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-background/50 backdrop-blur-sm">
           <div className="flex flex-col items-center gap-4">
@@ -190,6 +210,8 @@ export default function RichTextEditor({ content, onChange, isLoading }: RichTex
       )}
 
       <MenuBar editor={editor} />
+      
+      {editor && <VoiceSelectionMenu editor={editor} />}
       
       <div className="custom-scrollbar max-h-[60vh] overflow-y-auto">
         <EditorContent editor={editor} />
