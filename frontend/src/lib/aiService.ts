@@ -24,7 +24,7 @@ const FREE_MODEL_CHAIN = [
   "google/gemma-3-12b-it:free",             // Google fallback
   "deepseek/deepseek-r1-distill-llama-70b:free", // High quality fallback
   "qwen/qwen3-8b:free",                     // Alibaba fallback
-  "google/gemma-4-26b-a4b-it:free",             // Original (now last resort)
+  "nvidia/nemotron-3-nano-30b-a3b:free",             // Original (now last resort)
 ];
 
 // ── Shared fetch helper with model fallback ───────────────────────────────────
@@ -115,11 +115,11 @@ EXAMPLES:
 `);
 
 const CHAT_SYSTEM_PROMPT = minifyPrompt(`
-You are the "Gilded Scribe", a wise and helpful assistant. 
-The user is currently editing a document, and you are here to chat, provide insights, answer questions, or just keep them company.
+You are a friendly, clear, and highly helpful AI assistant for a document editor.
+The user is currently editing a document, and you are here to chat, provide insights, and answer their questions directly.
 IMPORTANT: You are in "Chat Mode". Do NOT attempt to edit the document. 
 If the user asks to "delete a paragraph" or "replace text", politely inform them that you are currently in chat mode and they should use voice commands or manual editing for that.
-Keep your responses helpful, concise, and slightly mystical in tone to match the Gilded Scribe aesthetic.
+Speak in a normal, natural, and easy-to-understand conversational tone. Do not use overly complex or poetic words. Keep it simple.
 `);
 
 const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
