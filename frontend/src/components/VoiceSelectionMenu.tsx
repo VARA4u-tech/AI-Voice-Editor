@@ -6,11 +6,42 @@ import { DOMSerializer } from "prosemirror-model";
 import { processSelectionEditWithAI } from "../lib/aiService";
 import { toast } from "sonner";
 
+// Web Speech API Types
+interface SpeechRecognitionEvent extends Event {
+  results: {
+    length: number;
+    [index: number]: {
+      [index: number]: {
+        transcript: string;
+      };
+    };
+  };
+}
+
+interface SpeechRecognitionErrorEvent extends Event {
+  error: string;
+}
+
+interface SpeechRecognition extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  start(): void;
+  stop(): void;
+  onresult: ((this: SpeechRecognition, ev: SpeechRecognitionEvent) => any) | null;
+  onerror: ((this: SpeechRecognition, ev: SpeechRecognitionErrorEvent) => any) | null;
+}
+
+interface WindowWithSpeech extends Window {
+  SpeechRecognition?: { new (): SpeechRecognition };
+  webkitSpeechRecognition?: { new (): SpeechRecognition };
+}
+
 export default function VoiceSelectionMenu({ editor }: { editor: Editor }) {
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [transcript, setTranscript] = useState("");
-  const recognitionRef = useRef<any>(null);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
 
   // Preserve the selection range so we don't lose it if editor blurs
   const [selectionRange, setSelectionRange] = useState<{
@@ -20,17 +51,17 @@ export default function VoiceSelectionMenu({ editor }: { editor: Editor }) {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const SpeechRecognition =
-        (window as any).SpeechRecognition ||
-        (window as any).webkitSpeechRecognition;
+      const win = window as WindowWithSpeech;
+      const SpeechRecognitionConstructor =
+        win.SpeechRecognition || win.webkitSpeechRecognition;
 
-      if (SpeechRecognition) {
-        const recognition = new SpeechRecognition();
+      if (SpeechRecognitionConstructor) {
+        const recognition = new SpeechRecognitionConstructor();
         recognition.continuous = true; // allow pausing briefly
         recognition.interimResults = true;
         recognition.lang = "en-US";
 
-        recognition.onresult = (event: any) => {
+        recognition.onresult = (event: SpeechRecognitionEvent) => {
           let currentTranscript = "";
           for (let i = 0; i < event.results.length; i++) {
             currentTranscript += event.results[i][0].transcript;
@@ -38,7 +69,7 @@ export default function VoiceSelectionMenu({ editor }: { editor: Editor }) {
           setTranscript(currentTranscript);
         };
 
-        recognition.onerror = (e: any) => {
+        recognition.onerror = (e: SpeechRecognitionErrorEvent) => {
           console.error("Speech recognition error", e.error);
           setIsRecording(false);
         };
