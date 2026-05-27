@@ -418,7 +418,7 @@ const commands: CommandPattern[] = [
         structuredData: {
           action: "detect_language",
           target: paragraphs[selectedParagraphIndex],
-        }
+        },
       };
     },
   },

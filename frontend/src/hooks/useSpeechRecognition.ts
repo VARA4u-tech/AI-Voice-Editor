@@ -79,16 +79,16 @@ const useSpeechRecognition = (): UseSpeechRecognitionResult => {
 
   const handleSilenceTimeout = useCallback(() => {
     if (!shouldBeListeningRef.current) return;
-    
+
     // Stop listening due to inactivity
     shouldBeListeningRef.current = false;
     setIsListening(false);
-    
+
     if (restartTimerRef.current) {
       clearTimeout(restartTimerRef.current);
       restartTimerRef.current = null;
     }
-    
+
     try {
       recognitionRef.current?.stop();
     } catch (e) {
@@ -150,7 +150,7 @@ const useSpeechRecognition = (): UseSpeechRecognitionResult => {
         setTranscript(final.trim());
       }
       setInterimTranscript(interim);
-      
+
       // Reset silence timeout whenever we get speech results
       resetSilenceTimeout();
     };

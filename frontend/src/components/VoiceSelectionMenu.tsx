@@ -29,8 +29,12 @@ interface SpeechRecognition extends EventTarget {
   start(): void;
   stop(): void;
   abort(): void;
-  onresult: ((this: SpeechRecognition, ev: SpeechRecognitionEvent) => void) | null;
-  onerror: ((this: SpeechRecognition, ev: SpeechRecognitionErrorEvent) => void) | null;
+  onresult:
+    | ((this: SpeechRecognition, ev: SpeechRecognitionEvent) => void)
+    | null;
+  onerror:
+    | ((this: SpeechRecognition, ev: SpeechRecognitionErrorEvent) => void)
+    | null;
   onend: ((this: SpeechRecognition, ev: Event) => void) | null;
 }
 
@@ -73,7 +77,7 @@ export default function VoiceSelectionMenu({ editor }: { editor: Editor }) {
     clearSilenceTimeout();
     silenceTimerRef.current = setTimeout(() => {
       if (!isRecordingRef.current) return;
-      
+
       // Auto-process the command instead of just turning off
       if (processRecordingRef.current) {
         processRecordingRef.current();
@@ -100,7 +104,7 @@ export default function VoiceSelectionMenu({ editor }: { editor: Editor }) {
           }
           setTranscript(currentTranscript);
           transcriptRef.current = currentTranscript;
-          
+
           // Reset silence timeout whenever we get speech results
           resetSilenceTimeout();
         };
@@ -181,7 +185,9 @@ export default function VoiceSelectionMenu({ editor }: { editor: Editor }) {
       toast.success("Edit applied successfully!");
     } catch (error) {
       console.error("Selection Edit Error", error);
-      toast.error(error instanceof Error ? error.message : "Failed to apply AI edit.");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to apply AI edit.",
+      );
     } finally {
       setIsProcessing(false);
       setTranscript("");
@@ -208,7 +214,7 @@ export default function VoiceSelectionMenu({ editor }: { editor: Editor }) {
 
     setTranscript("");
     transcriptRef.current = "";
-    
+
     // Abort any stale background sessions first
     try {
       recognitionRef.current.abort();

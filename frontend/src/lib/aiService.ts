@@ -132,7 +132,8 @@ Speak in a normal, natural, and easy-to-understand conversational tone. Do not u
 const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
 export async function detectLanguage(text: string): Promise<string> {
-  const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+  const backendUrl =
+    import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
   const { data } = await supabase.auth.getSession();
   const token = data.session?.access_token;
   if (!token) throw new Error("Authentication is required.");
@@ -150,7 +151,7 @@ export async function detectLanguage(text: string): Promise<string> {
     const err = await response.text().catch(() => "Unknown error");
     throw new Error(`Language detection failed: ${err}`);
   }
-  
+
   const result = await response.json();
   return result.detected_name || result.detected_code || "Unknown";
 }
@@ -190,7 +191,11 @@ export async function processChatOnly(
   } catch (error) {
     console.error("Chat API Error:", error);
     const errMsg = error instanceof Error ? error.message.toLowerCase() : "";
-    if (errMsg.includes("429") || errMsg.includes("rate limit") || errMsg.includes("rate-limited")) {
+    if (
+      errMsg.includes("429") ||
+      errMsg.includes("rate limit") ||
+      errMsg.includes("rate-limited")
+    ) {
       return "AI Rate Limit Reached! Please wait a few seconds before chatting again.";
     }
     return "The AI service is currently busy across all providers. Please try again in a moment.";
@@ -282,10 +287,17 @@ export async function processCommandWithAI(
     } catch (error) {
       if (attempt === retries) {
         console.error("AI Direct API Error:", error);
-        const errMsg = error instanceof Error ? error.message.toLowerCase() : "";
-        let displayMessage = "All AI providers are currently busy. Please try again in a moment.";
-        if (errMsg.includes("429") || errMsg.includes("rate limit") || errMsg.includes("rate-limited")) {
-          displayMessage = "AI Rate Limit Reached! Please wait a few seconds before your next command.";
+        const errMsg =
+          error instanceof Error ? error.message.toLowerCase() : "";
+        let displayMessage =
+          "All AI providers are currently busy. Please try again in a moment.";
+        if (
+          errMsg.includes("429") ||
+          errMsg.includes("rate limit") ||
+          errMsg.includes("rate-limited")
+        ) {
+          displayMessage =
+            "AI Rate Limit Reached! Please wait a few seconds before your next command.";
         }
         return {
           success: false,
@@ -363,8 +375,13 @@ export async function processSelectionEditWithAI(
     } catch (error) {
       if (attempt === retries) {
         console.error("Selection Edit API Error:", error);
-        const errMsg = error instanceof Error ? error.message.toLowerCase() : "";
-        if (errMsg.includes("429") || errMsg.includes("rate limit") || errMsg.includes("rate-limited")) {
+        const errMsg =
+          error instanceof Error ? error.message.toLowerCase() : "";
+        if (
+          errMsg.includes("429") ||
+          errMsg.includes("rate limit") ||
+          errMsg.includes("rate-limited")
+        ) {
           throw new Error("AI Rate Limit Reached! Please wait a few seconds.");
         }
         throw new Error(
