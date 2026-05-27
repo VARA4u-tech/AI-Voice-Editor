@@ -137,7 +137,6 @@ export async function exportToPdf(
 
       // Wait a moment for any external images/fonts to load within the iframe
       setTimeout(printAndClean, 800);
-
     } catch (error) {
       reject(error);
     }

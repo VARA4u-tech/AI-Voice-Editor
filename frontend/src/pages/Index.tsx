@@ -1328,7 +1328,11 @@ const Index = () => {
           className={`flex w-full flex-col items-center transition-all duration-1000 ${isFocusMode ? "mt-12" : "mt-0"}`}
         >
           <RichTextEditor
-            content={paragraphs.length > 0 && paragraphs[0].startsWith('<') ? paragraphs.join('') : paragraphs.map(p => `<p>${p}</p>`).join('')}
+            content={
+              paragraphs.length > 0 && paragraphs[0].startsWith("<")
+                ? paragraphs.join("")
+                : paragraphs.map((p) => `<p>${p}</p>`).join("")
+            }
             isLoading={isParsing}
             onChange={(html) => {
               if (!html || html === paragraphs.join("")) return;

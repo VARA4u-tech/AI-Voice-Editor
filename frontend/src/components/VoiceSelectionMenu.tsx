@@ -1,10 +1,10 @@
-import { Editor } from '@tiptap/react';
-import { BubbleMenu } from '@tiptap/react/menus';
-import { Mic, Pencil, Loader2, StopCircle } from 'lucide-react';
-import { useState, useRef, useEffect } from 'react';
-import { DOMSerializer } from 'prosemirror-model';
-import { processSelectionEditWithAI } from '../lib/aiService';
-import { toast } from 'sonner';
+import { Editor } from "@tiptap/react";
+import { BubbleMenu } from "@tiptap/react/menus";
+import { Mic, Pencil, Loader2, StopCircle } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { DOMSerializer } from "prosemirror-model";
+import { processSelectionEditWithAI } from "../lib/aiService";
+import { toast } from "sonner";
 
 export default function VoiceSelectionMenu({ editor }: { editor: Editor }) {
   const [isRecording, setIsRecording] = useState(false);
@@ -13,7 +13,10 @@ export default function VoiceSelectionMenu({ editor }: { editor: Editor }) {
   const recognitionRef = useRef<any>(null);
 
   // Preserve the selection range so we don't lose it if editor blurs
-  const [selectionRange, setSelectionRange] = useState<{ from: number, to: number } | null>(null);
+  const [selectionRange, setSelectionRange] = useState<{
+    from: number;
+    to: number;
+  } | null>(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -43,12 +46,12 @@ export default function VoiceSelectionMenu({ editor }: { editor: Editor }) {
         recognitionRef.current = recognition;
       }
     }
-    
+
     return () => {
       if (recognitionRef.current) {
         recognitionRef.current.stop();
       }
-    }
+    };
   }, []);
 
   const getSelectedHtml = () => {
@@ -65,13 +68,13 @@ export default function VoiceSelectionMenu({ editor }: { editor: Editor }) {
       toast.error("Speech recognition is not supported in this browser.");
       return;
     }
-    
+
     // Save selection range before we start doing things
     setSelectionRange({
       from: editor.state.selection.from,
-      to: editor.state.selection.to
+      to: editor.state.selection.to,
     });
-    
+
     setTranscript("");
     setIsRecording(true);
     try {
@@ -84,24 +87,24 @@ export default function VoiceSelectionMenu({ editor }: { editor: Editor }) {
   const stopRecording = async (e: React.MouseEvent) => {
     e.preventDefault();
     if (!isRecording) return;
-    
+
     recognitionRef.current?.stop();
     setIsRecording(false);
-    
+
     const finalTranscript = transcript.trim();
     if (!finalTranscript) {
       toast.info("No voice command detected.");
       return;
     }
-    
+
     setIsProcessing(true);
-    
+
     try {
       // Re-apply the saved selection if we lost it
       if (selectionRange) {
         editor.commands.setTextSelection(selectionRange);
       }
-      
+
       const selectedHtml = getSelectedHtml();
       if (!selectedHtml) {
         toast.error("No text selected.");
@@ -110,8 +113,11 @@ export default function VoiceSelectionMenu({ editor }: { editor: Editor }) {
       }
 
       toast.info("Applying AI edit...");
-      const newHtml = await processSelectionEditWithAI(selectedHtml, finalTranscript);
-      
+      const newHtml = await processSelectionEditWithAI(
+        selectedHtml,
+        finalTranscript,
+      );
+
       // Replace selection with new HTML
       // insertContent automatically replaces the current selection
       editor.commands.insertContent(newHtml);
@@ -132,23 +138,23 @@ export default function VoiceSelectionMenu({ editor }: { editor: Editor }) {
     <BubbleMenu
       editor={editor}
       updateDelay={100}
-      options={{ placement: 'top' }}
+      options={{ placement: "top" }}
       className="flex items-center gap-1 overflow-hidden rounded-lg border border-primary/30 bg-background/95 p-1 shadow-2xl backdrop-blur-xl"
     >
       {isProcessing ? (
         <div className="flex items-center gap-2 px-3 py-1.5 text-xs text-accent">
           <Loader2 className="h-4 w-4 animate-spin" />
-          <span className="font-tech tracking-wider uppercase">Editing...</span>
+          <span className="font-tech uppercase tracking-wider">Editing...</span>
         </div>
       ) : isRecording ? (
         <div className="flex items-center gap-2 px-2 py-1">
-          <button 
+          <button
             onMouseDown={stopRecording}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-red-500/20 text-red-500 hover:bg-red-500/30 transition-colors"
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-red-500/20 text-red-500 transition-colors hover:bg-red-500/30"
           >
             <StopCircle className="h-4 w-4 animate-pulse" />
           </button>
-          <span className="max-w-[200px] truncate text-xs text-foreground/80 italic pr-2">
+          <span className="max-w-[200px] truncate pr-2 text-xs italic text-foreground/80">
             "{transcript || "Listening..."}"
           </span>
         </div>
@@ -162,7 +168,10 @@ export default function VoiceSelectionMenu({ editor }: { editor: Editor }) {
             Voice Edit
           </button>
           <div className="h-4 w-[1px] bg-primary/20" />
-          <div className="flex items-center gap-2 rounded px-3 py-1.5 text-xs font-medium text-primary/50 cursor-default" title="Just start typing to manually edit the selection">
+          <div
+            className="flex cursor-default items-center gap-2 rounded px-3 py-1.5 text-xs font-medium text-primary/50"
+            title="Just start typing to manually edit the selection"
+          >
             <Pencil className="h-3.5 w-3.5" />
             Manual Edit
           </div>

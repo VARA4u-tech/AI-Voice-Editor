@@ -15,7 +15,8 @@ export async function parseDocument(file: File): Promise<ParsedDocument> {
     throw new Error("Authentication required to parse documents.");
   }
 
-  const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+  const backendUrl =
+    import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
 
   const formData = new FormData();
   formData.append("file", file);
@@ -30,11 +31,13 @@ export async function parseDocument(file: File): Promise<ParsedDocument> {
 
   if (!response.ok) {
     const errText = await response.text();
-    throw new Error(`Failed to parse document (HTTP ${response.status}): ${errText}`);
+    throw new Error(
+      `Failed to parse document (HTTP ${response.status}): ${errText}`,
+    );
   }
 
   const result = await response.json();
-  
+
   // The backend now returns { filename, full_text: "<html>..." }
   return {
     paragraphs: [result.full_text], // HTML string is stored as a single 'paragraph' node for TipTap

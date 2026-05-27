@@ -286,7 +286,8 @@ export async function processSelectionEditWithAI(
   voiceCommand: string,
   retries = 1,
 ): Promise<string> {
-  const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+  const backendUrl =
+    import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
   const { data } = await supabase.auth.getSession();
   const token = data.session?.access_token;
 
@@ -296,7 +297,10 @@ export async function processSelectionEditWithAI(
 
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
-      console.log(`Scribe Core: Processing selection edit (attempt ${attempt + 1})...`, voiceCommand);
+      console.log(
+        `Scribe Core: Processing selection edit (attempt ${attempt + 1})...`,
+        voiceCommand,
+      );
 
       const response = await fetchWithFallback(backendUrl, token, (model) => ({
         model,
@@ -315,13 +319,19 @@ export async function processSelectionEditWithAI(
       let aiContent = data.choices?.[0]?.message?.content || "";
 
       // Clean up markdown blocks if the AI accidentally adds them
-      aiContent = aiContent.replace(/^```html\n?/, "").replace(/^```\n?/, "").replace(/\n?```$/, "").trim();
-      
+      aiContent = aiContent
+        .replace(/^```html\n?/, "")
+        .replace(/^```\n?/, "")
+        .replace(/\n?```$/, "")
+        .trim();
+
       return aiContent || selectedHtml;
     } catch (error) {
       if (attempt === retries) {
         console.error("Selection Edit API Error:", error);
-        throw new Error("All AI providers are currently busy. Please try again.");
+        throw new Error(
+          "All AI providers are currently busy. Please try again.",
+        );
       }
       await delay((attempt + 1) * 2000);
     }
