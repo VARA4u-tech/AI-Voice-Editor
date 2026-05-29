@@ -39,15 +39,9 @@ export function useLenis(options: UseLenisOptions = {}) {
       smoothWheel: options.smoothWheel ?? true,
 
       // ── Touch / Mobile support ──────────────────────────────────────
-      // Pro implementation: Never hijack touch (smoothTouch: false). 
-      // It makes mobile scrolling feel unnatural and jittery.
-      smoothTouch: options.smoothTouch ?? false,
-      // Instead, sync native scroll with Lenis (syncTouch: true)
-      // so scroll-linked animations still work flawlessly.
-      syncTouch: options.syncTouch ?? true,
-      syncTouchLerp: options.syncTouchLerp ?? 0.1,
-      // Keep touch multiplier at 1 for natural native scroll speed
-      touchMultiplier: options.touchMultiplier ?? 1,
+      smoothTouch: options.smoothTouch ?? true,
+      syncTouch: options.syncTouch ?? false,
+      touchMultiplier: options.touchMultiplier ?? 0.6,
       // ────────────────────────────────────────────────────────────────
 
       infinite: options.infinite ?? false,
