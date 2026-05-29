@@ -6,6 +6,12 @@ interface UseLenisOptions {
   easing?: (t: number) => number;
   orientation?: "vertical" | "horizontal";
   smoothWheel?: boolean;
+  /** Enable smooth scroll on touch devices (mobile/tablet) */
+  smoothTouch?: boolean;
+  /** Sync touch inertia to Lenis easing (Lenis v2+) */
+  syncTouch?: boolean;
+  /** Inertia duration for touch devices in seconds (Lenis v2+) */
+  syncTouchLerp?: number;
   touchMultiplier?: number;
   infinite?: boolean;
 }
@@ -14,22 +20,37 @@ interface UseLenisOptions {
  * useLenis — initialises a Lenis smooth-scroll instance and drives its
  * requestAnimationFrame loop for the lifetime of the host component.
  *
+ * Works on desktop (mouse wheel), mobile and tablets (touch).
+ *
  * @returns the Lenis instance ref (useful for programmatic scroll)
  */
 export function useLenis(options: UseLenisOptions = {}) {
   const lenisRef = useRef<Lenis | null>(null);
 
   useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const lenis = new Lenis({
       duration: options.duration ?? 1.2,
       easing:
         options.easing ??
         ((t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t))),
       orientation: options.orientation ?? "vertical",
+      gestureOrientation: "vertical",
       smoothWheel: options.smoothWheel ?? true,
+
+      // ── Touch / Mobile support ──────────────────────────────────────
+      // smoothTouch: true  → Lenis v1 API (intercepts touch events)
+      smoothTouch: options.smoothTouch ?? true,
+      // syncTouch: true    → Lenis v2 API (syncs touch inertia to easing)
+      syncTouch: options.syncTouch ?? true,
+      // Controls how quickly the touch inertia fades (0–1, lower = longer)
+      syncTouchLerp: options.syncTouchLerp ?? 0.075,
+      // Amplifies the touch delta so it feels responsive on mobile
       touchMultiplier: options.touchMultiplier ?? 2,
+      // ────────────────────────────────────────────────────────────────
+
       infinite: options.infinite ?? false,
-    });
+    } as ConstructorParameters<typeof Lenis>[0]);
 
     lenisRef.current = lenis;
 
