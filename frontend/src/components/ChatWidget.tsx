@@ -80,7 +80,7 @@ const ChatWidget = ({ paragraphs, onChat }: ChatWidgetProps) => {
     <div className="fixed bottom-6 left-6 z-50 flex animate-fade-in flex-col items-start">
       {/* Chat Window */}
       {isOpen && (
-        <div className="mb-4 flex h-[450px] w-[320px] flex-col overflow-hidden rounded-lg border border-primary/20 bg-slate-950/80 shadow-2xl backdrop-blur-2xl duration-500 animate-in fade-in slide-in-from-bottom-4 sm:w-[380px]">
+        <div className="mb-4 flex h-[450px] w-[320px] flex-col overflow-hidden rounded-lg border border-primary/20 bg-slate-950/95 shadow-2xl backdrop-blur-sm duration-500 animate-in fade-in slide-in-from-bottom-4 sm:w-[380px]">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-primary/10 bg-primary/5 p-4">
             <div className="flex items-center gap-3">
